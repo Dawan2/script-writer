@@ -16,8 +16,8 @@ sw init → sw outline → sw draft → sw revise → sw export
 
 ## Quickstart
 
-> 当前处于主工作流落地阶段：CLI 入口（`sw --help` / `sw --version`）与 `sw status`（最小版）已可运行，
-> 其余子命令**规划中**（实现进度见 [docs/quickstart.md](docs/quickstart.md)）。
+> 当前处于主工作流落地阶段：CLI 入口（`sw --help` / `sw --version`）、`sw status` 与 `sw outline`（均最小版）
+> 已可运行，其余子命令**规划中**（实现进度见 [docs/quickstart.md](docs/quickstart.md)）。
 
 ```bash
 git clone https://github.com/Dawan2/script-writer.git
@@ -26,10 +26,11 @@ npm ci && npm run build
 node dist/cli/main.js --help   # 或 npm link 后直接运行：sw --help
 ```
 
-创作一个脚本项目（`sw status` 已可用；`sw init` / `sw export` **规划中**，随 W1-P1-T04/T05 落地）：
+创作一个脚本项目（`sw status` / `sw outline` 已可用；`sw init` / `sw export` **规划中**，随 W1-P1-T04/T05 落地）：
 
 ```bash
 sw init my-story    # 交互向导（≤ 4 问），产出可续写的项目脚手架
+sw outline          # 大纲缺失/为空时写入当前脚本类型的模板骨架（内嵌填写引导）
 sw status           # 随时找回："你在第几步、下一步敲什么命令"（末行可直接复制执行）
 sw export           # 导出成稿
 ```

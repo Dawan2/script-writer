@@ -89,6 +89,11 @@
 - **风险**：模板内容质量主观——验收聚焦结构完整与占位变量正确，文案质量留给后续内容槽。
 - **依赖**：T04、T05、T06。
 
+> 状态：领取 —— W3 实现槽（模板库 v1 + 最小 sw outline） / 2026-08-27 / `cursor/w3-outline-templates-5596`
+> （主体已交付：模板三选一齐备（short-video 与 T04 槽字节级同文件）+ `sw outline` 最小版（空态写骨架/幂等/末行可复制命令）；
+> 验收 ① 的命令级 `sw init --template` 联测待 T04 合流、验收 ② 的 `hint()` 接线待 T06，
+> 对照见 `docs/wave-03/work-outline-templates.md` §3/§6）
+
 ### W1-P1-T08 · P2 · `sw doctor` 配置诊断命令
 
 - **目标**：按方案 §6.7 实现 doctor：检查运行时版本、项目文件完整性、`progress.scenes_done` 与磁盘一致性、AI key 有效性（若启用），每项绿/红 + 修复命令。

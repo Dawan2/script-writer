@@ -164,3 +164,19 @@
 | 测试与验证 | 本地实测（Node v22.14.0）：lint ✅ 零警告、typecheck ✅、**test ✅ 77 passed / 0 失败 / 0 跳过（基线 21 条只增不减）**、build ✅、smoke ✅；真实 CLI 端到端：initProject → markSceneDone → `sw status` 输出末行可复制命令（exit 0），非项目目录输出 SW-E011 三段式（exit 1），落盘 YAML 与 SPEC-01 逐键一致 |
 | 阻塞更新 | 无新增；BLK-W1-02 未动（属 P3）。W1-P4-T01/T03 的"待 P1 引擎"前置在引擎与状态源层面已可开工 |
 | 合规声明 | 未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（新增 56 条真实单测全部执行通过）；未重写脚手架/ADR（基线文件仅 program.ts 三处最小改动与 package.json 依赖追加） |
+
+---
+
+## 回执：Wave-03 / 工作槽「实现 W1-P1-T07 模板库 v1 + 最小 sw outline」
+
+| 项目 | 内容 |
+| --- | --- |
+| 波次 / 槽位 | 第 3 波 / 周期 W3 / 工作槽 实现 W1-P1-T07 模板库 v1 + 最小 `sw outline` |
+| 日期 | 2026-08-27（UTC） |
+| 分支 | `cursor/w3-outline-templates-5596`（基于 `cursor/w2-workflow-engine-4cad @ a628de1`，已 push，未开 PR） |
+| 任务进度 | W1-P1-T07 **主体交付**：模板三选一（screenplay / short-video / podcast）齐备 + `sw outline` 最小可用（空态写骨架、幂等不覆盖、步骤补齐 draft、末行可复制命令）；命令级 `sw init --template` 三选一联测待 T04 合流、`hint()` 接线待 T06（任务在 ready-tasks 标记"领取"而非"完成"） |
+| 产出路径 | `templates/{screenplay,podcast}/`（新建）与 `templates/short-video/`、`src/infra/store/templates.ts`、`tests/infra/templates.spec.ts`（三者与 init 槽**字节级一致**，合并零冲突）；`src/infra/store/outlineFile.ts`（三态探测 + 原子写）；`src/app/workflow/{outline,outlineReport}.ts`；`src/cli/commands/outline.ts` + `program.ts` 三处最小改动；`src/core/model/{project,parseProject}.ts` 追加 GAP-03 `expectedSceneCount` 可选字段（解析/序列化无损往返，落盘口径与 init 槽逐字一致）；`tests/` 新增 6 文件 55 单测；`docs/wave-03/work-outline-templates.md`；本回执 |
+| 与并行槽衔接 | T04（init 向导）：short-video 模板、渲染器、其单测三处字节级同文件，模板 id 集合 ≡ `SCRIPT_FORMATS`（其"新增模板目录自动生效"约定下，合并后 `sw init --template` 即三选一）；T06（错误框架）：未新增错误出口，失败渲染全走既有 `renderProjectFailure`，新增 2 处 `TODO(W1-P1-T06)` 标记；`projectFile.ts` 两分支函数互不重名，合并取并集（详见落地说明 §5） |
+| 测试与验证 | 本地实测（Node v22.14.0）：lint ✅ 零警告、typecheck ✅、**test ✅ 132 passed / 0 失败 / 0 跳过（基线 77 条只增不减）**、build ✅、smoke ✅；真实 CLI 端到端：screenplay 项目 `sw outline` 首跑写入骨架（变量代入、无 `{{` 残留、末行 `sw draft 010 --title "开场"`，exit 0）→ 重复运行幂等未改动 → `sw status` 口径一致；非项目目录 SW-E011 三段式（exit 1） |
+| 阻塞更新 | 无新增；BLK-W1-02 未动（属 P3）。T07 关账条件：T04 合流后补命令级三选一联测、T06 合流后补 `hint()` 接线 |
+| 合规声明 | 未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（新增 55 条真实单测全部执行通过）；未重写引擎/脚手架（engine.ts/statusReport.ts/脚手架配置零改动；既有文件仅 program.ts 挂载 3 行、project.ts/parseProject.ts 可选字段追加、templates/README.md 表格更新） |
