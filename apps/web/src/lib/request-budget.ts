@@ -67,7 +67,7 @@ export const REQUEST_BUDGETS: Record<BudgetTier | BudgetOverride, BudgetRow<numb
   write: { label: "写入（默认）", browserMs: 45_000, proxyMs: 40_000, backendLimitMs: null },
   upload: { label: "上传（默认）", browserMs: 240_000, proxyMs: 235_000, backendLimitMs: 180_000 },
   stageSave: { label: "保存阶段文档", browserMs: 330_000, proxyMs: 325_000, backendLimitMs: 300_000 },
-  stageApprove: { label: "确认阶段通过", browserMs: 330_000, proxyMs: 325_000, backendLimitMs: 300_000 },
+  stageApprove: { label: "确认阶段通过", browserMs: 330_000, proxyMs: 325_000, backendLimitMs: 60_000 },
   projectReinitialize: { label: "重新初始化项目", browserMs: 120_000, proxyMs: 115_000, backendLimitMs: 90_000 },
   distributionBriefSave: { label: "保存发行简报", browserMs: 90_000, proxyMs: 85_000, backendLimitMs: 60_000 },
   outlineTitleSync: { label: "同步剧本名", browserMs: 90_000, proxyMs: 85_000, backendLimitMs: 60_000 },
