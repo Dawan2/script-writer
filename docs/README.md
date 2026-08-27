@@ -29,6 +29,7 @@
 | [`wave-02/ready-tasks.md`](./wave-02/ready-tasks.md) | Wave-02 就绪任务队列（WAVE02-GAP 分区：W2-GAP-T01…T06；WAVE02-Q1 分区：W2-Q1-T01…T04，W3 集成并入） | `cursor/w2-gap-adjudication-c82d @ 661b313` + `cursor/w2-q1-p2-cli-adaptation-1f96 @ b9966cd` 分区并集 |
 | [`wave-02/Q1-p2-cli-adaptation.md`](./wave-02/Q1-p2-cli-adaptation.md) | W2 Q1 裁定落地：P2 任务（T02–T09）的 CLI 适配对照、新立 W2-Q1-T01…T04、延后清单与勘误登记（W3 集成并入） | `cursor/w2-q1-p2-cli-adaptation-1f96 @ b9966cd` |
 | [`wave-02/implementation-backlog.md`](./wave-02/implementation-backlog.md) | W2 计划槽：全任务核验积压清单与落地排序（梯队 E1…、跨槽协调项 D1–D7；WAVE02-PLAN 分区随 wave-01/ready-tasks 并入，W3 集成并入） | `cursor/w2-plan-backlog-verification-f51f @ c3c5e8e` |
+| [`wave-02/evidence-and-ci-conventions.md`](./wave-02/evidence-and-ci-conventions.md) | W2 计划槽：证据存档与 CI 约定（E1–E5 证据类型落盘规则、docs/evidence/ 目录与命名约定；W3 集成并入） | `cursor/w2-evidence-ci-conventions-a17c @ 09fbfb8` |
 | [`wave-02/work-error-framework.md`](./wave-02/work-error-framework.md) | W2 实现槽：SPEC-03 错误框架 + SPEC-03-EXT 退出码落地说明（注册表 / 渲染层 / 退出码 0-1-2 / lint 防线 / 验收对照 / T04-T05 对接清单） | `cursor/w2-error-framework-exit-codes-f4d4` |
 | [`wave-02/work-workflow-engine.md`](./wave-02/work-workflow-engine.md) | W2 实现槽：SPEC-02 工作流引擎最小版落地说明（恢复式引擎 / 原子写 / sw status / 并行槽合并注意） | `cursor/w2-workflow-engine-4cad` |
 | [`wave-02/work-init-wizard.md`](./wave-02/work-init-wizard.md) | W2 实现槽：SPEC-01 `sw init` 向导落地说明（验收对照 / GAP-03·06 对照 / 偏差登记 / 交接） | `cursor/w2-init-wizard-87b4` |
