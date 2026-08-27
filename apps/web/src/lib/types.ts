@@ -580,6 +580,9 @@ export type AgentJob = {
   started_at?: string;
   finished_at?: string;
   error_message?: string;
+  error_code?: string;
+  error_category?: string;
+  error_retryable?: boolean;
   raw_log_path?: string;
   raw_log_bytes?: number;
   created_at: string;

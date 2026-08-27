@@ -31,10 +31,23 @@ const CATEGORIES: readonly ApiErrorCategory[] = [
   "runtime"
 ];
 
-/** 界面在读不到错误码时的兜底文案，与服务端注册表同一批措辞。 */
-const UNREADABLE_RESPONSE = {
-  message: "这次请求的返回内容无法读取。",
-  hint: "重试一次；如果还不行，把提示里的追踪号发给客服。"
+/**
+ * 三条客户端错误码的文案，与服务端注册表 client_codes 同一批措辞。
+ * 注册表是唯一事实源，这里是镜像，由 tests/request/client-copy.test.ts 逐字对比防漂移。
+ */
+export const CLIENT_ERROR_TEXT: Record<string, { message: string; hint: string }> = {
+  [CLIENT_ERROR_CODES.RESPONSE_UNREADABLE]: {
+    message: "这次请求的返回内容无法读取。",
+    hint: "重试一次；如果还不行，把提示里的追踪号发给客服。"
+  },
+  [CLIENT_ERROR_CODES.BACKEND_UNREACHABLE]: {
+    message: "服务暂时连不上，不是这次操作有问题。",
+    hint: "稍等一会儿重试；如果长时间连不上，联系团队管理员。"
+  },
+  [CLIENT_ERROR_CODES.BACKEND_TIMEOUT]: {
+    message: "这次请求等待太久已经中断。",
+    hint: "稍后重试；内容多的时候可以拆成几次提交。"
+  }
 };
 
 export class ApiError extends Error {
@@ -103,8 +116,8 @@ export function apiErrorFromResponse(
       code: CLIENT_ERROR_CODES.RESPONSE_UNREADABLE,
       category: "runtime",
       retryable: true,
-      message: UNREADABLE_RESPONSE.message,
-      hint: UNREADABLE_RESPONSE.hint,
+      message: CLIENT_ERROR_TEXT[CLIENT_ERROR_CODES.RESPONSE_UNREADABLE].message,
+      hint: CLIENT_ERROR_TEXT[CLIENT_ERROR_CODES.RESPONSE_UNREADABLE].hint,
       traceId: headerTraceId || text(envelope?.traceId),
       status
     });
@@ -120,6 +133,25 @@ export function apiErrorFromResponse(
     traceId: headerTraceId || text(envelope?.traceId),
     status,
     details: details && typeof details === "object" ? (details as Record<string, unknown>) : undefined
+  });
+}
+
+/**
+ * 传输层失败没有响应体可解析，按注册表文案合成信封。
+ * traceId 要带前缀，表示这次请求没有拿到后端响应。
+ */
+export function apiErrorFromTransport(kind: "unreachable" | "timeout", traceId: string): ApiError {
+  const code =
+    kind === "timeout" ? CLIENT_ERROR_CODES.BACKEND_TIMEOUT : CLIENT_ERROR_CODES.BACKEND_UNREACHABLE;
+  return new ApiError({
+    code,
+    category: "runtime",
+    retryable: true,
+    message: CLIENT_ERROR_TEXT[code].message,
+    hint: CLIENT_ERROR_TEXT[code].hint,
+    traceId,
+    // 一次响应都没拿到，没有 HTTP 状态码可写。
+    status: 0
   });
 }
 
