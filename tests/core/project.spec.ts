@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_EXPECTED_SCENE_COUNT,
   SCHEMA_VERSION,
   SCRIPT_FORMATS,
   createProjectMeta,
@@ -48,5 +49,31 @@ describe('core/model/project', () => {
 
   it('AI 默认关闭（P1 §5.1 "AI 为可空适配器" 硬约束）', () => {
     expect(createProjectMeta({ title: 't' }).settings.ai).toEqual({ enabled: false, provider: null });
+  });
+
+  it('aiEnabled=true 时 settings.ai.enabled 为 true（provider 仍为 null，属后续配置）', () => {
+    expect(createProjectMeta({ title: 't', aiEnabled: true }).settings.ai).toEqual({
+      enabled: true,
+      provider: null,
+    });
+  });
+
+  it('expectedSceneCount 提供时写入顶层字段（GAP-03 裁决）', () => {
+    const meta = createProjectMeta({ title: 't', expectedSceneCount: 8 });
+    expect(meta.expectedSceneCount).toBe(8);
+  });
+
+  it('expectedSceneCount 未提供时字段缺省（可选字段，旧式文件兼容）', () => {
+    expect('expectedSceneCount' in createProjectMeta({ title: 't' })).toBe(false);
+  });
+
+  it('expectedSceneCount 必须是正整数（GAP-03：正整数约束）', () => {
+    expect(() => createProjectMeta({ title: 't', expectedSceneCount: 0 })).toThrow(RangeError);
+    expect(() => createProjectMeta({ title: 't', expectedSceneCount: -3 })).toThrow(RangeError);
+    expect(() => createProjectMeta({ title: 't', expectedSceneCount: 2.5 })).toThrow(RangeError);
+  });
+
+  it('向导第 ③ 问默认值为 5（SPEC-01）', () => {
+    expect(DEFAULT_EXPECTED_SCENE_COUNT).toBe(5);
   });
 });

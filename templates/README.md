@@ -4,8 +4,10 @@
 
 | 模板 | 状态 | 责任任务 |
 | --- | --- | --- |
-| `short-video/` | 规划中 | W1-P1-T04（随 `sw init` 首个模板交付） |
-| `screenplay/`、`podcast/` | 规划中 | W1-P1-T07（模板库 v1） |
+| `short-video/` | **已交付** | W1-P1-T04（随 `sw init` 首个模板交付） |
+| `screenplay/`、`podcast/` | 规划中 | W1-P1-T07（模板库 v1）；落地前 `sw init` 回退 short-video 通用骨架并如实标注 |
 
-模板结构约定（SPEC-01）：`templates/<id>/` 下是一棵带变量占位的文件树，由 `sw init` 渲染为用户项目
-（`project.yaml` + `outline.md` + `characters/` + `scenes/`）。在上述任务落地前，本目录仅含本说明文件。
+模板结构约定（SPEC-01）：`templates/<id>/` 下是一棵带变量占位（`{{key}}`）的文件树，由 `sw init`
+渲染为用户项目（`project.yaml` 由元数据序列化产出，不走模板占位）。命名规约：模板内名为
+`gitignore` 的文件渲染为 `.gitignore`（避免影响本仓库自身忽略规则，且 npm 打包不剥除）。
+新增模板目录后无需改代码，`sw init --template <id>` 与「模板跟随脚本类型」解析自动生效。

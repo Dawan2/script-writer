@@ -219,3 +219,21 @@
 | 测试与验证 | 本地实测（Node v22.14.0）：lint ✅ 零警告、typecheck ✅、**test ✅ 77 passed / 0 失败 / 0 跳过（基线 21 条只增不减）**、build ✅、smoke ✅；真实 CLI 端到端：initProject → markSceneDone → `sw status` 输出末行可复制命令（exit 0），非项目目录输出 SW-E011 三段式（exit 1），落盘 YAML 与 SPEC-01 逐键一致 |
 | 阻塞更新 | 无新增；BLK-W1-02 未动（属 P3）。W1-P4-T01/T03 的"待 P1 引擎"前置在引擎与状态源层面已可开工 |
 | 合规声明 | 未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（新增 56 条真实单测全部执行通过）；未重写脚手架/ADR（基线文件仅 program.ts 三处最小改动与 package.json 依赖追加） |
+
+---
+
+## 回执：Wave-02 / 工作槽「实现 W1-P1-T04 SPEC-01 sw init 向导」
+
+| 项目 | 内容 |
+| --- | --- |
+| 波次 / 槽位 | 第 2 波 / 周期 W2 / 工作槽 实现 W1-P1-T04 SPEC-01 `sw init` 向导 |
+| 日期 | 2026-08-27（UTC） |
+| 分支 | `cursor/w2-init-wizard-87b4`（基于 `cursor/w2-scaffold-ci-ccbf @ 9f61b37`，已 push，未开 PR） |
+| 完成任务 | W1-P1-T04（SPEC-01 init 向导，验收全项对照见 `docs/wave-02/work-init-wizard.md` §3.1）；一并落地 GAP-03 `expectedSceneCount` 写入侧与 GAP-06 退出码约定接口层（对照见同文 §3.2，未虚报 W2-GAP-T03/T06 整任务完成） |
+| 执行依据 | P1 §7 SPEC-01；ADR-0001 §3.6（默认导出 markdown）；W2 GAP 裁决 §3.3/§3.6（`cursor/w2-gap-adjudication-c82d @ 661b313`） |
+| 产出路径 | `src/app/workflow/init.ts`、`src/app/errors/sw-error.ts`、`src/infra/store/{projectFile,templates}.ts`、`src/cli/{run,io}.ts`、`src/cli/commands/init.ts`、`src/core/model/project.ts`（扩展）、`templates/short-video/`（首个模板）、`tests/{app,cli,infra,core}/` 新增/扩展 5 个测试文件、`docs/wave-02/work-init-wizard.md`、quickstart/README/templates 索引与进度更新、本回执 |
+| 功能要点 | 四问向导（回车接受默认、无法识别重问）；`--yes` 与逐旗标跳问；EOF=接受默认（管道/CI 不挂起）；SW-E010/SW-E031 三段式错态；临时目录+rename 原子写（三种目标状态分路径）；退出码 0/1/2（GAP-06，顶层唯一裁定点，业务代码零 process.exit）；`expectedSceneCount` 两模式均显式落盘（GAP-03） |
+| 测试与验证 | 本地实测（Node v22.14.0）：lint ✅ 零警告、typecheck ✅、**test ✅ 69 passed / 9 文件 / 0 失败 / 0 跳过**（基线 21 条全保留 + 新增 48 条）、build ✅、smoke ✅；构建产物实测：`--yes`、管道交互、伪终端 TTY 交互、EOF 全默认、SW-E010（退出码 1）、非法旗标（退出码 2）全通过 |
+| 偏差登记 | 摘要末行暂不印未实现的 `sw status`（TODO 标记 T05 切换点）；错误框架为暂行 SwError（TODO 标记 T06 迁移义务）；新触达码 SW-E031 待 T06 注册表收录——详见 `docs/wave-02/work-init-wizard.md` §4 |
+| 阻塞 | 无新增；BLK-W1-02 未动（本槽 AI 问答仅落布尔开关，未接供应商） |
+| 合规声明 | 未创建子代理；未创建 PR；未删除测试、未跳过失败、未降低 CI 标准（基线 21 条单测原样保留并全数通过）；未重做 ADR-0001/T01/T03 及任何有效架构文档（基线取自已推送脚手架分支，GAP 裁决文档只引用未改写） |

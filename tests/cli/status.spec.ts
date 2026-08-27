@@ -1,10 +1,11 @@
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildProgram } from '../../src/cli/program.js';
 import { runStatus } from '../../src/cli/commands/status.js';
 import { initProject, markSceneDone } from '../../src/app/workflow/engine.js';
+import { runInitWorkflow } from '../../src/app/workflow/init.js';
 import { isSwError, type SwError } from '../../src/app/errors/registry.js';
 import { renderError } from '../../src/app/errors/render.js';
 import { EXIT_OK, EXIT_RUNTIME_ERROR, runCli, type CliIo } from '../../src/cli/run.js';
@@ -141,5 +142,40 @@ describe('cli/commands/status：退出码通道（语义冲突 ① 核销——�
     expect(io.stderr()).toContain('原因：');
     expect(io.stderr()).toContain('怎么办：');
     expect(io.stderr()).toContain('docs/errors/SW-E011.md');
+  });
+});
+
+describe('端到端往返：expectedSceneCount 贯通（语义冲突 ⑥——integration-map 交接项 4）', () => {
+  it('init 写入 → status 读出分母 → markSceneDone 重写不丢字段', async () => {
+    // ① init 向导写入 expectedSceneCount（GAP-03 写入侧）
+    const target = join(dir, 'my-story');
+    await runInitWorkflow(
+      target,
+      { yes: true, scenes: 5 },
+      {
+        ask: () => Promise.resolve(''),
+        info: () => undefined,
+        today: () => '2026-08-27',
+      },
+    );
+    expect(await readFile(join(target, 'project.yaml'), 'utf8')).toContain(
+      'expectedSceneCount: 5',
+    );
+
+    // ② status 以该字段为场景完成度分母（GAP-03 消费侧）
+    await writeFile(join(target, 'scenes', '010-opening.md'), '# 开场', 'utf8');
+    const linesBefore = await runStatus(target);
+    expect(linesBefore.join('\n')).toContain('0/5 场已完成');
+
+    // ③ markSceneDone 经 engine 序列化路径重写文件，字段不得静默丢失（数据丢失级堵点）
+    const marked = await markSceneDone(target, '010');
+    expect(marked.ok).toBe(true);
+    const rewritten = await readFile(join(target, 'project.yaml'), 'utf8');
+    expect(rewritten).toContain('expectedSceneCount: 5');
+    expect(rewritten).toContain('- "010"');
+
+    // ④ 重写后 status 分母保持不变，分子随完成数推进
+    const linesAfter = await runStatus(target);
+    expect(linesAfter.join('\n')).toContain('1/5 场已完成');
   });
 });

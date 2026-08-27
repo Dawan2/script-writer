@@ -55,16 +55,8 @@ export function toExitCode(error: unknown, io: CliIo): ExitCode {
  * 避免 process.exit 截断未刷完的输出流）。
  */
 export async function runCli(argv: readonly string[], io: CliIo = processIo): Promise<ExitCode> {
+  // exitOverride 与 configureOutput 由 buildProgram 在注册子命令前设置（子命令继承）。
   const program = buildProgram(io);
-  program.exitOverride();
-  program.configureOutput({
-    writeOut: (str) => {
-      io.out(str);
-    },
-    writeErr: (str) => {
-      io.err(str);
-    },
-  });
   try {
     await program.parseAsync([...argv]);
     return EXIT_OK;

@@ -27,6 +27,11 @@ export interface ErrorContexts {
   'SW-E010': { dir: string };
   /** SPEC-02：项目命令在非项目目录运行（缺 project.yaml）。 */
   'SW-E011': { cwd: string };
+  /**
+   * SPEC-01：init 目标路径已存在且是文件（W3 集成登记，E010 双现场拆分裁定——
+   * 与「目录非空」文案语义不同，拆码而非同码双文案；SW-E012 留给 GAP-04 文件锁既定规划）。
+   */
+  'SW-E013': { target: string };
   /** SPEC-02：project.yaml schema 版本不兼容。 */
   'SW-E020': { found: string | number; supported: number };
   /** SPEC-02：project.yaml 存在但不是合法 YAML（引擎 loadProject 的 invalid-yaml 分支，W3 集成登记）。 */
@@ -35,6 +40,8 @@ export interface ErrorContexts {
   'SW-E022': { issues: readonly string[] };
   /** SPEC-02：场景 id 不存在（附现有 id 列表）。 */
   'SW-E030': { sceneId: string; existingIds: readonly string[] };
+  /** SPEC-01：--template 指定的模板不存在（init 向导实际触达，W3 集成随 init 并入同提交登记）。 */
+  'SW-E031': { templateId: string; available: readonly string[] };
 }
 
 export type ErrorCode = keyof ErrorContexts;
@@ -58,7 +65,8 @@ export interface ErrorSpec<C extends ErrorCode = ErrorCode> {
  * 错误码注册表（全部来自 SPEC-01/02 的实际触达路径）。
  * 段位含义（SPEC-03 注册表）：E01x 项目/文件系统；E02x 状态/版本；E03x 输入校验；
  * E04x AI 供应商（未登记：AI 默认关闭、无触达路径，登记即违反「禁止预填未用码」）。
- * W3 集成追加：E021/E022（工作流引擎 loadProject 实际触达，语义冲突 ② 核销）。
+ * W3 集成追加：E021/E022（工作流引擎 loadProject 实际触达，语义冲突 ② 核销）；
+ * E013/E031（init 向导实际触达，语义冲突 ③④ 核销；E012 留给 GAP-04 文件锁）。
  */
 export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
   'SW-E010': {
@@ -72,6 +80,12 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     why: '未找到 project.yaml（查找位置：{cwd}）。',
     fix: '运行 `sw init` 新建项目，或 cd 到既有项目目录。',
     example: { cwd: '/home/writer/somewhere' },
+  },
+  'SW-E013': {
+    what: '目标路径已存在且不是目录',
+    why: '{target} 是一个文件，无法作为项目目录。',
+    fix: '换一个目录名，或移走该文件后重试 `sw init <dir>`。',
+    example: { target: './my-script' },
   },
   'SW-E020': {
     what: 'project.yaml 的 schema 版本不兼容',
@@ -96,6 +110,12 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     why: 'scenes/ 目录中没有编号为 {sceneId} 的场景文件。',
     fix: '从现有场景中选择一个编号：{existingIds}；或运行 `sw draft {sceneId} --title "<标题>"` 新建这一场。',
     example: { sceneId: '040', existingIds: ['010', '020', '030'] },
+  },
+  'SW-E031': {
+    what: '模板不存在：{templateId}',
+    why: 'templates/ 下没有名为 {templateId} 的模板目录。',
+    fix: '可用模板：{available}。换用 `--template <id>`，或省略该旗标（默认跟随脚本类型）。',
+    example: { templateId: 'nope', available: ['short-video'] },
   },
 };
 

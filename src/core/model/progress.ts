@@ -49,7 +49,12 @@ export function isStepBefore(a: WorkflowStep, b: WorkflowStep): boolean {
   return stepIndex(a) < stepIndex(b);
 }
 
-/** 场景完成度：已记录完成数 / 磁盘实际场文件数（sw status 的 "3/5 场已完成"）。 */
+/**
+ * 场景完成度（sw status 的 "3/5 场已完成"）：
+ * 分母优先取 GAP-03 的 expectedSceneCount（init 向导第 ③ 问答案）；
+ * 字段缺省时退化为磁盘实际场文件数（engine 既定行为，比裁决文本的
+ * scenes_done 长度信息量更足，作为集成决策登记于 wave-03 落地说明）。
+ */
 export interface SceneCompletion {
   done: number;
   total: number;
@@ -58,6 +63,10 @@ export interface SceneCompletion {
 export function sceneCompletion(
   progress: ProjectProgress,
   disk: ProjectDiskSnapshot,
+  expectedSceneCount?: number,
 ): SceneCompletion {
-  return { done: progress.scenesDone.length, total: disk.sceneIds.length };
+  return {
+    done: progress.scenesDone.length,
+    total: expectedSceneCount ?? disk.sceneIds.length,
+  };
 }

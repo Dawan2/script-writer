@@ -15,17 +15,20 @@ import {
 import { formatTemplate, renderError, renderHint } from '../../src/app/errors/render.js';
 
 describe('app/errors/registry：错误码注册表（SPEC-03）', () => {
-  it('恰好收录 SPEC-01/02 实际触达的错误码（「禁止预填未用码」回归锁，W1-P1-T06 风险条款；W3 集成追加引擎触达的 E021/E022）', () => {
+  it('恰好收录 SPEC-01/02 实际触达的错误码（「禁止预填未用码」回归锁，W1-P1-T06 风险条款；W3 集成追加引擎触达的 E021/E022 与 init 触达的 E013/E031）', () => {
     expect([...ERROR_CODES].sort()).toEqual([
       'SW-E010',
       'SW-E011',
+      'SW-E013',
       'SW-E020',
       'SW-E021',
       'SW-E022',
       'SW-E030',
+      'SW-E031',
     ]);
-    // AI 段 SW-E04x 在 AI 适配器落地前不得登记
+    // AI 段 SW-E04x 在 AI 适配器落地前不得登记；SW-E012 留给 GAP-04 文件锁（落地前不预填）
     expect(ERROR_CODES.some((code) => code.startsWith('SW-E04'))).toBe(false);
+    expect(ERROR_CODES.includes('SW-E012' as (typeof ERROR_CODES)[number])).toBe(false);
   });
 
   it.each(ERROR_CODES)('%s：码格式为 SW-E + 三位数字，且段位可解析', (code) => {

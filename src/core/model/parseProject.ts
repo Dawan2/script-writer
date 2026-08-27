@@ -14,12 +14,14 @@ import {
 } from './project.js';
 import { isWorkflowStep } from './workflow.js';
 
-/** project.yaml v1 的磁盘形态（键名与 SPEC-01 示例一致）。 */
+/** project.yaml v1 的磁盘形态（键名与 SPEC-01 示例一致；expectedSceneCount 为 GAP-03 顶层可选字段）。 */
 export interface ProjectFileShape {
   schema: number;
   title: string;
   format: string;
   created: string;
+  /** 预计场数（正整数，向导第 ③ 问答案；可选，旧式文件缺省仍可读——GAP-03/W2-GAP-T03）。 */
+  expectedSceneCount?: number;
   settings: {
     ai: { enabled: boolean; provider: string | null };
     export: { default: string };
@@ -78,6 +80,21 @@ export function parseProjectMeta(data: unknown): ParseProjectResult {
     issues.push('created 必须是 ISO 日期（YYYY-MM-DD）');
   }
 
+  // GAP-03 可选字段：缺省合法（旧式文件兼容）；出现则必须是正整数。
+  const expectedSceneCountRaw = data['expectedSceneCount'];
+  let expectedSceneCount: number | undefined;
+  if (expectedSceneCountRaw !== undefined && expectedSceneCountRaw !== null) {
+    if (
+      typeof expectedSceneCountRaw !== 'number' ||
+      !Number.isInteger(expectedSceneCountRaw) ||
+      expectedSceneCountRaw < 1
+    ) {
+      issues.push('expectedSceneCount 必须是正整数（或省略该字段）');
+    } else {
+      expectedSceneCount = expectedSceneCountRaw;
+    }
+  }
+
   const settings = data['settings'];
   let ai: { enabled: boolean; provider: string | null } | null = null;
   let exportDefault: string | null = null;
@@ -133,6 +150,7 @@ export function parseProjectMeta(data: unknown): ParseProjectResult {
       title: (title as string).trim(),
       format: format as ProjectMeta['format'],
       created: createdText as string,
+      ...(expectedSceneCount !== undefined ? { expectedSceneCount } : {}),
       settings: { ai, export: { default: exportDefault } },
       progress: { step, scenesDone },
     },
@@ -146,6 +164,10 @@ export function toProjectFileShape(meta: ProjectMeta): ProjectFileShape {
     title: meta.title,
     format: meta.format,
     created: meta.created,
+    // 可选字段仅在存在时写入（往返不丢、缺省不冒出 null——GAP-03 数据丢失级风险的存储侧堵点）
+    ...(meta.expectedSceneCount !== undefined
+      ? { expectedSceneCount: meta.expectedSceneCount }
+      : {}),
     settings: {
       ai: { enabled: meta.settings.ai.enabled, provider: meta.settings.ai.provider },
       export: { default: meta.settings.export.default },

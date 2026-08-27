@@ -134,7 +134,7 @@ export async function readStatus(projectDir: string): Promise<ReadStatusResult> 
     status: {
       meta: loaded.meta,
       disk,
-      scenes: sceneCompletion(loaded.meta.progress, disk),
+      scenes: sceneCompletion(loaded.meta.progress, disk, loaded.meta.expectedSceneCount),
     },
   };
 }
