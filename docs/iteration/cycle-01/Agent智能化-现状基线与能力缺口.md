@@ -306,9 +306,10 @@
 
 #### G-17 阶段状态与产物脱钩（中）
 
-进度文件可以把 `world_view` 标为 `completed` 而工作区里没有 `2.1-world-view.json`；
-`init-trial.mjs` 经 `writeStageExecutionSpec` → `getAdaptationContext` 强依赖该文件存在，
-于是报"世界观不存在或不是有效 JSON"。本槽实测：`apps/api` 中
+`update-progress.mjs:78-99` 把 `output_files` 原样记入进度，从不校验这些文件是否存在，
+因此进度可以把 `world_view` 标为 `completed` 而工作区里没有 `2.1-world-view.json`；
+而 `init-trial.mjs` 经 `writeStageExecutionSpec` → `getAdaptationContext` 强依赖该文件存在，
+于是报"世界观不存在或不是有效 JSON"——一句面向内部的解析错误。本槽实测：`apps/api` 中
 `test_script_output_contracts` 的 4 个用例因此失败，覆盖的正是**试稿/全稿的字数下限与
 可选目标语台词这两条验收规则**——即 A 类问题最需要回归的地方恰好跑不起来。
 
