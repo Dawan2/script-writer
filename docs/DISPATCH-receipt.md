@@ -131,3 +131,20 @@
 | 本槽范围 | 仅提案与任务核验，未做功能开发；未开 PR |
 | 阻塞 | 承接 P1 的 B1（假设 A1–A4 待调度器确认，默认推进）；P4 全部任务前置于 W1-P1-T03/T05/T06（脚手架/引擎/错误框架），已逐条登记依赖，不空转 |
 | 合规声明 | 未创建子代理；未创建 PR；未删测/跳过失败/降低 CI 标准（仓库当前无测试与 CI，亦未引入绕过机制）；未改写其他槽已推送文档，本分支三个文件均为基线上新建 |
+
+---
+
+## 回执：Wave-02 / 工作槽「实现脚手架 + CI」
+
+| 项目 | 内容 |
+| --- | --- |
+| 波次 / 槽位 | 第 2 波 / 周期 W2 落地 / 工作槽 实现脚手架 + CI（解除 BLK-W1-01） |
+| 日期 | 2026-08-27（UTC） |
+| 分支 | `cursor/w2-scaffold-ci-ccbf`（基于 `main @ deda75a`，已 push，未开 PR） |
+| 完成任务 | W1-P1-T02（ADR-0001 定栈定形态）、W1-P1-T03（脚手架 + CI 基线）、W1-P1-T01（README 路由页，余力项） |
+| 执行依据 | 调度器默认执行确认：采用 P1 假设 A1–A4（脚本创作工具 / AI 可选 / CLI 优先 / TypeScript）；B1 就此关闭 |
+| 产出路径 | `docs/adr/0001-stack-and-product-shape.md`；`package.json`/`package-lock.json`/`tsconfig*.json`/`eslint.config.js`/`vitest.config.ts`/`.gitignore`；`src/{core,app,cli,infra}/`；`tests/`（5 文件 21 单测）；`.github/workflows/ci.yml`；`templates/README.md`；`README.md` + `docs/quickstart.md`；`docs/wave-02/work-scaffold-ci.md`；本回执 |
+| 文档合并 | 已将 W1-D/P1/W1-A/P3/P4 五分支 docs 并入本分支（正文原样保留；`ready-tasks.md` 取 P1+P3+P4 分区并集、本文件取五份回执并集）；P2 分支不在参考清单内未并入，其文档仍在原分支有效 |
+| 测试与验证 | 本地实测（Node v22.14.0）：`npm run lint` ✅ 零警告、`npm run typecheck` ✅、`npm test` ✅ **21 passed / 0 失败 / 0 跳过**、`npm run build` ✅、`npm run smoke` ✅（`sw --version`→`0.1.0`、`--help` 输出五步路线图）；`npm link` 后 `sw` 与别名 `script-writer` 均可执行。CI（push+PR 触发，Node 20/22 矩阵）随本分支 push 生效 |
+| 阻塞更新 | **BLK-W1-01 解除**（定栈 + 可构建骨架入库）；**BLK-W1-03 解除**（CI 入库，合并 main 后完全生效）；BLK-W1-02 未动（属 P3 范围）；B1 关闭（调度器确认 A1–A4） |
+| 合规声明 | 未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（本槽为仓库首次引入测试与 CI，21 条单测全部真实执行并通过）；未重做/覆盖任何有效架构文档（全部原样并入） |
