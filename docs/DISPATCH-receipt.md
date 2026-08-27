@@ -166,3 +166,21 @@
 | 偏差登记 | 摘要末行暂不印未实现的 `sw status`（TODO 标记 T05 切换点）；错误框架为暂行 SwError（TODO 标记 T06 迁移义务）；新触达码 SW-E031 待 T06 注册表收录——详见 `docs/wave-02/work-init-wizard.md` §4 |
 | 阻塞 | 无新增；BLK-W1-02 未动（本槽 AI 问答仅落布尔开关，未接供应商） |
 | 合规声明 | 未创建子代理；未创建 PR；未删除测试、未跳过失败、未降低 CI 标准（基线 21 条单测原样保留并全数通过）；未重做 ADR-0001/T01/T03 及任何有效架构文档（基线取自已推送脚手架分支，GAP 裁决文档只引用未改写） |
+
+---
+
+## 回执：Wave-03 / 工作槽「实现 W1-P1-T08 sw doctor」
+
+| 项目 | 内容 |
+| --- | --- |
+| 波次 / 槽位 | 第 3 波 / 周期 W3 落地 / 工作槽 实现 W1-P1-T08 `sw doctor` |
+| 日期 | 2026-08-27（UTC） |
+| 分支 | `cursor/w3-doctor-3e3d`（基于 `cursor/w2-init-wizard-87b4 @ 4be6a21`，已 push，未开 PR） |
+| 完成任务 | W1-P1-T08（`sw doctor` 配置诊断，验收①②③对照见 `docs/wave-03/work-doctor.md` §3）；一并按 GAP-04 裁决预留锁健康检查承接位（可注册检查项数组 + 「未实现」跳过态） |
+| 执行依据 | P1 §6.7；ready-tasks W1-P1-T08；W2 GAP 裁决 §3.4（GAP-04 锁检查预留、SW-E012 已被锁占用预留）/§3.6（GAP-06 退出码）；调度指令「锁未实现则检查项报『未实现』但不崩溃」 |
+| 产出路径 | `src/app/diagnostics/{checks,doctor,validate}.ts`、`src/cli/commands/doctor.ts`、`src/infra/store/projectMetaRead.ts`（project.yaml 子集解析读侧，T05 可替换）、`src/cli/program.ts`（注册 + 路线图）、`tests/{app/diagnostics,cli/doctor,infra/projectMetaRead}.spec.ts` 新增 3 个测试文件、`docs/wave-03/work-doctor.md`、quickstart/README/ready-tasks/docs 索引进度更新、本回执 |
+| 功能要点 | 七项可注册检查（运行时版本 / 项目文件 / 元数据 schema / 目录布局 / scenes_done 磁盘一致性 / 项目锁 / AI key），逐项 ✔绿 ✖红 ○跳过，红项必附可复制「修复」命令；锁与 AI 网关未实现按「未实现」跳过不计红、不崩溃；退出码全绿 0 否则 1（红项聚合经 `SW-E013` 三段式，顶层唯一裁定点，GAP-06）；单项检查异常转红项，报告始终完整产出 |
+| 测试与验证 | 本地实测（Node v22.14.0）五件套：lint ✅ 零警告、typecheck ✅、**test ✅ 105 passed / 12 文件 / 0 失败 / 0 跳过**（基线 69 条全保留 + 新增 36 条）、build ✅、smoke ✅；构建产物实测：健康项目全绿退出码 0、三类人为损坏（删 project.yaml / 改坏 schema / scenes_done 与磁盘不符）各得红项 + 修复命令且退出码 1、修复后回归全绿、非项目目录运行不崩溃 |
+| 偏差登记 | 锁与 AI key 检查报「未实现」跳过（W2-GAP-T04 / TASK-P3-01 未交付，不虚假绿红）；schema 校验用 infra 子集解析器（T05 严格解析器落地后可替换）；红项聚合码取 SW-E013（E012 已被 GAP-04 预留），待 T06 注册表收录——详见 `docs/wave-03/work-doctor.md` §4 |
+| 阻塞 | 无新增；BLK-W1-02 未动（AI 检查仅消费 settings.ai.enabled 布尔） |
+| 合规声明 | 未创建子代理；未创建 PR；未删除测试、未跳过失败、未降低 CI 标准（基线 69 条单测原样保留并全数通过）；未重做 init/脚手架及任何有效架构文档（基线取自已推送 init 向导分支，GAP 裁决文档只引用未改写） |

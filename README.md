@@ -16,7 +16,7 @@ sw init → sw outline → sw draft → sw revise → sw export
 
 ## Quickstart
 
-> 当前进度：CLI 入口与 **`sw init` 向导已可用**，其余四步子命令**规划中**
+> 当前进度：CLI 入口、**`sw init` 向导与 `sw doctor` 自检已可用**，其余四步子命令**规划中**
 > （逐命令实现进度见 [docs/quickstart.md](docs/quickstart.md)）。
 
 ```bash
@@ -24,6 +24,7 @@ git clone https://github.com/Dawan2/script-writer.git
 cd script-writer
 npm ci && npm run build && npm link   # npm link 后可直接运行 sw
 sw init my-story                      # 交互向导（≤ 4 问）；--yes 全默认非交互
+sw doctor my-story                    # 项目自检：逐项绿/红 + 修复命令（全绿退出码 0）
 ```
 
 后续步骤（**规划中**，随 W1-P1-T05 落地）：

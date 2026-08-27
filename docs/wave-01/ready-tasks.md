@@ -95,6 +95,8 @@
 - **风险**：低。检查项清单会随功能增长——在代码中以可注册检查项数组组织，避免巨型函数。
 - **依赖**：T05、T06。
 
+> 状态：完成 —— W3 实现槽（doctor） / 2026-08-27 / `cursor/w3-doctor-3e3d`（按调度指令先于 T05/T06 落地：schema 校验用 infra 子集解析器、错误走暂行 SwError、锁与 AI key 检查报「未实现」跳过，验收对照与偏差登记见 `docs/wave-03/work-doctor.md`）
+
 ### W1-P1-T09 · P2 · 用户文档 IA 落地
 
 - **目标**：按方案 §6.6 建立 `docs/quickstart.md`（补全 T01 占位）、`docs/concepts/`（领域词汇表）、`docs/reference/`（命令逐条，含 ≥1 可复制示例）并接通互链闭环（help ↔ docs ↔ 错误锚点）。
