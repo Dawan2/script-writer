@@ -25,6 +25,7 @@
 | 文档 | 内容一句话 | 所在分支 @ commit |
 | --- | --- | --- |
 | [`wave-02/work-scaffold-ci.md`](./wave-02/work-scaffold-ci.md) | W2 实现槽：脚手架 + CI 落地说明（做了什么 / 如何跑测试 / 验收对照 / 阻塞更新） | `cursor/w2-scaffold-ci-ccbf`（本分支） |
+| [`wave-02/work-workflow-engine.md`](./wave-02/work-workflow-engine.md) | W2 实现槽：SPEC-02 工作流引擎最小版落地说明（恢复式引擎 / 原子写 / sw status / 并行槽合并注意） | `cursor/w2-workflow-engine-4cad` |
 
 ## 决策与用户文档（W2 起建立）
 

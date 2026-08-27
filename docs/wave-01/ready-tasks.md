@@ -69,6 +69,10 @@
 - **风险**：范围最大的一项——若超载，按方案 §8 回退策略砍导出格式，不砍 status 可恢复性。
 - **依赖**：T03、T04（消费其产出的 project.yaml）。
 
+> 状态：领取 —— W2 实现槽（工作流引擎最小版） / 2026-08-27 / `cursor/w2-workflow-engine-4cad`
+> （最小版已交付：恢复式引擎 + schema v1 解析 + 原子写 + `sw status`，引擎级端到端进 CI；
+> `sw outline/draft/export` 子命令本体待后续槽，验收对照见 `docs/wave-02/work-workflow-engine.md` §3/§4）
+
 ### W1-P1-T06 · P1 · 实现 SPEC-03 统一错误与空态框架
 
 - **目标**：按方案 §7 SPEC-03 落地错误码注册表、`fail()/hint()` 渲染层、`docs/errors/` 生成器与注册表 lint（进 CI）。

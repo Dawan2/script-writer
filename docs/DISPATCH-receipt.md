@@ -148,3 +148,19 @@
 | 测试与验证 | 本地实测（Node v22.14.0）：`npm run lint` ✅ 零警告、`npm run typecheck` ✅、`npm test` ✅ **21 passed / 0 失败 / 0 跳过**、`npm run build` ✅、`npm run smoke` ✅（`sw --version`→`0.1.0`、`--help` 输出五步路线图）；`npm link` 后 `sw` 与别名 `script-writer` 均可执行。CI（push+PR 触发，Node 20/22 矩阵）随本分支 push 生效 |
 | 阻塞更新 | **BLK-W1-01 解除**（定栈 + 可构建骨架入库）；**BLK-W1-03 解除**（CI 入库，合并 main 后完全生效）；BLK-W1-02 未动（属 P3 范围）；B1 关闭（调度器确认 A1–A4） |
 | 合规声明 | 未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（本槽为仓库首次引入测试与 CI，21 条单测全部真实执行并通过）；未重做/覆盖任何有效架构文档（全部原样并入） |
+
+---
+
+## 回执：Wave-02 / 工作槽「实现 W1-P1-T05 SPEC-02 工作流引擎最小版」
+
+| 项目 | 内容 |
+| --- | --- |
+| 波次 / 槽位 | 第 2 波 / 周期 W2 落地 / 工作槽 实现 W1-P1-T05 SPEC-02 工作流引擎最小版 |
+| 日期 | 2026-08-27（UTC） |
+| 分支 | `cursor/w2-workflow-engine-4cad`（基于 `cursor/w2-scaffold-ci-ccbf @ 9f61b37`，已 push，未开 PR） |
+| 任务进度 | W1-P1-T05 **最小版交付**：恢复式引擎 + 状态机 + 原子写 + `sw status`；`sw outline/draft/export` 子命令本体不在本槽（引擎原语已备好，任务在 ready-tasks 标记"领取"而非"完成"） |
+| 产出路径 | `src/core/model/{parseProject,progress}.ts`（零 IO：schema v1 解析/序列化 + 进度状态机）；`src/infra/store/{atomicFile,projectFile}.ts`（临时文件+rename 原子写、YAML 存取、目录扫描）；`src/app/workflow/{engine,statusReport}.ts`（恢复式引擎含 T04 init 挂钩、三段式渲染）；`src/cli/commands/status.ts` + `program.ts` 三处最小改动；`tests/` 新增 7 文件 56 单测；`package.json` 增 `yaml` 依赖；`docs/wave-02/work-workflow-engine.md`；本回执 |
+| 与并行槽衔接 | T04（init 向导）：调 `initProject` 挂钩即得"原子写 project.yaml + 目录骨架 + 重复 init 报错不破坏现场"；T06（错误框架）：迁移点集中在 `ProjectFailure` 判别联合与 `renderProjectFailure`，均有 `TODO(W1-P1-T06)` 标记；CLI 冲突面刻意压到 3 行（详见落地说明 §5） |
+| 测试与验证 | 本地实测（Node v22.14.0）：lint ✅ 零警告、typecheck ✅、**test ✅ 77 passed / 0 失败 / 0 跳过（基线 21 条只增不减）**、build ✅、smoke ✅；真实 CLI 端到端：initProject → markSceneDone → `sw status` 输出末行可复制命令（exit 0），非项目目录输出 SW-E011 三段式（exit 1），落盘 YAML 与 SPEC-01 逐键一致 |
+| 阻塞更新 | 无新增；BLK-W1-02 未动（属 P3）。W1-P4-T01/T03 的"待 P1 引擎"前置在引擎与状态源层面已可开工 |
+| 合规声明 | 未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（新增 56 条真实单测全部执行通过）；未重写脚手架/ADR（基线文件仅 program.ts 三处最小改动与 package.json 依赖追加） |
