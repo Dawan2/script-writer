@@ -54,6 +54,17 @@ def episode(episode_number: int) -> dict:
     }
 
 
+def world_view() -> dict:
+    return {
+        "世界观描述": f"故事发生在美国西海岸的新闻编辑部，{LOCALIZED_ROLE_NAME}在这里追查一桩被压下的旧案。",
+        "关键概念映射": [{
+            "原设定": "宗族祠堂",
+            "新设定": "家族基金会董事会",
+            "改编理由": "让权力压制在北美语境下成立。",
+        }],
+    }
+
+
 def outline(script_name: str) -> dict:
     return {
         "剧本名称": script_name,
@@ -148,6 +159,9 @@ class ScriptOutputContractsTest(unittest.TestCase):
         )
         (self.workspace / "1.2-project-progress.json").write_text(
             json.dumps(progress, ensure_ascii=False), encoding="utf-8"
+        )
+        (self.workspace / "2.1-world-view.json").write_text(
+            json.dumps(world_view(), ensure_ascii=False), encoding="utf-8"
         )
         (self.workspace / "3.1-outline.json").write_text(
             json.dumps(outline(script_name), ensure_ascii=False), encoding="utf-8"

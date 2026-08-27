@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { createEmptyKnowledgeLibrary, createKnowledgeLibrary } from "./helpers/knowledge-library.mjs";
 import { buildDistributionBrief } from "../.claude/tools/distribution-brief.mjs";
 import { resolveScriptProfile } from "../.claude/tools/resolve-script-profile.mjs";
 import { initializeWorldView } from "../.claude/skills/world_view/scripts/init-world-view.mjs";
@@ -35,6 +37,12 @@ test("公共执行规范通过阶段配置表达差异，不硬编码世界观�
   assert.equal(STAGE_EXECUTION_CONFIG.world_view.execution_target, "世界观创作");
   assert.deepEqual(STAGE_EXECUTION_CONFIG.world_view.output_contract.top_level_fields, ["世界观描述", "关键概念映射"]);
 });
+
+async function createKnowledgeDb(t) {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "orca-knowledge-"));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  return createKnowledgeLibrary(directory);
+}
 
 async function writeJson(filePath, value) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -72,6 +80,7 @@ async function createWorkspace(t, { taskType = "rewrite", useFormulas = false, a
 
 test("世界观初始化只生成事实规范，执行策略单独加载原则且改写场景不加载公式", async (t) => {
   const workspace = await createWorkspace(t);
+  const knowledgeDbPath = await createKnowledgeDb(t);
   const first = await initializeWorldView(workspace, "tester");
   assert.equal(first.execution_spec_directory, path.dirname(first.execution_spec_file));
   const spec = await fs.readFile(first.execution_spec_file, "utf8");
@@ -80,7 +89,8 @@ test("世界观初始化只生成事实规范，执行策略单独加载原则�
   assert.doesNotMatch(spec, /## 执行原则/u);
   assert.doesNotMatch(spec, /## 策略公式/u);
 
-  const strategyResult = await getWorldViewExecutionStrategy(workspace);
+  const strategyResult = await getWorldViewExecutionStrategy(workspace, { knowledgeDbPath });
+  assert.equal(strategyResult.knowledge_status, "loaded");
   const strategy = await fs.readFile(strategyResult.execution_strategy_file, "utf8");
   const strategySnapshot = JSON.parse(await fs.readFile(
     path.join(path.dirname(strategyResult.execution_strategy_file), "execution-strategy.json"),
@@ -133,7 +143,10 @@ test("标签确定前执行策略不获取任何知识，重新初始化后可�
     audience: "女频"
   });
   const refreshed = await initializeWorldView(workspace, "tester");
-  const strategyResult = await getWorldViewExecutionStrategy(workspace);
+  const strategyResult = await getWorldViewExecutionStrategy(workspace, {
+    knowledgeDbPath: await createKnowledgeDb(t)
+  });
+  assert.equal(strategyResult.knowledge_status, "loaded");
   const current = await fs.readFile(strategyResult.execution_strategy_file, "utf8");
   assert.match(current, /## 策略公式/u);
   const formulaName = current.match(/^\| (?!使用场景|---)[^|]+ \| ([^|]+) \|$/mu)?.[1]?.trim();
@@ -176,7 +189,9 @@ test("公式是否可用由当前场景策略决定，而不是由改写类型�
   const result = await initializeWorldView(workspace, "tester");
   const spec = await fs.readFile(result.execution_spec_file, "utf8");
   assert.doesNotMatch(spec, /## 策略公式/u);
-  const strategyResult = await getWorldViewExecutionStrategy(workspace);
+  const strategyResult = await getWorldViewExecutionStrategy(workspace, {
+    knowledgeDbPath: await createKnowledgeDb(t)
+  });
   const strategy = await fs.readFile(strategyResult.execution_strategy_file, "utf8");
   assert.match(strategy, /请遵循`执行原则`，按需使用`策略公式`/u);
   assert.match(strategy, /## 策略公式/u);
@@ -184,10 +199,47 @@ test("公式是否可用由当前场景策略决定，而不是由改写类型�
   assert.doesNotMatch(strategy, /执行脚本|get-strategy-formula\.mjs|--workspace|--stage/u);
 });
 
+test("知识库为空时执行策略如实标记未取到知识，并在文件中说明", async (t) => {
+  const workspace = await createWorkspace(t, { useFormulas: true });
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "orca-knowledge-empty-"));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  await initializeWorldView(workspace, "tester");
+
+  const strategyResult = await getWorldViewExecutionStrategy(workspace, {
+    knowledgeDbPath: await createEmptyKnowledgeLibrary(directory)
+  });
+
+  assert.equal(strategyResult.knowledge_status, "empty");
+  assert.equal(strategyResult.principle_count, 0);
+  const strategy = await fs.readFile(strategyResult.execution_strategy_file, "utf8");
+  assert.match(strategy, /创作知识库中还没有适用于本阶段和当前剧本标签的创作原则/u);
+  assert.doesNotMatch(strategy, /## 执行原则/u);
+  assert.doesNotMatch(strategy, /剧本标签尚未全部确定/u);
+});
+
+test("执行策略谎称已取到创作原则时门禁不放行", async (t) => {
+  const workspace = await createWorkspace(t);
+  await initializeWorldView(workspace, "tester");
+  const strategyResult = await getWorldViewExecutionStrategy(workspace, {
+    knowledgeDbPath: await createKnowledgeDb(t)
+  });
+  const snapshotPath = path.join(path.dirname(strategyResult.execution_strategy_file), "execution-strategy.json");
+  const snapshot = JSON.parse(await fs.readFile(snapshotPath, "utf8"));
+  snapshot.principles = [];
+  await fs.writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+  const input = JSON.parse(await fs.readFile(path.join(workspace, "1.1-user-input.json"), "utf8"));
+
+  const issues = await stageExecutionStrategyIssues(workspace, "world_view", input);
+
+  assert.match(issues.join("\n"), /标记为已获取创作原则，实际一条都没有/u);
+});
+
 test("旧执行策略快照含成立原因时要求重新生成", async (t) => {
   const workspace = await createWorkspace(t);
   await initializeWorldView(workspace, "tester");
-  const strategyResult = await getWorldViewExecutionStrategy(workspace);
+  const strategyResult = await getWorldViewExecutionStrategy(workspace, {
+    knowledgeDbPath: await createKnowledgeDb(t)
+  });
   const strategyPath = strategyResult.execution_strategy_file;
   const snapshotPath = path.join(path.dirname(strategyPath), "execution-strategy.json");
   const snapshot = JSON.parse(await fs.readFile(snapshotPath, "utf8"));

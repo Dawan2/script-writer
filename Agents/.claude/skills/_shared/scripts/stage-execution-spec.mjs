@@ -12,6 +12,7 @@ import { pendingScriptProfileFields } from "../../../tools/script-profile.mjs";
 
 const agentRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const defaultKnowledgeDbPath = path.resolve(agentRoot, "../data/workbench.sqlite3");
+const KNOWLEDGE_STATUSES_AFTER_LOOKUP = Object.freeze(["loaded", "empty", "unavailable"]);
 
 const CREATIVE_STAGE_DEFAULTS = Object.freeze({
   include_adaptation_context: true,
@@ -492,10 +493,20 @@ ${renderNumbered(requirements, config.empty_requirements)}${scriptProfileSection
 
 function renderExecutionStrategy(snapshot, stage) {
   const config = stageConfig(stage);
-  if (snapshot.knowledge_status !== "loaded") {
+  if (snapshot.knowledge_status === "skipped_unresolved_profile") {
     return `# 执行策略
 
 剧本标签尚未全部确定，本次不获取创作原则和策略公式。完成标签后，重新调用“执行策略”工具。\n`;
+  }
+  if (snapshot.knowledge_status === "unavailable") {
+    return `# 执行策略
+
+创作知识库当前无法读取，本次没有可用的创作原则和策略公式。请先联系管理员恢复剧本知识库，再重新调用“执行策略”工具；在此之前，${config.execution_target}只能依据 Skill 中的固定质量、格式与准出要求完成，成品质量会低于正常水平。\n`;
+  }
+  if (snapshot.knowledge_status === "empty") {
+    return `# 执行策略
+
+创作知识库中还没有适用于本阶段和当前剧本标签的创作原则，本次没有可用的创作原则和策略公式。请先联系管理员补充剧本知识库，再重新调用“执行策略”工具；在此之前，${config.execution_target}只能依据 Skill 中的固定质量、格式与准出要求完成，成品质量会低于正常水平。\n`;
   }
   const instruction = snapshot.policy.use_formulas
     ? `请遵循\`执行原则\`，按需使用\`策略公式\`，完成${config.execution_target}。`
@@ -586,6 +597,7 @@ export async function writeStageExecutionStrategy({ workspace, stage, userInput,
   const unresolvedFields = unresolvedProfileFields(scriptProfile);
   let principles = [];
   let formulas = [];
+  let knowledgeStatus = "skipped_unresolved_profile";
   if (!unresolvedFields.length) {
     const knowledgeDbPath = await resolveKnowledgeDbPath(options);
     principles = canReuse && existing.knowledge_status === "loaded"
@@ -599,6 +611,7 @@ export async function writeStageExecutionStrategy({ workspace, stage, userInput,
     formulas = !policy.use_formulas
       ? []
       : canReuseFormulas ? existing.formulas : loadFormulas(knowledgeDbPath, stage, profileTags(scriptProfile));
+    knowledgeStatus = !knowledgeDbPath ? "unavailable" : principles.length ? "loaded" : "empty";
   }
   const now = new Date().toISOString();
   const snapshot = {
@@ -613,7 +626,7 @@ export async function writeStageExecutionStrategy({ workspace, stage, userInput,
     policy,
     script_profile: scriptProfile,
     unresolved_script_profile_fields: unresolvedFields,
-    knowledge_status: unresolvedFields.length ? "skipped_unresolved_profile" : "loaded",
+    knowledge_status: knowledgeStatus,
     principles,
     formulas,
     formulas_resolved: !unresolvedFields.length
@@ -685,7 +698,12 @@ export async function stageExecutionStrategyIssues(workspace, stage, userInput, 
     if (snapshot.knowledge_status !== "skipped_unresolved_profile") issues.push("剧本标签尚未确定，当前执行策略不应获取创作原则或策略公式");
     if ((snapshot.principles || []).length || (snapshot.formulas || []).length) issues.push("剧本标签尚未确定，请重新生成不含创作原则和策略公式的执行策略");
   } else {
-    if (snapshot.knowledge_status !== "loaded") issues.push("执行策略没有获取当前标签对应的知识，请重新调用执行策略工具");
+    if (!KNOWLEDGE_STATUSES_AFTER_LOOKUP.includes(snapshot.knowledge_status)) {
+      issues.push("执行策略没有获取当前标签对应的知识，请重新调用执行策略工具");
+    }
+    if (snapshot.knowledge_status === "loaded" && !(snapshot.principles || []).length) {
+      issues.push("执行策略标记为已获取创作原则，实际一条都没有，请重新调用执行策略工具");
+    }
     if (snapshot.policy?.use_formulas && snapshot.formulas_resolved !== true) issues.push("当前阶段的策略公式尚未获取，请重新调用执行策略工具");
   }
   try {
@@ -698,7 +716,8 @@ export async function stageExecutionStrategyIssues(workspace, stage, userInput, 
 
 export function strategyFormulaPayload(snapshot, formulaName, stage) {
   if (!isObject(snapshot) || snapshot.stage !== stage) throw new Error("当前阶段执行策略不可用");
-  if (snapshot.knowledge_status !== "loaded") throw new Error("剧本标签尚未确定，当前执行策略没有获取公式");
+  if (snapshot.knowledge_status === "skipped_unresolved_profile") throw new Error("剧本标签尚未确定，当前执行策略没有获取公式");
+  if (snapshot.knowledge_status !== "loaded") throw new Error("创作知识库没有可用于本阶段的知识，当前执行策略没有获取公式");
   if (!snapshot.policy?.use_formulas) throw new Error("当前任务场景不使用策略公式");
   const matches = (snapshot.formulas || []).filter((item) => item.name === formulaName);
   if (matches.length !== 1) throw new Error(matches.length ? "公式名称不唯一" : "当前执行策略中没有该公式");
