@@ -827,7 +827,13 @@ export function ProjectList({
             </div>
           );
         })}
-        {!visibleProjects.length ? <p className="empty-hint">{projectView === "completed" ? "暂无已归档项目" : "暂无进行中项目"}</p> : null}
+        {!visibleProjects.length ? (
+          <p className="empty-hint">
+            {query.trim() || filtersActive
+              ? "没有符合当前搜索和筛选条件的项目，换个关键词或清空筛选再看看。"
+              : projectView === "completed" ? "暂无已归档项目" : "暂无进行中项目"}
+          </p>
+        ) : null}
       </div>
 
       <div className="project-user-shell" ref={userMenuShellRef}>

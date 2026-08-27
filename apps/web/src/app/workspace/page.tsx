@@ -620,6 +620,8 @@ export default function WorkspacePage() {
   const commentRequestRef = useRef(0);
   const selectedStageRef = useRef<string | null>(null);
   const dismissedQualityIssueRef = useRef<string | null>(null);
+  const queryRef = useRef(query);
+  queryRef.current = query;
 
   const handleCommentScrollElementChange = useCallback((element: HTMLElement | null) => {
     commentContentScrollElementRef.current = element;
@@ -896,11 +898,11 @@ export default function WorkspacePage() {
       });
   }, [document?.content_hash, documentCommentsEnabled, selectedFile?.stage, selectedProject?.id]);
 
-  const refreshProjects = useCallback(async (search = query) => {
-    const nextProjects = await getProjects(search);
+  const refreshProjects = useCallback(async (search?: string) => {
+    const nextProjects = await getProjects(search ?? queryRef.current);
     setProjects(nextProjects);
     return nextProjects;
-  }, [query]);
+  }, []);
 
   const refreshNotifications = useCallback(async () => {
     const payload = await getNotifications();
@@ -1214,8 +1216,8 @@ export default function WorkspacePage() {
   }, [query, refreshProjects]);
 
   useEffect(() => {
-    refreshProjects(query).catch((err) => setError(err.message));
-  }, [agentBusy, query, refreshProjects]);
+    refreshProjects().catch((err) => setError(err.message));
+  }, [agentBusy, refreshProjects]);
 
   useEffect(() => {
     if (agentActionPending) {
@@ -2149,7 +2151,7 @@ export default function WorkspacePage() {
   return (
     <main className="app-shell">
       {error ? (
-        <div className="error-banner" role="status" aria-atomic="true">
+        <div className="error-banner" role="alert" aria-atomic="true">
           <span>{error}</span>
           <div className="error-banner-actions">
             {errorCountdown > 0 ? <span className="error-countdown" aria-hidden="true">{errorCountdown}s</span> : null}
