@@ -2110,7 +2110,7 @@ def sync_project_to_base(
         project_id=project_id,
         details={"record_id": record_id, "attachment_count": len(next_tokens)},
     )
-    return {"project_id": project_id, "record_id": record_id, "synced_at": utc_now_iso(), "status": SYNC_STATUS_SYNCED}
+    return {"project_id": project_id, "record_id": record_id, "synced_at": _utc_now_iso(), "status": SYNC_STATUS_SYNCED}
 
 
 def mark_project_sync_failed(
