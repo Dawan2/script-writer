@@ -1,11 +1,12 @@
 /**
  * 接口层·CLI 程序构建。
- * W1-P1-T04 起 `sw init` 可用；其余子命令仍标注"规划中"（禁止虚假可用性承诺，
- * 见 W1-P1-T01 验收 ③），随 W1-P1-T05 等任务逐步落地。
+ * W1-P1-T04 起 `sw init` 可用、W1-P1-T08 起 `sw doctor` 可用；其余子命令仍标注
+ * "规划中"（禁止虚假可用性承诺，见 W1-P1-T01 验收 ③），随 W1-P1-T05 等任务逐步落地。
  */
 
 import { readFileSync } from 'node:fs';
 import { Command } from 'commander';
+import { registerDoctorCommand } from './commands/doctor.js';
 import { registerInitCommand } from './commands/init.js';
 import { processIo, type CliIo } from './io.js';
 
@@ -25,6 +26,7 @@ const ROADMAP_HELP = `
 
 子命令实现进度：
   sw init      初始化项目向导          [可用 · W1-P1-T04]
+  sw doctor    环境与项目自检          [可用 · W1-P1-T08]
   sw status    显示进度与下一步命令    [规划中 · W1-P1-T05]
   sw outline   编辑大纲                [规划中 · W1-P1-T05]
   sw draft     起草/续写场景           [规划中 · W1-P1-T05]
@@ -58,5 +60,6 @@ export function buildProgram(io: CliIo = processIo()): Command {
     });
 
   registerInitCommand(program, io);
+  registerDoctorCommand(program, io);
   return program;
 }
