@@ -13,6 +13,7 @@
 | 文档 | 内容一句话 | 所在分支 @ commit |
 | --- | --- | --- |
 | [`wave-01/inventory-codebase.md`](./wave-01/inventory-codebase.md) | W1-A 代码库结构盘点：空仓事实证据（无包/无测试/无 CI）+ 对齐 P1 的建议目标目录树 | `cursor/w1-a-codebase-inventory-bb07`（本分支） |
+| [`wave-01/inventory-features-flows.md`](./wave-01/inventory-features-flows.md) | W1-B 功能与交互路径盘点：目标功能清单、主/边缘路径、空态/错态基准清单、P2 裁决 CLI 映射与 GAP 登记（W3 集成并入） | `cursor/w1-b-features-flows-9843 @ 9ef7ea7` |
 | [`wave-01/maturity-baseline.md`](./wave-01/maturity-baseline.md) | W1-D 成熟度基线：L0–L5 量表、E1–E5 证据规则、阻塞登记（BLK-W1-01/02/03）、三维度自评（全 L0） | `cursor/w1-d-maturity-baseline-b2eb @ 60c37e8` |
 | [`wave-01/P1-usability-architecture.md`](./wave-01/P1-usability-architecture.md) | P1 功能易用性：假设 A1–A4（CLI 优先、TS）、七维度准则、SPEC-01/02/03、目标分层 | `cursor/w1-p1-usability-architecture-5d0e @ 5545c22`（回执 `4612cdb`） |
 | [`wave-01/P2-interaction-reliability.md`](./wave-01/P2-interaction-reliability.md) | P2 交互可靠性：12 维度审查、设计裁决 D1–D39、可靠性分层、后续规格 S1–S3 | `cursor/w1-p2-interaction-reliability-a3c2 @ 7873b66` |
@@ -54,9 +55,16 @@
 | --- | --- | --- |
 | [`DISPATCH-receipt.md`](./DISPATCH-receipt.md) | 各工作槽完工回执（append-only） | 三个既有分支各持一版 + 本分支一版，**合并时取并集追加，勿丢任何回执** |
 
+## 证据存档区（W3 集成起建立）
+
+| 文档 | 内容一句话 | 说明 |
+| --- | --- | --- |
+| [`evidence/`](./evidence/README.md) | E1–E5 证据存档区（目录/命名/引用约定见其 README 与 `wave-02/evidence-and-ci-conventions.md`） | 随 W3 集成并入（原 `cursor/w2-evidence-ci-conventions-a17c` 分支） |
+
 ## 规划中的用户文档分区（未建立，责任任务见括号）
 
-`concepts/`（T09）· `reference/`（T09）· `evidence/`（W1-D 基线约定的证据存档区，目录/命名约定见 `cursor/w2-evidence-ci-conventions-a17c` 分支）
+`concepts/`（T09）· `reference/`（T09）
 
 以上分区随对应任务落地后，请将其从本节移入正式分区并附链接。
-（`quickstart.md` 与 `adr/` 已随 W2 脚手架槽落地、`errors/` 已随 W2 错误框架槽落地，均移入上方"决策与用户文档"分区。）
+（`quickstart.md` 与 `adr/` 已随 W2 脚手架槽落地、`errors/` 已随 W2 错误框架槽落地、
+`evidence/` 已随 W3 集成槽落地，均移入上方正式分区。）
