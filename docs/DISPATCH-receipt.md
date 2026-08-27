@@ -340,3 +340,21 @@
 - **复用声明**：只读引用 16 条远端分支头（锚点见集成图 §1），未改写未覆盖；测试数为临时 worktree 内 `npm ci && npx vitest run` 实测（Node v22.14.0），CI 状态取自 GitHub Actions run 33057519551 / 33059507608 / 33059843463 / 33059618720；未携带 `docs/README.md` 副本（索引追加行已写入集成图文首供合并者粘贴）。
 - **阻塞**：无新增。提示性约束一条：集成期间四条 W2 源分支应冻结，源分支若有新提交则集成图头提交锚点失效、需重跑 merge-tree 复核（集成图 §6-6）。
 - **合规声明**：未创建子代理；未创建 PR；未使用 Task；未删测试、未跳过失败、未降低 CI 标准（本槽 docs-only，且集成图/任务队列明确「测试只增不减、断言只迁移不删除、CI 门不可降标」）；未合并任何代码进 `main`。
+
+---
+
+## 回执：W3 / 工作槽「WAVE03-PLAN T01–T05 三线集成」
+
+- **日期**：2026-08-27（UTC）
+- **槽位**：第 3 波 / 周期 W3 / 工作槽 WAVE03-PLAN T01–T05 三线集成
+- **分支**：`cursor/w3-integrate-w2-f334`（基于 `cursor/w2-error-framework-exit-codes-f4d4 @ e3aff95`，已 push，未开 PR，未合并进 `main`）
+- **产出**：
+  - 合并提交九个：engine 并入 `ce910ad`（语义冲突①②核销）、init 并入 `e2721d4`（③④⑤⑥⑦核销）、六游离 docs 分支并集收编 `874c783`/`775f32e`/`45d623a`/`7c2ebcb`/`fe80055`/`a0236e5`、集成图分支收编 `02f0a6a`
+  - `docs/wave-03/work-integration.md` — 落地说明：合并梯队执行记录、文本冲突解法表、语义冲突①–⑦核销表（含核销提交号）、测试对账（77→145→207 零删测）、错误码 8 码现状、doctor/outline rebase 交接清单 6 条
+  - `docs/evidence/wave-03/W3-PLAN-T05/` — E2 静态门 / E3 测试套件 / E4 五步链走查三份证据（按 evidence 约定：锚定 commit、复现命令、原始输出含退出码、脱敏自查零命中）
+  - `docs/wave-03/ready-tasks.md` — WAVE03-PLAN 分区追加执行状态行（T01–T05 全部完成，各附提交号与证据路径）
+  - 注册表新增四码：SW-E021（YAML 不合法）、SW-E022（字段不合法）、SW-E013（目标是文件）、SW-E031（模板不存在）；`docs/errors/` 同步再生成
+- **关键结论**：三线集成完成，终态 **207 测试全绿（0 失败 0 跳过）≥160**；四源分支 181 条并集断言全存活 + 集成期净增 26；全套验收门（lint/lint:errors/typecheck/test/build/smoke/smoke:exit-codes）在终验锚点 `02f0a6a` 全绿；`expectedSceneCount` 数据丢失风险（集成图 §3-⑥）以存储层贯通 + 端到端往返断言 + 进程级走查三重核销。
+- **复用声明**：严格按 `docs/wave-03/integration-map.md @ 43a6ecf` 执行，合并顺序、底分支裁定、冲突解法均出自集成图；四源分支头提交与集成图锚点核对一致后才开工；六 docs 分支正文原样收编未改写。
+- **阻塞**：无新增。doctor/outline 并行槽未等待（按指令），其 rebase 到本分支的接口清单见 `work-integration.md` §7（预期冲突面：program.ts 注册行与 ROADMAP_HELP、registry.ts 码表、回归锁测试）。
+- **合规声明**：未创建子代理；未创建 PR；未使用 Task；未删测试、未跳过失败、未降低 CI 标准（断言仅按集成图授权迁移改写，数目只增不减）；未合并任何代码进 `main`。

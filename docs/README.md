@@ -41,7 +41,8 @@
 | 文档 | 内容一句话 | 所在分支 @ commit |
 | --- | --- | --- |
 | [`wave-03/integration-map.md`](./wave-03/integration-map.md) | W2 四实现分支集成顺序、文件级冲突面与语义冲突清单 7 项（W3 计划槽） | `cursor/w3-integration-map-bf24 @ 43a6ecf`（W3 集成并入） |
-| [`wave-03/ready-tasks.md`](./wave-03/ready-tasks.md) | Wave-03 就绪任务队列（WAVE03-PLAN 分区：W3-PLAN-T01…T05 集成任务） | `cursor/w3-integration-map-bf24 @ 43a6ecf`（W3 集成并入） |
+| [`wave-03/ready-tasks.md`](./wave-03/ready-tasks.md) | Wave-03 就绪任务队列（WAVE03-PLAN 分区：W3-PLAN-T01…T05 集成任务，已全部完成并附状态行） | `cursor/w3-integration-map-bf24 @ 43a6ecf`（W3 集成并入） |
+| [`wave-03/work-integration.md`](./wave-03/work-integration.md) | W3 集成槽落地说明：合并梯队记录、文本/语义冲突①–⑦核销、测试对账（77→207 零删测）、doctor/outline rebase 交接清单 | `cursor/w3-integrate-w2-f334`（本分支） |
 
 ## 决策与用户文档（W2 起建立）
 

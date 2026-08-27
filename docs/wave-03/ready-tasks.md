@@ -104,4 +104,12 @@
 ### 修订记录
 
 （暂无）
+
+### 执行状态（W3 集成槽 2026-08-27 追加，证据见括号内路径）
+
+- W3-PLAN-T01：**完成** @ `ce910ad`（分支 `cursor/w3-integrate-w2-f334`；145 测试全绿，语义冲突①②核销）
+- W3-PLAN-T02：**完成** @ `e2721d4`（207 测试全绿 ≥160，`rg 'sw-error' src/` 零命中，SW-E031/E013 登记，语义冲突③④⑤⑦核销）
+- W3-PLAN-T03：**完成** @ `e2721d4`（往返断言常驻 `tests/cli/status.spec.ts`；进程级走查证据 `docs/evidence/wave-03/W3-PLAN-T05/E4-init-status-walkthrough.md`）
+- W3-PLAN-T04：**完成** @ `874c783`…`a0236e5` 六提交（六分支正文逐一在位、三份 ready-tasks 分区完整、回执并集无丢失）
+- W3-PLAN-T05：**完成**（终验锚定 `02f0a6a`：验收门全绿、207 测试 0 跳过、退出码 0/1/2 三档冒烟各≥1 例；证据 `docs/evidence/wave-03/W3-PLAN-T05/`；①–⑦ 核销表见 [`work-integration.md`](./work-integration.md) §3）
 <!-- END:WAVE03-PLAN -->
