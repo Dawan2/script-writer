@@ -1,0 +1,51 @@
+$ npm run test:web
+> orca-script-workbench@0.1.0 test:web
+> cd apps/web && npm test
+> @orca/workbench-web@0.1.0 test
+> vitest run
+ RUN  v4.1.11 /workspace/apps/web
+ Test Files  8 passed (8)
+      Tests  37 passed (37)
+   Start at  13:43:29
+   Duration  1.92s (transform 162ms, setup 104ms, import 272ms, tests 311ms, environment 3.66s)
+
+--- 逐项清单（vitest run --reporter=verbose）---
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 按接口区分响应，互不影响 4ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 同一接口按第几次调用给出不同结果 1ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > onCall 只覆盖指定次序，其余调用仍走默认响应 2ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 畸形响应让 JSON 解析失败 1ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 延迟由可控时钟推进，不占用真实时间 2ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 超时响应只在调用方取消时结束 3ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 记录请求方法、查询串与请求体 1ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 未声明的请求会报错并列出已声明的路由 1ms
+ ✓ tests/harness/http-faults.test.ts > 请求故障注入 > 路由缺少预设响应时给出可操作的报错 1ms
+ ✓ tests/harness/no-bare-fetch.test.ts > 静态检查：业务代码不得直接调用 fetch > 当前代码零违规，也不误报 109ms
+ ✓ tests/harness/no-bare-fetch.test.ts > 静态检查：业务代码不得直接调用 fetch > 反例夹具会被拦下，并指出文件与行号 23ms
+ ✓ tests/harness/no-bare-fetch.test.ts > 静态检查：业务代码不得直接调用 fetch > 认得出借全局对象绕开的写法 1ms
+ ✓ tests/harness/no-bare-fetch.test.ts > 静态检查：业务代码不得直接调用 fetch > 不把注释、字符串与同名方法当成违规 1ms
+ ✓ tests/harness/no-bare-fetch.test.ts > 静态检查：业务代码不得直接调用 fetch > 模板串里的插值仍会被检查 0ms
+ ✓ tests/harness/no-bare-fetch.test.ts > 静态检查：业务代码不得直接调用 fetch > 剥离注释与字符串后行数不变，行号可信 0ms
+ ✓ tests/harness/render.test.tsx > 组件渲染与用户操作 > 点击保存后界面显示保存结果 125ms
+ ✓ tests/harness/render.test.tsx > 组件渲染与用户操作 > 请求失败时界面显示失败而不是停在正在保存 16ms
+ ✓ tests/examples/retry-with-backoff.test.ts > 示例：超时与退避的验收怎么写 > 首次超时、第二次 503、第三次成功，全程不占真实时间 6ms
+ ✓ tests/examples/retry-with-backoff.test.ts > 示例：超时与退避的验收怎么写 > 重试次数用尽后抛错，不会无限重试 2ms
+ ✓ tests/examples/api-client-contract.test.ts > 示例：给真实接口模块写用例 > 搜索关键词会经过转义后进查询串 3ms
+ ✓ tests/examples/api-client-contract.test.ts > 示例：给真实接口模块写用例 > 服务端的中文错误文案原样抛给调用方 1ms
+ ✓ tests/examples/api-client-contract.test.ts > 示例：给真实接口模块写用例 > 响应体畸形时给出带状态码的兜底文案 1ms
+ ✓ tests/harness/clock.test.ts > 可控时钟 > 从指定时间起算，推进后时间随之变化 2ms
+ ✓ tests/harness/clock.test.ts > 可控时钟 > 退避间隔的断言不依赖真实等待 1ms
+ ✓ tests/harness/clock.test.ts > 可控时钟 > 推进到下一个定时器，无需知道具体间隔 1ms
+ ✓ tests/harness/clock.test.ts > 可控时钟 > 周期任务按推进的时长触发相应次数 0ms
+ ✓ tests/harness/clock.test.ts > 可控时钟 > 还原后回到真实时钟 0ms
+ ✓ tests/harness/browser-state.test.ts > 连接状态与页面可见性注入 > 断网与恢复都会派发事件 2ms
+ ✓ tests/harness/browser-state.test.ts > 连接状态与页面可见性注入 > 切后台与回前台都会派发 visibilitychange 0ms
+ ✓ tests/harness/browser-state.test.ts > 连接状态与页面可见性注入 > 可从初始离线状态起算 0ms
+ ✓ tests/harness/browser-state.test.ts > 连接状态与页面可见性注入 > 关闭前确认的时机可被触发，并能观察到是否被拦截 0ms
+ ✓ tests/harness/browser-state.test.ts > 连接状态与页面可见性注入 > 还原后不再影响真实状态 0ms
+ ✓ tests/harness/storage.test.ts > 本地存储沙箱 > 每个测试拿到干净的存储 2ms
+ ✓ tests/harness/storage.test.ts > 本地存储沙箱 > 上一个测试写入的内容不会串到下一个测试 0ms
+ ✓ tests/harness/storage.test.ts > 本地存储沙箱 > 可预置初始内容，模拟刷新前遗留的草稿 0ms
+ ✓ tests/harness/storage.test.ts > 本地存储沙箱 > 可注入写入失败，用于验证保存失败时的提示 0ms
+ ✓ tests/harness/storage.test.ts > 本地存储沙箱 > 会话存储与本地存储互不影响 0ms
+ Test Files  8 passed (8)
+      Tests  37 passed (37)

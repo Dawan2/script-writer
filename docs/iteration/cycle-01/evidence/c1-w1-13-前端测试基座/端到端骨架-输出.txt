@@ -1,0 +1,5 @@
+$ npm run test:web:e2e
+Running 2 tests using 2 workers
+  ✓  1 [chromium] › tests/e2e/smoke.spec.ts:6:7 › 落地页 › 首屏可见，标题与主行动按钮都在 (975ms)
+  ✓  2 [chromium] › tests/e2e/smoke.spec.ts:13:7 › 落地页 › 未登录时点主行动按钮会弹出登录窗口 (1.1s)
+  2 passed (6.7s)

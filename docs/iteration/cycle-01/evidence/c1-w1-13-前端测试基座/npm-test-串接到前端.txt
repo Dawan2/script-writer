@@ -1,0 +1,25 @@
+$ npm test
+（下面是 4 个套件的分段标题、前端套件的完整输出与末尾汇总；Agent 与服务端的存量失败明细已省略）
+
+=== Agent 脚本（npm run test:agent）===
+# tests 81
+# pass 76
+# fail 5
+=== 服务端接口（npm run test:api）===
+Ran 454 tests in 26.667s
+FAILED (failures=4, errors=8)
+=== 排障工具（npm run test:zdebug）===
+# tests 19
+# pass 19
+# fail 0
+=== 前端（npm run test:web）===
+ Test Files  8 passed (8)
+      Tests  37 passed (37)
+=== 测试汇总 ===
+失败  Agent 脚本（npm run test:agent，0.9s）
+失败  服务端接口（npm run test:api，27.2s）
+通过  排障工具（npm run test:zdebug，0.2s）
+通过  前端（npm run test:web，2.3s）
+2 个套件失败：test:agent、test:api
+
+退出码：1（Agent 与服务端的存量失败所致，见下）
