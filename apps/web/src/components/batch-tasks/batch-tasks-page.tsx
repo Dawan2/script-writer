@@ -353,9 +353,9 @@ export function BatchTasksPage({ user }: { user: User }) {
     <main className={styles.shell}>
       <header className={styles.header}>
         <div className={styles.heading}>
-          <AppNav current="batch-tasks" user={user} />
           <span className={styles.headingIcon}><ListChecks size={20} /></span>
           <div><h1>批量任务</h1><p>同时执行 {maxParallel} 个任务，其余任务会依次进入处理队列</p></div>
+          <AppNav current="batch-tasks" user={user} />
         </div>
         <div className={styles.headerActions}>
           <button className={styles.iconButton} type="button" onClick={() => void refresh(true)} aria-label="刷新任务列表" title="刷新任务列表" disabled={refreshing}>

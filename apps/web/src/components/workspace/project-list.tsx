@@ -6,6 +6,7 @@ import { type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPoi
 import type { CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { AppNav } from "@/components/navigation/app-nav";
+import appNavStyles from "@/components/navigation/app-nav.module.css";
 import { ChangePasswordDialog } from "@/components/workspace/change-password-dialog";
 import { NotificationCenter } from "@/components/workspace/notification-center";
 import { ProjectPermissionsDialog } from "@/components/workspace/project-permissions-dialog";
@@ -573,33 +574,36 @@ export function ProjectList({
       >
         <ChevronLeft size={14} />
       </button>
-      <div className="project-brand-row">
-        <div className="project-brand-left">
-          <div className="brand-mark" aria-hidden="true">
-            <img className="brand-logo" src="/logo.png" alt="" />
+      {/* 项目栏是固定五行的网格，品牌行与导航必须合成同一行，否则列表区会失去弹性高度 */}
+      <div className={appNavStyles.panelHeader}>
+        <div className="project-brand-row">
+          <div className="project-brand-left">
+            <div className="brand-mark" aria-hidden="true">
+              <img className="brand-logo" src="/logo.png" alt="" />
+            </div>
+            <div className="brand-copy">
+              <strong>出海剧作家</strong>
+            </div>
           </div>
-          <div className="brand-copy">
-            <strong>出海剧作家</strong>
+          <div className="project-brand-actions">
+            <a
+              className="icon-button manual-help-button"
+              href={OPERATION_MANUAL_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="打开操作手册"
+              title="操作手册"
+            >
+              <CircleHelp size={18} />
+            </a>
+            <NotificationCenter
+              notifications={notifications}
+              hasUnread={hasUnreadNotifications}
+              onSelect={onNotificationSelect}
+            />
           </div>
         </div>
-        <AppNav current="workspace" user={user} compact />
-        <div className="project-brand-actions">
-          <a
-            className="icon-button manual-help-button"
-            href={OPERATION_MANUAL_URL}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="打开操作手册"
-            title="操作手册"
-          >
-            <CircleHelp size={18} />
-          </a>
-          <NotificationCenter
-            notifications={notifications}
-            hasUnread={hasUnreadNotifications}
-            onSelect={onNotificationSelect}
-          />
-        </div>
+        <AppNav current="workspace" user={user} />
       </div>
 
       <div ref={searchShellRef}>
