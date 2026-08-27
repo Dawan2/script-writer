@@ -77,7 +77,7 @@
 - **风险**：先于足量错误场景落框架可能过度设计——注册表 v1 只收 SPEC-01/02 实际触达的错误码（约 6–8 个），禁止预填未用码。
 - **依赖**：T03；与 T04 可并行开发、合并前对接。
 
-### W1-P1-T07 · P2 · 模板库 v1 与空态引导
+> 状态：完成 —— W2 实现槽（错误框架+退出码） / 2026-08-27 / `cursor/w2-error-framework-exit-codes-f4d4`（注册表 v1 收 4 码 E010/E011/E020/E030 + 2 空态位点；「T04 错误输出迁移」按本条目"合并前对接"约定转记为 T04 分支合并前对接项——T04 在并行分支开发、尚未合入基线，对接清单见 `docs/wave-02/work-error-framework.md` §5）
 
 - **目标**：内置 3 个模板（screenplay / short-video / podcast），并为 `outline.md` 空态、`scenes/` 空态接入 `hint()` 引导（方案 §6.3 空态三要素）。
 - **文件范围**：`templates/{screenplay,podcast}/`（short-video 已由 T04 建立）、`src/app/workflow/` 空态位点接线、模板渲染单测。

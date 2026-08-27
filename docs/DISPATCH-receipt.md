@@ -6,6 +6,11 @@
 > （W1-A 盘点 §4 注意事项 2）组装：依次收录 W1-D（`60c37e8`）、P1（`4612cdb`）、W1-A（`92e19a4`）、
 > P3（`67e6670`）、P4（`6ec86f8`）五份回执**原文**（W1-D 为表格单页式，其余为追加式，均未改写）。
 > P2 回执仍在 `cursor/w1-p2-interaction-reliability-a3c2 @ 7873b66`（该分支不在本槽参考清单内），后续合并时同样取并集追加。
+>
+> **W2 错误框架槽追加（2026-08-27，分支 `cursor/w2-error-framework-exit-codes-f4d4`）**：按同一并集约定
+> 收录 W1-B（`cursor/w1-b-features-flows-9843 @ 9ef7ea7`）与 W2-GAP（`cursor/w2-gap-adjudication-c82d @ 661b313`）
+> 两份回执**原文**（追加于 P4/脚手架回执之后）。W2 证据约定槽回执仍在 `cursor/w2-evidence-ci-conventions-a17c @ 09fbfb8`
+> （本槽仅参考未并入其文件），后续合并时同样取并集追加。
 
 ---
 
@@ -148,3 +153,53 @@
 | 测试与验证 | 本地实测（Node v22.14.0）：`npm run lint` ✅ 零警告、`npm run typecheck` ✅、`npm test` ✅ **21 passed / 0 失败 / 0 跳过**、`npm run build` ✅、`npm run smoke` ✅（`sw --version`→`0.1.0`、`--help` 输出五步路线图）；`npm link` 后 `sw` 与别名 `script-writer` 均可执行。CI（push+PR 触发，Node 20/22 矩阵）随本分支 push 生效 |
 | 阻塞更新 | **BLK-W1-01 解除**（定栈 + 可构建骨架入库）；**BLK-W1-03 解除**（CI 入库，合并 main 后完全生效）；BLK-W1-02 未动（属 P3 范围）；B1 关闭（调度器确认 A1–A4） |
 | 合规声明 | 未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（本槽为仓库首次引入测试与 CI，21 条单测全部真实执行并通过）；未重做/覆盖任何有效架构文档（全部原样并入） |
+
+---
+
+## 回执：W1 / W1-B 功能与交互路径盘点
+
+- **日期**：2026-08-27（UTC）
+- **槽位**：第 1 波 / 周期 W1 / 工作槽 W1-B 功能与交互路径盘点
+- **分支**：`cursor/w1-b-features-flows-9843`（基于 `main @ deda75a`，已 push，未开 PR）
+- **产出**：
+  - `docs/wave-01/inventory-features-flows.md` — 功能与交互路径盘点主文档：因 `main` 空仓（引用 W1-A 证据，不复述），盘点对象为**目标交互路径**——用户可见功能 13 项（F-01…F-13）、主路径 6 条（MP，含 TTFS 首跑/恢复/非交互/AI opt-in/跳步/导出）、边缘路径 12 条（EP，含中断/幂等/schema 漂移/AI 降级/并发）、空态位点 6 个（ES 表，即 P1 §4"空态覆盖率 100%"的评审基准清单）、错态 6 码（ER 表，SPEC-03 注册表 v1 全集 + 三段式对照）、P2 向导/会话裁决（D5–D9、D20–D25、D32–D39）的 CLI 阶段映射表（已映射/部分映射/延后回接三档）、差距登记 6 项（GAP-01…06，含 revise 无规格、别名无任务归属、预计场数去向、并发写无裁决、characters/ 无命令、退出码约定不全）
+  - `docs/DISPATCH-receipt.md` — 本回执（本分支文件 = W1-A 版全文原样 + 本节追加，为超集，合并时按既定约定取并集）
+- **关键结论**：全部路径以 P1 假设 A1–A4（CLI 优先）为前提、锚定 SPEC-01/02/03 与 ready-tasks 任务号（每条路径带验收锚）；P2 Web 表述的裁决按其 §0"先落地者为准"声明与 W1-A §5 映射原则逐条归档，**未裁决新冲突、未新增架构决策、未重复架构正文**（依据均以 § / 条款号引用）。
+- **复用声明**：只引用 W1-D `@60c37e8`、P1 `@5545c22`、P2 `@7873b66`、W1-A `@92e19a4` 成果，未改写未覆盖；未携带 `docs/README.md` 副本（避免改写 W1-A 分支的"本分支"注记），索引追加行的现成文本已写入主文档 §8 交接项供合并者粘贴；根 README 未动（属 W1-P1-T01）。
+- **阻塞**：无新增。沿用 BLK-W1-01/02/03 与 B1；新登记 6 项 GAP 均为规格缺口（非阻塞），归属建议见主文档 §7。
+- **合规声明**：未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（仓库现无测试与 CI，本槽为 docs-only，亦未引入任何绕过机制）；未使用 Task。
+
+---
+
+## 回执：W2 / GAP 裁决与任务补登
+
+- **日期**：2026-08-27（UTC）
+- **槽位**：第 2 波 / 周期 W2 / 计划槽 GAP 裁决与任务补登
+- **分支**：`cursor/w2-gap-adjudication-c82d`（基于 `main @ deda75a`，已 push，未开 PR）
+- **产出**：
+  - `docs/wave-02/P-gap-adjudication.md` — GAP 裁决落地主文档：调度器对 W1-B GAP-01…06 的裁决逐条落地（每条含裁决、开工粒度要点、勘误对象与承接任务）；承载 **SPEC-04 `sw revise`** 规格要点（清单/打开/`--done` 幂等/`scenes_revised` 字段/status 联动/可跳过/无新错误码）、**SPEC-03-EXT 退出码约定**（0 成功 / 1 运行期错误 / 2 用法错误，doctor/check 既有语义零变更）、**文件锁机制要点**（`.sw/lock` 建议锁、`SW-E012`、stale 接管、doctor 检查项、与 P2 D32 的形态对应关系）；勘误登记表 8 条（append-only，供合并者回写，不改写他槽原文）
+  - `docs/wave-02/ready-tasks.md` — 新建 wave-02 任务队列，**仅含 WAVE02-GAP 分区**（W2-GAP-T01…T06：revise 实现 P0、别名+help --all、expectedSceneCount schema、文件锁、characters 空态覆盖、退出码落地；均前置于 W1 实现任务，含依赖图与建议开工顺序）；沿用 wave-01 同名文件的 BEGIN/END 分区纪律，不携带 wave-01 各分区副本
+  - `docs/DISPATCH-receipt.md` — 本回执（本分支文件 = W1-B 版全文原样 + 本节追加，为超集，合并时按既定约定取并集）
+- **关键结论**：6 项 GAP 全部闭合——GAP-01 以 SPEC-04 补全五步工作流第四步（P0）；GAP-02 别名/全集从命令注册表生成、验收并入 W1-P1-T10；GAP-03 定案 `expectedSceneCount` 可选字段（schema v1 追加，零迁移）；GAP-04 否决「最后写者胜」、采文件锁（CLI 单机形态对 P2 D32 的对应物，幂等映射 D5–D7 不变）；GAP-05 功能面全归 W1-P4-T05、本槽只补空态核验与过渡期不误报；GAP-06 以 SPEC-03 扩展段定三档退出码，不重写 SPEC-03 长文。**未重做任何有效架构**（A1–A4 已由调度器确认，B1 关闭；SPEC-01/02/03、D1–D39、F1–F6 原样沿用）。
+- **复用声明**：只引用 W1-B `@9ef7ea7`、P1/P2/P4 分支成果，未改写未覆盖；对既有文档的全部影响以勘误登记表表达（主文档 §4），由合并者回写；未携带 `docs/README.md` 与 wave-01 `ready-tasks.md` 副本。
+- **阻塞**：无新增。B1（假设 A1–A4）由调度器确认而关闭；W2-GAP 任务的 blocked/ready 状态均为对 W1 实现任务的正常前置。
+- **合规声明**：未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（仓库现无测试与 CI，本槽为 docs-only，亦未引入任何绕过机制）；未使用 Task。
+
+---
+
+## 回执：Wave-02 / 工作槽「错误框架 + 退出码」
+
+| 项目 | 内容 |
+| --- | --- |
+| 波次 / 槽位 | 第 2 波 / 周期 W2 / 工作槽 实现 W1-P1-T06（SPEC-03 错误框架）+ W2-GAP-T06（SPEC-03-EXT 退出码） |
+| 日期 | 2026-08-27（UTC） |
+| 分支 | `cursor/w2-error-framework-exit-codes-f4d4`（基于 `cursor/w2-scaffold-ci-ccbf @ 9f61b37`，已 push，未开 PR） |
+| 完成任务 | W1-P1-T06（错误码注册表 + `fail()/hint()` 渲染层 + `docs/errors/` 生成器 + 注册表 lint 进 CI）、W2-GAP-T06（退出码 0/1/2 顶层 catch 统一设定 + 业务代码 `process.exit` lint 拦截） |
+| 执行依据 | P1 方案 §7 SPEC-03（`cursor/w1-p1-usability-architecture-5d0e`，已并入基线）；SPEC-03-EXT 退出码表（`cursor/w2-gap-adjudication-c82d @ 661b313` §3.6，本槽已原样并入 `docs/wave-02/P-gap-adjudication.md`） |
+| 产出路径 | `src/app/errors/{registry,render}.ts`；`src/cli/{run,main}.ts`；`scripts/gen-error-docs.ts`、`scripts/smoke-exit-codes.mjs`；`docs/errors/`（4 码 + 索引，注册表生成物）；`eslint.config.js`（process.exit / process.exitCode / no-console 拦截）；`.github/workflows/ci.yml`（+2 步骤）；`tests/{app,cli}/` 新增 3 文件 56 用例；`docs/wave-02/work-error-framework.md`；本回执 |
+| 注册纪律 | 注册表 v1 只收 SPEC-01/02 实际触达的 4 码（E010/E011/E020/E030）+ 2 空态位点（scenes-empty/outline-empty）；SW-E04x（AI）按「禁止预填未用码」未登记；未注册码字面量由 `npm run lint:errors` 在 CI 拦截 |
+| 测试与验证 | 本地实测（Node v22.14.0）：`npm run lint` ✅ 零警告、`npm run lint:errors` ✅、`npm run typecheck` ✅、`npm test` ✅ **77 passed / 0 失败 / 0 跳过**（基线 21 → 77，只增不减）、`npm run build` ✅、`npm run smoke` ✅、`npm run smoke:exit-codes` ✅（真实进程断言 0/2 档）；lint 拦截反例验证（console/process.exit/process.exitCode/未注册码四道防线均触发）与 docs 漂移篡改验证均通过 |
+| 文档合并 | 按并集约定原样并入 `cursor/w2-gap-adjudication-c82d @ 661b313` 的 `docs/wave-02/{P-gap-adjudication,ready-tasks}.md` 与其两份回执（W1-B、W2-GAP）；证据约定分支（`cursor/w2-evidence-ci-conventions-a17c`）仅参考未并入 |
+| 并行避让 | 未触碰 `sw init` 向导（W1-P1-T04，并行分支）文件范围（`src/cli/commands/`、`src/app/workflow/init.ts`、`templates/`）；`src/cli/program.ts` 零改动；T04 合并前对接清单见 `docs/wave-02/work-error-framework.md` §5 |
+| 阻塞更新 | 无新增阻塞；W2-GAP-T01/T04（依赖 T06）的错误框架前置就此解除 |
+| 合规声明 | 未创建子代理；未创建 PR；未使用 Task；未删除测试、未跳过失败、未降低 CI 标准（CI 步骤只增不减：+注册表 lint、+退出码冒烟）；未重写脚手架、未改写他槽文档正文（任务状态按既定备注行格式追加） |

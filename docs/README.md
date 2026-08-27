@@ -25,6 +25,9 @@
 | 文档 | 内容一句话 | 所在分支 @ commit |
 | --- | --- | --- |
 | [`wave-02/work-scaffold-ci.md`](./wave-02/work-scaffold-ci.md) | W2 实现槽：脚手架 + CI 落地说明（做了什么 / 如何跑测试 / 验收对照 / 阻塞更新） | `cursor/w2-scaffold-ci-ccbf`（本分支） |
+| [`wave-02/P-gap-adjudication.md`](./wave-02/P-gap-adjudication.md) | W2 GAP 裁决落地：GAP-01…06 逐条裁决、SPEC-04 `sw revise` 要点、SPEC-03-EXT 退出码表、文件锁要点、勘误登记（错误框架槽按并集并入原文） | `cursor/w2-gap-adjudication-c82d @ 661b313` |
+| [`wave-02/ready-tasks.md`](./wave-02/ready-tasks.md) | Wave-02 就绪任务队列（WAVE02-GAP 分区：W2-GAP-T01…T06） | `cursor/w2-gap-adjudication-c82d @ 661b313`（并入时追加 T06 状态行） |
+| [`wave-02/work-error-framework.md`](./wave-02/work-error-framework.md) | W2 实现槽：SPEC-03 错误框架 + SPEC-03-EXT 退出码落地说明（注册表 / 渲染层 / 退出码 0-1-2 / lint 防线 / 验收对照 / T04-T05 对接清单） | `cursor/w2-error-framework-exit-codes-f4d4`（本分支） |
 
 ## 决策与用户文档（W2 起建立）
 
@@ -32,6 +35,7 @@
 | --- | --- | --- |
 | [`adr/0001-stack-and-product-shape.md`](./adr/0001-stack-and-product-shape.md) | ADR-0001：确认 A1–A4，定栈（TS/Node/npm/Vitest/ESLint/commander）与导出格式首选项 | W1-P1-T02 交付；此后"新增顶层目录须有 ADR" |
 | [`quickstart.md`](./quickstart.md) | 上手指南占位：当前可用命令 + 目标命令序列 + 逐命令实现进度 | W1-P1-T01 交付，T09 补全 |
+| [`errors/`](./errors/README.md) | SPEC-03 错误码逐条（三段式 + 示例输出 + 退出码表 + 空态位点索引）——注册表生成物，禁止手改 | W1-P1-T06 交付；改 `src/app/errors/registry.ts` 后 `npm run gen:errors` 再生成，CI `lint:errors` 拦截漂移 |
 
 ## 流程模板
 
@@ -47,7 +51,7 @@
 
 ## 规划中的用户文档分区（未建立，责任任务见括号）
 
-`concepts/`（T09）· `reference/`（T09）· `errors/`（T06 生成物）· `evidence/`（W1-D 基线约定的证据存档区）
+`concepts/`（T09）· `reference/`（T09）· `evidence/`（W1-D 基线约定的证据存档区，目录/命名约定见 `cursor/w2-evidence-ci-conventions-a17c` 分支）
 
 以上分区随对应任务落地后，请将其从本节移入正式分区并附链接。
-（`quickstart.md` 与 `adr/` 已随 W2 槽落地，移入上方"决策与用户文档"分区。）
+（`quickstart.md` 与 `adr/` 已随 W2 脚手架槽落地、`errors/` 已随 W2 错误框架槽落地，均移入上方"决策与用户文档"分区。）
