@@ -24,7 +24,9 @@
 
 | 文档 | 内容一句话 | 所在分支 @ commit |
 | --- | --- | --- |
-| [`wave-02/work-scaffold-ci.md`](./wave-02/work-scaffold-ci.md) | W2 实现槽：脚手架 + CI 落地说明（做了什么 / 如何跑测试 / 验收对照 / 阻塞更新） | `cursor/w2-scaffold-ci-ccbf`（本分支） |
+| [`wave-02/work-scaffold-ci.md`](./wave-02/work-scaffold-ci.md) | W2 实现槽：脚手架 + CI 落地说明（做了什么 / 如何跑测试 / 验收对照 / 阻塞更新） | `cursor/w2-scaffold-ci-ccbf` |
+| [`wave-02/work-init-wizard.md`](./wave-02/work-init-wizard.md) | W2 实现槽：SPEC-01 `sw init` 向导落地说明（验收对照 / GAP-03·06 对照 / 偏差登记 / 交接） | `cursor/w2-init-wizard-87b4`（本分支） |
+| `wave-02/P-gap-adjudication.md`、`wave-02/ready-tasks.md` | W2 GAP 裁决（SPEC-04 要点、SPEC-03-EXT 退出码、文件锁）与 WAVE02-GAP 任务分区（**未并入本分支**，合并时取并集） | `cursor/w2-gap-adjudication-c82d @ 661b313` |
 
 ## 决策与用户文档（W2 起建立）
 

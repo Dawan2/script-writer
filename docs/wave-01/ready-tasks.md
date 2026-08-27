@@ -61,6 +61,8 @@
 - **风险**：向导交互库选型影响测试性——优先选可注入 stdin 的实现以便自动化测试。
 - **依赖**：T03；错误输出终态依赖 T06。
 
+> 状态：完成 —— W2 实现槽（init 向导） / 2026-08-27 / `cursor/w2-init-wizard-87b4`（验收对照与偏差登记见 `docs/wave-02/work-init-wizard.md`；错误输出按约定以 TODO 标记待 T06 迁移）
+
 ### W1-P1-T05 · P1 · 实现 SPEC-02 状态文件与工作流引擎（最小版）
 
 - **目标**：按方案 §7 SPEC-02 实现 `sw status / outline / draft / export`（export 先支持 Markdown 单格式），进度可恢复、输出含下一步可复制命令。
