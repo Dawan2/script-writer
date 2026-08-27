@@ -176,6 +176,21 @@ class ScriptOutputContractsTest(unittest.TestCase):
             check=False,
         )
 
+    def prepare_execution_strategy(self, stage: str) -> None:
+        result = subprocess.run(
+            [
+                NODE,
+                str(AGENTS_DIR / f".claude/skills/{stage}/scripts/get-execution-strategy.mjs"),
+                "--workspace",
+                str(self.workspace),
+            ],
+            cwd=AGENTS_DIR,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_outline_uses_a_renamed_script_title_for_file_and_heading(self) -> None:
         self.write_workspace(script_name="星海协议")
 
@@ -272,6 +287,7 @@ class ScriptOutputContractsTest(unittest.TestCase):
 
         full_init_result = self.run_tool(".claude/skills/full_generate/scripts/init-full.mjs")
         self.assertEqual(full_init_result.returncode, 0, full_init_result.stderr)
+        self.prepare_execution_strategy("full_generate")
         full_path = self.workspace / "output" / "星海协议-剧本全稿.md"
         self.assertEqual(
             self.run_tool(".claude/skills/full_generate/scripts/check-full.mjs").returncode,
@@ -299,6 +315,7 @@ class ScriptOutputContractsTest(unittest.TestCase):
         (self.workspace / "output" / "剧本试稿.md").write_text(legacy_trial, encoding="utf-8")
 
         init_result = self.run_tool(".claude/skills/full_generate/scripts/init-full.mjs")
+        self.prepare_execution_strategy("full_generate")
         check_result = self.run_tool(".claude/skills/full_generate/scripts/check-full.mjs")
         full_path = self.workspace / "output" / "星海协议-剧本全稿.md"
 
