@@ -405,6 +405,17 @@
       "hint": "",
       "hint_owner": "C1-W1-42"
     },
+    "BILINGUAL_CONTINUATION_CHECK": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
     "BILLING_EXHAUSTED": {
       "categories": [
         "billing"
@@ -482,6 +493,17 @@
       "hint": "",
       "hint_owner": "C1-W1-42"
     },
+    "CONTINUATION_INCOMPLETE": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
     "CONTINUATION_RECONCILE": {
       "categories": [
         "quality"
@@ -527,6 +549,28 @@
       "hint": "",
       "hint_owner": "C1-W1-42"
     },
+    "CONTINUATION_SOURCE_CHECK": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUOUS_SCREENPLAY_TOOL": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
     "DIALOGUE_REVIEW_TOOL": {
       "categories": [
         "runtime"
@@ -535,6 +579,17 @@
         false
       ],
       "message": "台词语义审读模板建立失败。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "EPISODE_PLAYABILITY_FLOOR": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
       "hint": "",
       "hint_owner": "C1-W1-42"
     },
@@ -929,6 +984,17 @@
       "hint": "",
       "hint_owner": "C1-W1-42"
     },
+    "SCREENPLAY_FORMAT": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
     "SCRIPT_PROFILE_RESOLUTION_FAILED": {
       "categories": [
         "quality"
@@ -1050,6 +1116,17 @@
       "hint": "",
       "hint_owner": "C1-W1-42"
     },
+    "TOOL_FAILED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
     "TOOL_PROTOCOL": {
       "categories": [
         "runtime"
@@ -1161,5 +1238,28 @@
       "hint_owner": "C1-W1-42"
     }
   },
-  "legacy_literal_detail_budget": {}
+  "legacy_literal_detail_budget": {
+    "apps/api/app/routers/admin.py": 7,
+    "apps/api/app/routers/agent.py": 4,
+    "apps/api/app/routers/batch_tasks.py": 6,
+    "apps/api/app/routers/openclaw_api.py": 7,
+    "apps/api/app/routers/projects.py": 11,
+    "apps/api/app/services/admin_service.py": 25,
+    "apps/api/app/services/agent_runner.py": 38,
+    "apps/api/app/services/auth_service.py": 6,
+    "apps/api/app/services/batch_task_service.py": 22,
+    "apps/api/app/services/credit_service.py": 17,
+    "apps/api/app/services/document_comment_service.py": 3,
+    "apps/api/app/services/model_config_service.py": 22,
+    "apps/api/app/services/novel_analysis_admission.py": 5,
+    "apps/api/app/services/project_lifecycle_service.py": 4,
+    "apps/api/app/services/project_trash_service.py": 2,
+    "apps/api/app/services/region_admin_service.py": 5,
+    "apps/api/app/services/role_service.py": 19,
+    "apps/api/app/services/script_knowledge_service.py": 1,
+    "apps/api/app/services/script_library_service.py": 17,
+    "apps/api/app/services/system_agent_evolution_service.py": 10,
+    "apps/api/app/services/workspace_service.py": 100,
+    "apps/api/app/services/writer_preference_service.py": 22
+  }
 }

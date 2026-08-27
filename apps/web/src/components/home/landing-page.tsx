@@ -33,7 +33,9 @@ import {
 } from "react";
 import { InteractiveDifferenceCursor } from "@/components/ui/interactive-difference-cursor";
 import { getSessionUser, login, logout } from "@/lib/api-client";
+import { hasErrorCode } from "@/lib/api-error";
 import { OPERATION_MANUAL_URL } from "@/lib/constants";
+import { HTTP_ERROR_CODES } from "@/lib/error-codes";
 import type { User } from "@/lib/types";
 
 const navigation = [
@@ -679,8 +681,11 @@ export function LandingPage() {
       loginDialogRef.current?.close();
       window.location.href = "/workspace";
     } catch (error) {
-      const message = error instanceof Error ? error.message : "登录失败";
-      setLoginError(message.includes("Incorrect username or password") ? "账号或密码不正确" : message);
+      setLoginError(
+        hasErrorCode(error, HTTP_ERROR_CODES.LOGIN_FAILED)
+          ? "账号或密码不正确"
+          : error instanceof Error ? error.message : "登录失败"
+      );
     } finally {
       setLoginBusy(false);
     }
