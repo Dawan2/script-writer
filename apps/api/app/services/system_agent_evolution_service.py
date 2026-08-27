@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import re
 import sqlite3
@@ -23,6 +24,8 @@ from app.services.writer_preference_service import (
     list_writer_preferences,
 )
 
+
+logger = logging.getLogger(__name__)
 
 ACTIVE_RUN_STATUSES = {"queued", "analyzing", "applying"}
 ERROR_WORD_RE = re.compile(r"(error|failed|failure|exception|报错|失败|异常|超时)", re.IGNORECASE)
@@ -512,8 +515,8 @@ def run_evolution_validation_tool(action: str, **paths: Path) -> dict:
         timeout=90,
     )
     if result.returncode != 0:
-        detail = (result.stderr or result.stdout or f"exit code {result.returncode}").strip()
-        raise RuntimeError(f"进化{action}校验失败：{detail[-3000:]}")
+        logger.error("进化%s校验失败：%s", action, (result.stderr or result.stdout).strip()[-3000:])
+        raise RuntimeError(f"进化{action}校验失败，未能确认通过。")
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError as exc:

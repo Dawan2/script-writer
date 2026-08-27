@@ -9,6 +9,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPExcepti
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.core.errors import stage_file_missing_error, unknown_stage_error
 from app.db.session import get_db
 from app.dependencies import current_user
 from app.services.agent_runner import active_job_for_project, create_job, run_agent_job
@@ -242,7 +243,7 @@ def _record_artifact_download(
     workspace = resolve_workspace(project["workspace_dir"])
     file_path = workspace / stage_file_for_workspace(workspace, stage)
     if not file_path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage file not found")
+        raise stage_file_missing_error(stage)
     record_audit(
         conn,
         actor=user,
@@ -856,13 +857,13 @@ def download_project_file(
 ) -> Response:
     project = get_project_or_404(conn, project_id, user)
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     if stage_delivery_in_progress(project, stage):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="该阶段正在生成，完成后可以下载")
     workspace = resolve_workspace(project["workspace_dir"])
     file_path = workspace / stage_file_for_workspace(workspace, stage)
     if not file_path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage file not found")
+        raise stage_file_missing_error(stage)
     if audit:
         _record_artifact_download(
             conn,
@@ -895,7 +896,7 @@ def record_project_file_download(
 ) -> dict:
     project = get_project_or_404(conn, project_id, user)
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     _record_artifact_download(
         conn,
         project=project,
@@ -934,7 +935,7 @@ def get_document_comments(
 ) -> dict:
     get_project_or_404(conn, project_id, user)
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     return {"comments": list_document_comments(conn, project_id, stage)}
 
 
@@ -948,7 +949,7 @@ def post_document_comment(
 ) -> dict:
     get_project_or_404(conn, project_id, user)
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     if payload.anchor_end <= payload.anchor_start:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="评论位置无效")
     if payload.preview_end is not None and payload.preview_start is not None and payload.preview_end <= payload.preview_start:
@@ -982,7 +983,7 @@ def post_document_comment_reply(
 ) -> dict:
     get_project_or_404(conn, project_id, user)
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     return {
         "comment": add_document_comment_reply(
             conn,
@@ -1006,7 +1007,7 @@ def delete_document_comment(
 ) -> dict:
     get_project_or_404(conn, project_id, user)
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     return {
         "result": delete_document_comment_message(
             conn,
@@ -1099,13 +1100,13 @@ def approve_project_stage(
     project = get_project_or_404(conn, project_id, user, required_permission="edit")
     ensure_project_editable(project)
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     if stage_delivery_in_progress(project, stage):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="该阶段正在生成，完成后再进行确认")
     workspace = resolve_workspace(project["workspace_dir"])
     artifact_path = workspace / stage_file_for_workspace(workspace, stage)
     if not artifact_path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage file not found")
+        raise stage_file_missing_error(stage)
     artifact_hash = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
     if payload.expected_hash and payload.expected_hash != artifact_hash:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="文档内容已变化，请刷新后重新确认")

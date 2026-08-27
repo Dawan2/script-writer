@@ -17,6 +17,7 @@ from xml.etree import ElementTree
 from fastapi import HTTPException, UploadFile, status
 
 from app.core.config import settings
+from app.core.errors import tool_failure_error
 from app.db.session import get_connection
 from app.services.direct_skill_runner import (
     call_direct_model,
@@ -370,8 +371,10 @@ def _extract_with_markdown_converter(filename: str, raw: bytes) -> str:
             check=False,
         )
         if result.returncode != 0 or not output.is_file():
-            detail = (result.stderr or result.stdout or "文档转换失败").strip()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail[-1000:])
+            raise tool_failure_error(
+                "DOCUMENT_CONVERT_FAILED",
+                root_cause=(result.stderr or result.stdout or "").strip(),
+            )
         return output.read_text(encoding="utf-8")
 
 
@@ -400,8 +403,10 @@ def _extract_legacy_word_document(filename: str, raw: bytes) -> str:
         output = root / f"{source.stem}.txt"
         if converted.returncode == 0 and output.is_file():
             return output.read_text(encoding="utf-8", errors="replace")
-        detail = converted.stderr or textutil.stderr.decode("utf-8", errors="replace") or "DOC 文件无法读取"
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(detail)[-1000:])
+        raise tool_failure_error(
+            "LEGACY_DOCUMENT_UNREADABLE",
+            root_cause=converted.stderr or textutil.stderr.decode("utf-8", errors="replace"),
+        )
 
 
 def _guess_title(filename: str, text: str) -> str:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import shlex
 import subprocess
@@ -8,6 +9,9 @@ from typing import Any
 
 from app.core.config import settings
 from app.services.model_config_service import claude_command_options, claude_process_environment, fallback_runtime
+
+
+logger = logging.getLogger(__name__)
 
 
 def bundled_claude_path() -> str:
@@ -110,6 +114,6 @@ def run_ai_skill(
         encoding="utf-8",
     )
     if result.returncode != 0:
-        detail = (result.stderr or result.stdout or f"exit code {result.returncode}").strip()
-        raise RuntimeError(f"AI 任务执行失败：{detail[-2000:]}")
+        logger.error("AI 任务执行失败：%s", (result.stderr or result.stdout).strip()[-2000:])
+        raise RuntimeError("AI 任务执行失败，本次结果未产生。")
     return result

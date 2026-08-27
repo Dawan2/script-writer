@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sqlite3
 import subprocess
@@ -17,6 +18,8 @@ from app.services.writer_preference_service import (
 )
 from app.services.workspace_service import resolve_workspace, workspace_input_path
 
+
+logger = logging.getLogger(__name__)
 
 MAX_SUMMARY_REPAIR_ATTEMPTS = 1
 
@@ -308,8 +311,8 @@ def run_preference_summary_tool(action: str, *, evidence_path: Path, output_path
         timeout=60,
     )
     if result.returncode != 0:
-        detail = (result.stderr or result.stdout or f"exit code {result.returncode}").strip()
-        raise RuntimeError(f"偏好总结{action}校验失败：{detail[-2000:]}")
+        logger.error("偏好总结%s校验失败：%s", action, (result.stderr or result.stdout).strip()[-2000:])
+        raise RuntimeError(f"偏好总结{action}校验失败，未能确认通过。")
     try:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError as exc:

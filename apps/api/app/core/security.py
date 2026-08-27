@@ -58,7 +58,16 @@ def create_access_token(payload: dict[str, Any]) -> str:
     return f"{encoded_body}.{_b64encode(signature)}"
 
 
-def decode_access_token(token: str) -> dict[str, Any] | None:
+TOKEN_OK = "ok"
+TOKEN_EXPIRED = "expired"
+TOKEN_INVALID = "invalid"
+
+
+def read_access_token(token: str) -> tuple[dict[str, Any] | None, str]:
+    """返回载荷与失败原因。
+
+    "签名不对"和"已过期"必须分开，否则最常见的自然过期会被说成无法识别的登录状态。
+    """
     try:
         encoded_body, signature_b64 = token.split(".", 1)
         expected_sig = hmac.new(
@@ -67,10 +76,15 @@ def decode_access_token(token: str) -> dict[str, Any] | None:
             hashlib.sha256,
         ).digest()
         if not hmac.compare_digest(_b64decode(signature_b64), expected_sig):
-            return None
+            return None, TOKEN_INVALID
         payload = json.loads(_b64decode(encoded_body))
         if int(payload.get("exp", 0)) < int(time.time()):
-            return None
-        return payload
+            return None, TOKEN_EXPIRED
+        return payload, TOKEN_OK
     except Exception:
-        return None
+        return None, TOKEN_INVALID
+
+
+def decode_access_token(token: str) -> dict[str, Any] | None:
+    payload, _reason = read_access_token(token)
+    return payload

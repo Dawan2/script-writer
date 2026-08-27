@@ -7,6 +7,7 @@ import subprocess
 from fastapi import HTTPException, status
 
 from app.core.config import settings
+from app.core.errors import APIError
 from app.services.workspace_service import TASK_TYPE_NOVEL, resolve_workspace, row_task_type
 
 
@@ -58,9 +59,11 @@ def assert_novel_analysis_admission(project: dict) -> dict:
         ) from exc
 
     if result.returncode != 0:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=_tool_message(result.stderr or result.stdout, "小说原文暂时无法读取，请检查后重试。"),
+        raw_output = result.stderr or result.stdout
+        raise APIError(
+            "NOVEL_SOURCE_UNREADABLE",
+            message=_tool_message(raw_output, ""),
+            root_cause=raw_output,
         )
 
     try:
