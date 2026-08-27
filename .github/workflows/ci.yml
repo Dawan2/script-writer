@@ -30,6 +30,9 @@ jobs:
       - name: Lint（零警告过关）
         run: npm run lint
 
+      - name: 错误码注册表 lint（SPEC-03：三段式齐备 + docs/errors/ 零漂移 + 未注册码拦截）
+        run: npm run lint:errors
+
       - name: 类型检查
         run: npm run typecheck
 
@@ -41,3 +44,6 @@ jobs:
 
       - name: CLI 入口冒烟（sw --version / --help）
         run: npm run smoke
+
+      - name: 退出码约定冒烟（SPEC-03-EXT：0 成功 / 2 用法错误，真实进程断言）
+        run: npm run smoke:exit-codes
