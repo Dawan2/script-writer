@@ -56,8 +56,8 @@ htmlcov/
 # Browser automation artifacts
 /.playwright-cli/
 /output/
-/playwright-report/
-/test-results/
+playwright-report/
+test-results/
 
 # Planning notes, generated mockups, and other scratch files
 /tmp/
