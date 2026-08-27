@@ -67,6 +67,23 @@ npm run check
 - FastAPI Python 编译检查
 - `Agents` 子项目的原有 `npm run check`
 
+## 测试
+
+后端测试用到 `fastapi.testclient`，它依赖 `httpx`。先安装测试依赖：
+
+```bash
+cd apps/api
+.venv/bin/pip install -r requirements-dev.txt
+```
+
+然后在仓库根目录执行：
+
+```bash
+npm test
+```
+
+该命令依次执行 `Agents` 测试、后端测试与 ZDebug 测试。也可以单独运行 `npm run test:agent`、`npm run test:api`、`npm run test:zdebug`。
+
 ## Agent 子项目
 
 `Agents/` 仍然是完整 Claude Code Agent 项目。可以单独进入后手动运行：
