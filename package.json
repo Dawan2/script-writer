@@ -1,0 +1,41 @@
+{
+  "name": "script-writer",
+  "version": "0.1.0",
+  "description": "结构化脚本创作 CLI：大纲 → 场景 → 导出；AI 为可选适配器（sw 命令）",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "sw": "./dist/cli/main.js",
+    "script-writer": "./dist/cli/main.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "smoke": "node dist/cli/main.js --version && node dist/cli/main.js --help"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dawan2/script-writer.git"
+  },
+  "dependencies": {
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.4.0",
+    "eslint": "^10.9.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.11"
+  }
+}

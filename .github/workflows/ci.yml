@@ -1,0 +1,43 @@
+# CI 基线（W1-P1-T03，解除 BLK-W1-03）：push + PR 触发 lint / typecheck / test / build / CLI 冒烟。
+# 约定：失败必须修复，禁止删测/跳过失败/降低标准换绿（调度器红线）。
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    name: lint+typecheck+test+smoke (node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: 安装依赖（锁文件精确安装）
+        run: npm ci
+
+      - name: Lint（零警告过关）
+        run: npm run lint
+
+      - name: 类型检查
+        run: npm run typecheck
+
+      - name: 单元测试
+        run: npm test
+
+      - name: 构建
+        run: npm run build
+
+      - name: CLI 入口冒烟（sw --version / --help）
+        run: npm run smoke
