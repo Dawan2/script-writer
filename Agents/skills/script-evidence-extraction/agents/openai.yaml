@@ -1,0 +1,4 @@
+interface:
+  display_name: "剧本事实提取"
+  short_description: "分段读取剧本证据，记录可回查的人物、事件、关系和写法事实"
+  default_prompt: "使用 $script-evidence-extraction 从带编号的剧本片段中提取可回查事实。"

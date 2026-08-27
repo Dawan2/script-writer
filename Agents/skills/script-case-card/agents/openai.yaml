@@ -1,0 +1,4 @@
+interface:
+  display_name: "剧本案例卡"
+  short_description: "依据全剧事实索引选择标准标签，并生成可供编剧学习的剧本案例卡"
+  default_prompt: "使用 $script-case-card 根据全剧事实索引生成标签和案例卡。"

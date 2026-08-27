@@ -1,0 +1,4 @@
+interface:
+  display_name: "剧本蒸馏审稿"
+  short_description: "审查案例卡、公式候选与创作原则之间的事实一致性和证据边界"
+  default_prompt: "使用 $script-distillation-review 审查分阶段蒸馏结果是否可以入库。"

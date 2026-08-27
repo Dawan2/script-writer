@@ -1,0 +1,4 @@
+interface:
+  display_name: "剧本事实合并"
+  short_description: "合并各段事实记录，生成覆盖全剧且可以回查证据的统一事实索引"
+  default_prompt: "使用 $script-fact-consolidation 将分段事实整理为全剧事实索引。"

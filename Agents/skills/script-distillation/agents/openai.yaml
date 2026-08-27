@@ -1,0 +1,4 @@
+interface:
+  display_name: "单剧蒸馏"
+  short_description: "读完短剧原文，提炼案例卡、可复用写作方法和创作原则候选"
+  default_prompt: "使用 $script-distillation 完成单个短剧剧本的证据化蒸馏。"

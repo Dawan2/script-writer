@@ -1,0 +1,34 @@
+{
+  "name": "orca-script-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "description": "虎鲸｜剧本出海工作站 Web shell",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "SCRIPT_SYNC_LOCAL_MODE=1 concurrently -n web,api -c cyan,blue \"cd apps/web && NEXT_DIST_DIR=.next-dev next dev --hostname 0.0.0.0 --port 3000\" \"cd apps/api && .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000\"",
+    "dev:watch": "SCRIPT_SYNC_LOCAL_MODE=1 concurrently -n web,api -c cyan,blue \"cd apps/web && NEXT_DIST_DIR=.next-dev next dev --hostname 0.0.0.0 --port 3000\" \"cd apps/api && .venv/bin/python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000\"",
+    "dev:web": "cd apps/web && SCRIPT_SYNC_LOCAL_MODE=1 NEXT_DIST_DIR=.next-dev next dev --hostname 0.0.0.0 --port 3000",
+    "dev:api": "cd apps/api && SCRIPT_SYNC_LOCAL_MODE=1 .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "dev:api:watch": "cd apps/api && SCRIPT_SYNC_LOCAL_MODE=1 .venv/bin/python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
+    "build": "cd apps/web && next build",
+    "start": "concurrently -k -n web,api -c cyan,blue \"npm run start:web\" \"npm run start:api\"",
+    "start:web": "cd apps/web && next start --hostname 0.0.0.0 --port 3000",
+    "start:api": "cd apps/api && .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "check": "cd apps/web && tsc --noEmit && cd ../api && .venv/bin/python -m compileall app && cd ../../Agents && npm run check",
+    "check:web": "cd apps/web && tsc --noEmit",
+    "check:api": "cd apps/api && .venv/bin/python -m compileall app",
+    "check:agent": "cd Agents && npm run check",
+    "test": "npm run test:agent && npm run test:api && npm run test:zdebug",
+    "test:agent": "cd Agents && npm test",
+    "test:api": "cd apps/api && .venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "test:zdebug": "node --test tools/zdebug/src/*.test.mjs",
+    "api:create-user": "cd apps/api && .venv/bin/python -m app.scripts.create_user",
+    "api:import-workspaces": "cd apps/api && .venv/bin/python -m app.scripts.import_workspaces"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-code": "2.1.204",
+    "concurrently": "^9.2.1"
+  }
+}

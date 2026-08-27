@@ -1,0 +1,4 @@
+interface:
+  display_name: "创作偏好提炼"
+  short_description: "项目归档后从手工操作证据提炼待确认的长期创作偏好建议"
+  default_prompt: "Use $preference-summary to extract reviewable writing preferences from archived project evidence."

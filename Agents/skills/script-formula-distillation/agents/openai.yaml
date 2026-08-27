@@ -1,0 +1,4 @@
+interface:
+  display_name: "剧本公式提炼"
+  short_description: "从案例卡和事实索引中提炼少量具备使用条件与边界的公式候选"
+  default_prompt: "使用 $script-formula-distillation 从案例卡中提炼可复用公式候选。"

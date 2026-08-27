@@ -1,0 +1,6 @@
+{
+  "required_headings": ["分析范围", "证据概览", "优化建议", "执行优先级", "验证与回滚"],
+  "recommendation_fields": ["现象", "证据", "根因假设", "调整对象", "具体方案", "预期收益", "副作用", "验收指标", "回滚点"],
+  "no_change_fields": ["判断", "证据缺口", "后续采集"],
+  "minimum_section_chars": 12
+}

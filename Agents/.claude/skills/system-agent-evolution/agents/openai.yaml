@@ -1,0 +1,4 @@
+interface:
+  display_name: "系统 Agent 进化"
+  short_description: "基于跨项目证据分析并执行经批准的 Skill 优化"
+  default_prompt: "使用 $system-agent-evolution 基于指定证据生成可审计的 Agent 优化报告。"

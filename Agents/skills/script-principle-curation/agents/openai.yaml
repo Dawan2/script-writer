@@ -1,0 +1,4 @@
+interface:
+  display_name: "创作原则归档"
+  short_description: "比较原则观察与已有原则，记录支持、边界、反例或候选"
+  default_prompt: "使用 $script-principle-curation 整理原则观察并生成归档操作。"

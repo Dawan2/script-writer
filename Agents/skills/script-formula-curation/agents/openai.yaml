@@ -1,0 +1,4 @@
+interface:
+  display_name: "公式卡归档"
+  short_description: "比较公式候选与已有公式，决定复用、完善或新增"
+  default_prompt: "使用 $script-formula-curation 整理公式候选并生成归档操作。"

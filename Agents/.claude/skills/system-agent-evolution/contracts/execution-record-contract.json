@@ -1,0 +1,5 @@
+{
+  "required_headings": ["执行范围", "实际变更", "未执行项及原因", "指标对照", "回滚方法", "系统验证结果"],
+  "minimum_section_chars": 12,
+  "required_commands": ["npm test", "npm run check"]
+}

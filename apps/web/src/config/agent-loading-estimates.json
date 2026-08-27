@@ -1,0 +1,38 @@
+{
+  "novel_analysis": {
+    "label": "小说解读",
+    "estimatedMinutes": 90
+  },
+  "world_view": {
+    "label": "世界观生成",
+    "estimatedMinutes": 20
+  },
+  "outline_rewrite": {
+    "label": "故事梗概生成",
+    "estimatedMinutes": 25
+  },
+  "character_rewrite": {
+    "label": "人物小传生成",
+    "estimatedMinutes": 15
+  },
+  "trial_generate": {
+    "label": "剧本试稿生成",
+    "estimatedMinutes": 15
+  },
+  "full_generate": {
+    "label": "完整剧本生成",
+    "estimatedMinutes": 40
+  },
+  "dialogue_translate": {
+    "label": "台词翻译",
+    "estimatedMinutes": 10
+  },
+  "foreign_review": {
+    "label": "审稿报告",
+    "estimatedMinutes": 30
+  },
+  "humanizer_zh": {
+    "label": "剧本润色",
+    "estimatedMinutes": 20
+  }
+}

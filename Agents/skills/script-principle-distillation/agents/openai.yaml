@@ -1,0 +1,4 @@
+interface:
+  display_name: "创作原则提炼"
+  short_description: "从案例和公式候选中提炼跨题材适用、仍需审核的创作原则观察"
+  default_prompt: "使用 $script-principle-distillation 提炼待审核的通用创作原则观察。"
