@@ -14,10 +14,11 @@
 | --- | --- | --- |
 | [`wave-01/inventory-codebase.md`](./wave-01/inventory-codebase.md) | W1-A 代码库结构盘点：空仓事实证据（无包/无测试/无 CI）+ 对齐 P1 的建议目标目录树 | `cursor/w1-a-codebase-inventory-bb07`（本分支） |
 | [`wave-01/inventory-features-flows.md`](./wave-01/inventory-features-flows.md) | W1-B 功能与交互路径盘点：目标功能清单、主/边缘路径、空态/错态基准清单、P2 裁决 CLI 映射与 GAP 登记（W3 集成并入） | `cursor/w1-b-features-flows-9843 @ 9ef7ea7` |
+| [`wave-01/inventory-agent-tooling.md`](./wave-01/inventory-agent-tooling.md) | W1-C Agent/工具/自动化链路盘点：目标工具清单、工作流对账锚点与缺口登记（G1 已由 WAVE02-PLAN 分区补登；W3 集成并入） | `cursor/w1-c-agent-tooling-inventory-0ec2 @ 8553c7f` |
 | [`wave-01/maturity-baseline.md`](./wave-01/maturity-baseline.md) | W1-D 成熟度基线：L0–L5 量表、E1–E5 证据规则、阻塞登记（BLK-W1-01/02/03）、三维度自评（全 L0） | `cursor/w1-d-maturity-baseline-b2eb @ 60c37e8` |
 | [`wave-01/P1-usability-architecture.md`](./wave-01/P1-usability-architecture.md) | P1 功能易用性：假设 A1–A4（CLI 优先、TS）、七维度准则、SPEC-01/02/03、目标分层 | `cursor/w1-p1-usability-architecture-5d0e @ 5545c22`（回执 `4612cdb`） |
-| [`wave-01/P2-interaction-reliability.md`](./wave-01/P2-interaction-reliability.md) | P2 交互可靠性：12 维度审查、设计裁决 D1–D39、可靠性分层、后续规格 S1–S3 | `cursor/w1-p2-interaction-reliability-a3c2 @ 7873b66` |
-| [`wave-01/ready-tasks.md`](./wave-01/ready-tasks.md) | 就绪任务队列（按槽位分区追加）：W1-P1-T01…T10 与 W1-P2-T01…T10 | P1 与 P2 分支各持一版，**合并时取分区并集** |
+| [`wave-01/P2-interaction-reliability.md`](./wave-01/P2-interaction-reliability.md) | P2 交互可靠性：12 维度审查、设计裁决 D1–D39、可靠性分层、后续规格 S1–S3（W3 集成并入正文） | `cursor/w1-p2-interaction-reliability-a3c2 @ 7873b66` |
+| [`wave-01/ready-tasks.md`](./wave-01/ready-tasks.md) | 就绪任务队列（按槽位分区追加）：P1/P3/P4/WAVE02-PLAN/P2 五分区并集（W3 集成完成拼接） | 本分支为全分区并集版 |
 | [`wave-01/P3-agent-intelligence.md`](./wave-01/P3-agent-intelligence.md) | P3 Agent 智能化：8 子系统设计、量表映射、SPEC-P3-01/02/03（W2 追加条目） | `cursor/w1-p3-agent-intelligence-ca4d @ 67e6670` |
 | [`wave-01/P4-major-experience-features.md`](./wave-01/P4-major-experience-features.md) | P4 重大工具体验功能：F1–F6 提案与去重/可实现性核验（W2 追加条目） | `cursor/w1-p4-major-experience-features-5fba @ 6ec86f8` |
 
