@@ -115,6 +115,7 @@ async function sendOnce(
   path: string,
   request: CoreRequest,
   traceId: string,
+  budgetMs: number | null,
   remainingMs: number | null
 ): Promise<Attempt> {
   const method = request.method ?? "GET";
@@ -122,8 +123,8 @@ async function sendOnce(
   headers.set(REQUEST_ID_HEADER, traceId);
   if (request.json !== undefined) headers.set("content-type", "application/json");
   if (request.idempotencyKey) headers.set(IDEMPOTENCY_KEY_HEADER, request.idempotencyKey);
-  const budget = budgetOf(request.budget ?? defaultBudget(method, request.form));
-  if (budget.browserMs !== null) headers.set(CLIENT_TIMEOUT_HEADER, String(budget.browserMs));
+  // 代理层按这个头换算自己的预算，好在浏览器之前到期。
+  if (budgetMs !== null) headers.set(CLIENT_TIMEOUT_HEADER, String(budgetMs));
 
   const controller = new AbortController();
   let timedOut = false;
@@ -171,7 +172,7 @@ async function send(path: string, request: CoreRequest): Promise<{ response: Res
       throw apiErrorFromTransport("timeout", webTraceId(traceId));
     }
 
-    const outcome = await sendOnce(path, request, traceId, remainingMs);
+    const outcome = await sendOnce(path, request, traceId, budget.browserMs, remainingMs);
     // 预算到期即停，超时之后不再重试。
     if (outcome.timedOut) throw apiErrorFromTransport("timeout", webTraceId(traceId));
 
