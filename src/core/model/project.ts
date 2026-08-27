@@ -1,6 +1,7 @@
 /**
  * 核心域·项目元数据（P1 方案 §7 SPEC-01 的 project.yaml schema v1）。
  * 默认导出格式按 ADR-0001 §3.6 勘误为 markdown（v1 先行实现的格式）。
+ * 顶层可选字段 expectedSceneCount 依 W2 GAP-03 裁决追加（schema 仍为 1，零迁移成本）。
  */
 
 import type { WorkflowStep } from './workflow.js';
@@ -40,9 +41,17 @@ export interface ProjectMeta {
   format: ScriptFormat;
   /** ISO 日期（YYYY-MM-DD） */
   created: string;
+  /**
+   * 预计场数（正整数，向导第 ③ 问答案；GAP-03 裁决的顶层可选字段）。
+   * 可选：字段缺失的旧式文件必须仍可读（消费方分母退化逻辑属 W1-P1-T05）。
+   */
+  expectedSceneCount?: number;
   settings: ProjectSettings;
   progress: ProjectProgress;
 }
+
+/** 向导第 ③ 问的默认值（SPEC-01：预计场数默认 5）。 */
+export const DEFAULT_EXPECTED_SCENE_COUNT = 5;
 
 export interface CreateProjectMetaInput {
   title: string;

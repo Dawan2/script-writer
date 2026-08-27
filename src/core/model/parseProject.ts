@@ -20,6 +20,8 @@ export interface ProjectFileShape {
   title: string;
   format: string;
   created: string;
+  /** GAP-03 顶层可选字段（落盘键即驼峰 expectedSceneCount，与 init 向导序列化口径一致）。 */
+  expectedSceneCount?: number;
   settings: {
     ai: { enabled: boolean; provider: string | null };
     export: { default: string };
@@ -78,6 +80,17 @@ export function parseProjectMeta(data: unknown): ParseProjectResult {
     issues.push('created 必须是 ISO 日期（YYYY-MM-DD）');
   }
 
+  // GAP-03 可选字段：缺失合法（旧式文件仍可读）；存在则必须是正整数。
+  const expectedSceneCount = data['expectedSceneCount'];
+  if (
+    expectedSceneCount !== undefined &&
+    (typeof expectedSceneCount !== 'number' ||
+      !Number.isInteger(expectedSceneCount) ||
+      expectedSceneCount < 1)
+  ) {
+    issues.push('expectedSceneCount（可选）必须是正整数');
+  }
+
   const settings = data['settings'];
   let ai: { enabled: boolean; provider: string | null } | null = null;
   let exportDefault: string | null = null;
@@ -133,6 +146,7 @@ export function parseProjectMeta(data: unknown): ParseProjectResult {
       title: (title as string).trim(),
       format: format as ProjectMeta['format'],
       created: createdText as string,
+      ...(typeof expectedSceneCount === 'number' ? { expectedSceneCount } : {}),
       settings: { ai, export: { default: exportDefault } },
       progress: { step, scenesDone },
     },
@@ -146,6 +160,10 @@ export function toProjectFileShape(meta: ProjectMeta): ProjectFileShape {
     title: meta.title,
     format: meta.format,
     created: meta.created,
+    // 无损往返：字段存在才落盘（键序与 init 向导序列化一致——紧随 created）
+    ...(meta.expectedSceneCount !== undefined
+      ? { expectedSceneCount: meta.expectedSceneCount }
+      : {}),
     settings: {
       ai: { enabled: meta.settings.ai.enabled, provider: meta.settings.ai.provider },
       export: { default: meta.settings.export.default },

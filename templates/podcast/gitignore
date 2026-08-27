@@ -1,0 +1,2 @@
+# 导出产物不入库（P1 方案 §6.1：exports/ 为 git-ignored）
+exports/

@@ -6,6 +6,7 @@
 
 import { readFileSync } from 'node:fs';
 import { Command } from 'commander';
+import { registerOutlineCommand } from './commands/outline.js';
 import { registerStatusCommand } from './commands/status.js';
 
 interface PackageManifest {
@@ -25,7 +26,7 @@ const ROADMAP_HELP = `
 子命令实现进度：
   sw init      初始化项目向导          [规划中 · W1-P1-T04]
   sw status    显示进度与下一步命令    [可用 · W1-P1-T05 最小版]
-  sw outline   编辑大纲                [规划中 · W1-P1-T05]
+  sw outline   创建/补齐大纲骨架       [可用 · W1-P1-T07 最小版]
   sw draft     起草/续写场景           [规划中 · W1-P1-T05]
   sw export    导出脚本                [规划中 · W1-P1-T05]
 
@@ -47,5 +48,6 @@ export function buildProgram(): Command {
       program.outputHelp();
     });
   registerStatusCommand(program);
+  registerOutlineCommand(program);
   return program;
 }
