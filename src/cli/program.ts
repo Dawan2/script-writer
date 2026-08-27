@@ -6,6 +6,7 @@
 
 import { readFileSync } from 'node:fs';
 import { Command } from 'commander';
+import { registerStatusCommand } from './commands/status.js';
 
 interface PackageManifest {
   version: string;
@@ -23,7 +24,7 @@ const ROADMAP_HELP = `
 
 子命令实现进度：
   sw init      初始化项目向导          [规划中 · W1-P1-T04]
-  sw status    显示进度与下一步命令    [规划中 · W1-P1-T05]
+  sw status    显示进度与下一步命令    [可用 · W1-P1-T05 最小版]
   sw outline   编辑大纲                [规划中 · W1-P1-T05]
   sw draft     起草/续写场景           [规划中 · W1-P1-T05]
   sw export    导出脚本                [规划中 · W1-P1-T05]
@@ -41,8 +42,10 @@ export function buildProgram(): Command {
     .helpOption('-h, --help', '显示帮助')
     .addHelpText('after', ROADMAP_HELP)
     .action(() => {
-      // 子命令落地前，无参数运行 = 输出帮助（落地后按 P1 §6.4 改为等价 sw status）
+      // 无参数运行 = 输出帮助；待 init（T04）合入、非项目目录也有引导后，
+      // 按 P1 §6.4 切换为等价 sw status（切换点：本 action 改调 runStatus）
       program.outputHelp();
     });
+  registerStatusCommand(program);
   return program;
 }
