@@ -114,6 +114,20 @@ function fileNameToProjectName(file: File | null) {
   return file?.name.replace(/\.[^.]+$/, "").trim() ?? "";
 }
 
+/** 批量操作里没能完成的那一项：哪个任务、什么原因。 */
+type BulkFailure = { label: string; message: string };
+
+/** 结果按实际计数表述：有失败也不把成功的那几项说成失败。 */
+function bulkResultNotice(action: TaskAction, succeeded: number, failed: number) {
+  if (failed) return `成功 ${succeeded} 项、失败 ${failed} 项，失败原因见上方提示`;
+  return {
+    start: `已将 ${succeeded} 项任务重新排队，将从当前阶段继续`,
+    pause: `已暂停 ${succeeded} 项任务`,
+    rerun: `已重新安排 ${succeeded} 项任务，并将从头创建新的工作台项目`,
+    delete: `已删除 ${succeeded} 条批量记录，工作台项目会保留`
+  }[action];
+}
+
 export function BatchTasksPage({ user }: { user: User }) {
   const rowId = useRef(1);
   const [tasks, setTasks] = useState<BatchTask[]>([]);
@@ -125,6 +139,7 @@ export function BatchTasksPage({ user }: { user: User }) {
   const [busy, setBusy] = useState(false);
   const [busyTaskId, setBusyTaskId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [bulkFailures, setBulkFailures] = useState<BulkFailure[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [scenarioFilter, setScenarioFilter] = useState("");
@@ -314,23 +329,31 @@ export function BatchTasksPage({ user }: { user: User }) {
     setBusy(true);
     setBulkMenuOpen(false);
     setError(null);
+    setBulkFailures([]);
+    const taskLabel = (taskId: number) => tasks.find((task) => task.id === taskId)?.project_name ?? `任务 ${taskId}`;
     try {
+      let failures: BulkFailure[] = [];
+      let succeeded = ids.length;
       if (action === "delete") {
-        await Promise.all(ids.map((id) => deleteBatchTask(id)));
+        // 一项失败不吞掉其余项的结果。
+        const results = await Promise.allSettled(ids.map((id) => deleteBatchTask(id)));
+        failures = results.flatMap((result, index) =>
+          result.status === "rejected"
+            ? [{
+              label: taskLabel(ids[index]),
+              message: result.reason instanceof Error ? result.reason.message : "删除失败"
+            }]
+            : []
+        );
+        succeeded = ids.length - failures.length;
       } else {
         const result = await batchTaskAction(action, ids);
-        if (result.failures.length) setError(result.failures.map((item) => item.message).join("；"));
+        failures = result.failures.map((item) => ({ label: taskLabel(item.task_id), message: item.message }));
+        succeeded = result.updated;
       }
+      setBulkFailures(failures);
       setSelectedIds(new Set());
-      setNotice(
-        action === "pause"
-          ? "已暂停所选任务"
-          : action === "start"
-            ? "已将所选任务重新排队，将从当前阶段继续"
-            : action === "rerun"
-              ? "已重新安排所选任务，并将从头创建新的工作台项目"
-              : "已删除所选批量记录，工作台项目会保留"
-      );
+      setNotice(bulkResultNotice(action, succeeded, failures.length));
       await refresh();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "批量操作失败");
@@ -369,6 +392,7 @@ export function BatchTasksPage({ user }: { user: User }) {
 
       <section className={styles.content}>
         {error ? <div className={styles.errorBanner} role="alert"><span>{error}</span><button type="button" onClick={() => setError(null)} aria-label="关闭提示" title="关闭提示"><X size={15} /></button></div> : null}
+        {bulkFailures.map((failure, index) => <div className={styles.errorBanner} role="alert" key={`${failure.label}-${index}`}><span>{failure.label}：{failure.message}</span><button type="button" onClick={() => setBulkFailures((current) => current.filter((_, at) => at !== index))} aria-label="关闭提示" title="关闭提示"><X size={15} /></button></div>)}
         {notice ? <div className={styles.noticeBanner} role="status">{notice}</div> : null}
 
         <div className={styles.summaryLine}>

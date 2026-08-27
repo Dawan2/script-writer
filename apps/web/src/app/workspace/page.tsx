@@ -51,6 +51,7 @@ import {
   updateOutlineTitle,
   updateProject
 } from "@/lib/api-client";
+import { isApiError } from "@/lib/api-error";
 import type { AgentDocumentExcerpt, AgentJob, AgentStageChoice, CreditSummary, DistributionBriefSnapshot, DocumentCommentAnchor, DocumentCommentLayout, DocumentCommentThread, Notification, NovelAnalysis, NovelAnalysisSection, Project, ProjectInitialization, ProjectReinitializeInput, ScriptTagTaxonomy, StageDocument, StageFile, TargetRegion, TrashedProject, User, WorldView } from "@/lib/types";
 
 type MarkdownMode = "preview" | "markdown";
@@ -190,21 +191,12 @@ function novelAnalysisFromDraft(draft: string, document: StageDocument | null): 
   }
 }
 
-function saveErrorMessage(error: unknown, stage: string) {
-  const message = error instanceof Error ? error.message : "保存失败";
-  if (stage !== "novel_analysis") return message;
-  const start = message.indexOf("{");
-  const end = message.lastIndexOf("}");
-  if (start < 0 || end <= start) return message;
-  try {
-    const result = JSON.parse(message.slice(start, end + 1)) as { issues?: unknown };
-    const issues = Array.isArray(result.issues)
-      ? result.issues.filter((item): item is string => typeof item === "string" && Boolean(item.trim()))
-      : [];
-    return issues.length ? `请完善后再保存：${issues.join("；")}` : message;
-  } catch {
-    return message;
-  }
+function saveErrorMessage(error: unknown) {
+  const issues = isApiError(error) && Array.isArray(error.details?.issues)
+    ? error.details.issues.filter((item): item is string => typeof item === "string" && Boolean(item.trim()))
+    : [];
+  if (issues.length) return `请完善后再保存：${issues.join("；")}`;
+  return error instanceof Error ? error.message : "保存失败";
 }
 
 function markStageGenerating(files: StageFile[], stage: string) {
@@ -1463,7 +1455,7 @@ export default function WorkspacePage() {
       setDraft(nextDocument.content);
       await refreshCurrentProject();
     } catch (err) {
-      setError(saveErrorMessage(err, selectedFile.stage));
+      setError(saveErrorMessage(err));
     } finally {
       setBusy(false);
     }
