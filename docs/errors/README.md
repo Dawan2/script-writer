@@ -22,6 +22,8 @@
 | [`SW-E010`](./SW-E010.md) | 目标目录非空，初始化已中止 | SW-E01x 项目 / 文件系统 |
 | [`SW-E011`](./SW-E011.md) | 当前目录不是 script-writer 项目 | SW-E01x 项目 / 文件系统 |
 | [`SW-E020`](./SW-E020.md) | project.yaml 的 schema 版本不兼容 | SW-E02x 状态 / 版本 |
+| [`SW-E021`](./SW-E021.md) | project.yaml 无法解析 | SW-E02x 状态 / 版本 |
+| [`SW-E022`](./SW-E022.md) | project.yaml 字段不完整或类型错误 | SW-E02x 状态 / 版本 |
 | [`SW-E030`](./SW-E030.md) | 场景 {sceneId} 不存在 | SW-E03x 输入校验 |
 
 注：SW-E04x（AI 供应商）段暂无登记——AI 默认关闭、无触达路径，

@@ -29,6 +29,10 @@ export interface ErrorContexts {
   'SW-E011': { cwd: string };
   /** SPEC-02：project.yaml schema 版本不兼容。 */
   'SW-E020': { found: string | number; supported: number };
+  /** SPEC-02：project.yaml 存在但不是合法 YAML（引擎 loadProject 的 invalid-yaml 分支，W3 集成登记）。 */
+  'SW-E021': { detail: string };
+  /** SPEC-02：project.yaml 字段缺失或类型错误（引擎 parseProjectMeta 的 malformed 分支，W3 集成登记）。 */
+  'SW-E022': { issues: readonly string[] };
   /** SPEC-02：场景 id 不存在（附现有 id 列表）。 */
   'SW-E030': { sceneId: string; existingIds: readonly string[] };
 }
@@ -51,9 +55,10 @@ export interface ErrorSpec<C extends ErrorCode = ErrorCode> {
 }
 
 /**
- * 错误码注册表 v1（4 码，全部来自 SPEC-01/02 的实际触达路径）。
+ * 错误码注册表（全部来自 SPEC-01/02 的实际触达路径）。
  * 段位含义（SPEC-03 注册表）：E01x 项目/文件系统；E02x 状态/版本；E03x 输入校验；
- * E04x AI 供应商（v1 未登记：AI 默认关闭、无触达路径，登记即违反「禁止预填未用码」）。
+ * E04x AI 供应商（未登记：AI 默认关闭、无触达路径，登记即违反「禁止预填未用码」）。
+ * W3 集成追加：E021/E022（工作流引擎 loadProject 实际触达，语义冲突 ② 核销）。
  */
 export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
   'SW-E010': {
@@ -73,6 +78,18 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     why: '文件声明的 schema 版本是 {found}，本版本 CLI 支持的是 schema {supported}。',
     fix: '若 schema 字段是被误改的，请改回 {supported}；若项目由更新版本的 CLI 创建，请先升级本机 CLI（`npm install -g script-writer@latest`）再重试。',
     example: { found: 2, supported: 1 },
+  },
+  'SW-E021': {
+    what: 'project.yaml 无法解析',
+    why: '文件不是合法 YAML——{detail}。',
+    fix: '用编辑器检查 project.yaml 最近的改动并修正语法；或从 git 历史恢复该文件（`git checkout -- project.yaml`）。',
+    example: { detail: 'Unexpected end of flow sequence' },
+  },
+  'SW-E022': {
+    what: 'project.yaml 字段不完整或类型错误',
+    why: '{issues}。',
+    fix: '按「原因」中的提示逐项修正字段；或从 git 历史恢复该文件（`git checkout -- project.yaml`）。',
+    example: { issues: ['title 必须是非空字符串'] },
   },
   'SW-E030': {
     what: '场景 {sceneId} 不存在',

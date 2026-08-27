@@ -31,7 +31,8 @@
     "url": "git+https://github.com/Dawan2/script-writer.git"
   },
   "dependencies": {
-    "commander": "^15.0.0"
+    "commander": "^15.0.0",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

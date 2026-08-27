@@ -13,6 +13,7 @@
 import { CommanderError } from 'commander';
 import { isSwError } from '../app/errors/registry.js';
 import { renderError, renderUnexpectedError } from '../app/errors/render.js';
+import { processIo, type CliIo } from './io.js';
 import { buildProgram } from './program.js';
 
 /** 成功（含幂等式「无事可做」的成功）。 */
@@ -24,20 +25,8 @@ export const EXIT_USAGE_ERROR = 2;
 
 export type ExitCode = typeof EXIT_OK | typeof EXIT_RUNTIME_ERROR | typeof EXIT_USAGE_ERROR;
 
-/** 输出通道抽象：默认写 stdout/stderr；测试注入以捕获输出。 */
-export interface CliIo {
-  out(text: string): void;
-  err(text: string): void;
-}
-
-const processIo: CliIo = {
-  out: (text) => {
-    process.stdout.write(text);
-  },
-  err: (text) => {
-    process.stderr.write(text);
-  },
-};
+// IO 抽象移至 src/cli/io.ts（W3 集成：语义冲突 ⑦ 统一）；原路径 re-export 保持既有导入不变。
+export type { CliIo } from './io.js';
 
 /**
  * 顶层 catch 的错误 → 退出码映射（SPEC-03-EXT 唯一实现点）。
@@ -66,7 +55,7 @@ export function toExitCode(error: unknown, io: CliIo): ExitCode {
  * 避免 process.exit 截断未刷完的输出流）。
  */
 export async function runCli(argv: readonly string[], io: CliIo = processIo): Promise<ExitCode> {
-  const program = buildProgram();
+  const program = buildProgram(io);
   program.exitOverride();
   program.configureOutput({
     writeOut: (str) => {

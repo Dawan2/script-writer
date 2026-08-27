@@ -33,7 +33,8 @@ sw export                         # ④ 导出成稿到 exports/
 | --- | --- | --- |
 | `sw --version` / `sw --help` | **可用** | W1-P1-T03（本槽已交付） |
 | `sw init` | 规划中 | W1-P1-T04 |
-| `sw status` / `sw outline` / `sw draft` / `sw export` | 规划中 | W1-P1-T05 |
+| `sw status` | **可用（最小版）**：项目内输出进度 + 末行可复制的下一步命令 | W1-P1-T05（引擎最小版已交付） |
+| `sw outline` / `sw draft` / `sw export` | 规划中（引擎原语已就绪） | W1-P1-T05 后续 |
 | `sw doctor` | 规划中 | W1-P1-T08 |
 | `sw check` / `sw snapshot` / `sw character` / `sw stats` 等 | 规划中 | W1-P4-T01…T09 |
 

@@ -28,6 +28,7 @@
 | [`wave-02/P-gap-adjudication.md`](./wave-02/P-gap-adjudication.md) | W2 GAP 裁决落地：GAP-01…06 逐条裁决、SPEC-04 `sw revise` 要点、SPEC-03-EXT 退出码表、文件锁要点、勘误登记（错误框架槽按并集并入原文） | `cursor/w2-gap-adjudication-c82d @ 661b313` |
 | [`wave-02/ready-tasks.md`](./wave-02/ready-tasks.md) | Wave-02 就绪任务队列（WAVE02-GAP 分区：W2-GAP-T01…T06） | `cursor/w2-gap-adjudication-c82d @ 661b313`（并入时追加 T06 状态行） |
 | [`wave-02/work-error-framework.md`](./wave-02/work-error-framework.md) | W2 实现槽：SPEC-03 错误框架 + SPEC-03-EXT 退出码落地说明（注册表 / 渲染层 / 退出码 0-1-2 / lint 防线 / 验收对照 / T04-T05 对接清单） | `cursor/w2-error-framework-exit-codes-f4d4`（本分支） |
+| [`wave-02/work-workflow-engine.md`](./wave-02/work-workflow-engine.md) | W2 实现槽：SPEC-02 工作流引擎最小版落地说明（恢复式引擎 / 原子写 / sw status / 并行槽合并注意） | `cursor/w2-workflow-engine-4cad` |
 
 ## 决策与用户文档（W2 起建立）
 
