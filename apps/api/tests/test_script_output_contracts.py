@@ -177,6 +177,61 @@ class ScriptOutputContractsTest(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def run_progress_tool(self, *args: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [NODE, str(AGENTS_DIR / ".claude/tools/update-progress.mjs"), "--workspace", str(self.workspace), *args],
+            cwd=AGENTS_DIR,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+    def test_stage_cannot_be_completed_while_a_declared_output_is_missing(self) -> None:
+        self.write_workspace(script_name="星海协议")
+        progress_path = self.workspace / "1.2-project-progress.json"
+        user_input_path = self.workspace / "1.1-user-input.json"
+        progress_before = progress_path.read_text(encoding="utf-8")
+        user_input_before = user_input_path.read_text(encoding="utf-8")
+
+        result = self.run_progress_tool(
+            "--stage", "outline_rewrite",
+            "--status", "completed",
+            "--updated-by", "tester",
+            "--output", "output/星海协议-故事梗概.md",
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("output/星海协议-故事梗概.md", result.stderr)
+        self.assertIn("先生成并保存这一步的成果", result.stderr)
+        self.assertEqual(progress_path.read_text(encoding="utf-8"), progress_before)
+        self.assertEqual(user_input_path.read_text(encoding="utf-8"), user_input_before)
+
+    def test_stage_is_completed_once_the_declared_output_is_on_disk(self) -> None:
+        self.write_workspace(script_name="星海协议")
+        (self.workspace / "output" / "星海协议-故事梗概.md").write_text("# 星海协议 - 故事梗概\n", encoding="utf-8")
+
+        result = self.run_progress_tool(
+            "--stage", "outline_rewrite",
+            "--status", "completed",
+            "--updated-by", "tester",
+            "--output", "output/星海协议-故事梗概.md",
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        progress = json.loads((self.workspace / "1.2-project-progress.json").read_text(encoding="utf-8"))
+        self.assertEqual(progress["stages"]["outline_rewrite"]["status"], "completed")
+
+    def test_trial_initialization_names_the_missing_world_view_and_the_next_step(self) -> None:
+        self.write_workspace(script_name="星海协议")
+        (self.workspace / "2.1-world-view.json").unlink(missing_ok=True)
+
+        result = self.run_tool(".claude/skills/trial_generate/scripts/init-trial.mjs")
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("读不到世界观", result.stderr)
+        self.assertIn("重新执行“世界观”这一步", result.stderr)
+        self.assertNotIn("不是有效 JSON", result.stderr)
+
     def test_outline_uses_a_renamed_script_title_for_file_and_heading(self) -> None:
         self.write_workspace(script_name="星海协议")
 

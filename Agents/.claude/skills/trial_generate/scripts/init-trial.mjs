@@ -130,7 +130,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     const result = await initializeTrial(args.workspace, args.updatedBy);
     process.stdout.write(`${JSON.stringify({ ok: true, ...result, message: `剧本试稿已初始化完成，请先阅读\`${result.execution_spec_file}\`，再按照 Skill 要求执行下一步。`, next_action: "请按照 Skill 步骤，继续执行下一步" }, null, 2)}\n`);
   } catch (error) {
-    process.stderr.write(`${JSON.stringify({ ok: false, stage: "trial_generate", tool: "init", message: error.message, next_action: "修复角色小传或剧本大纲后重新初始化。" }, null, 2)}\n`);
+    process.stderr.write(`${JSON.stringify({ ok: false, stage: "trial_generate", tool: "init", message: error.message, next_action: error.nextAction || "修复角色小传或剧本大纲后重新初始化。" }, null, 2)}\n`);
     process.exitCode = 1;
   }
 }

@@ -8,6 +8,7 @@ import { resolveMaturityTarget } from "./distribution-brief.mjs";
 const agentRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const workspaceRoot = path.join(agentRoot, "workspaces");
 const REPLICATION_REPORT_PATH = "output/爆款分析报告.md";
+const WORLD_VIEW_REDO_STEP = "重新执行“世界观”这一步，产出世界观后再继续。";
 
 function parseArgs(argv) {
   if (argv.length !== 2 || argv[0] !== "--workspace") throw new Error("请使用 --workspace <项目目录>");
@@ -17,11 +18,13 @@ function parseArgs(argv) {
   return workspace;
 }
 
-async function readJson(filePath, label) {
+async function readJson(filePath, label, redoStep) {
   try {
     return JSON.parse(await fs.readFile(filePath, "utf8"));
   } catch {
-    throw new Error(`${label}不存在或不是有效 JSON`);
+    const error = new Error(`读不到${label}，内容缺失或已损坏，改编无法在此基础上继续。`);
+    error.nextAction = redoStep;
+    throw error;
   }
 }
 
@@ -77,11 +80,11 @@ function novelAnalysisForAdaptation(analysis) {
 }
 
 export async function getAdaptationContext(workspace) {
-  const userInput = await readJson(path.join(workspace, "1.1-user-input.json"), "项目输入");
+  const userInput = await readJson(path.join(workspace, "1.1-user-input.json"), "项目信息", "重新创建项目或补全项目信息后重试。");
   const taskType = userInput.project?.task_type || "rewrite";
   const maturityTarget = resolveMaturityTarget(userInput.project?.distribution_brief);
   if (taskType === "novel") {
-    const analysis = await readJson(path.join(workspace, "2.1-novel-analysis.json"), "小说解读");
+    const analysis = await readJson(path.join(workspace, "2.1-novel-analysis.json"), "小说解读", "重新执行“小说解读”这一步，产出小说解读后再继续。");
     const adaptationAnalysis = novelAnalysisForAdaptation(analysis);
     const worldDescription = adaptationAnalysis["世界观"];
     if (typeof worldDescription !== "string" || !worldDescription.trim()) throw new Error("小说解读缺少世界观");
@@ -95,7 +98,7 @@ export async function getAdaptationContext(workspace) {
     };
   }
   if (taskType === "replicate") {
-    const worldView = await readJson(path.join(workspace, "2.1-world-view.json"), "世界观");
+    const worldView = await readJson(path.join(workspace, "2.1-world-view.json"), "世界观", WORLD_VIEW_REDO_STEP);
     try {
       await fs.access(path.join(workspace, REPLICATION_REPORT_PATH));
     } catch {
@@ -110,7 +113,7 @@ export async function getAdaptationContext(workspace) {
     };
   }
   if (taskType !== "rewrite") throw new Error("当前场景不使用改编上下文");
-  const worldView = await readJson(path.join(workspace, "2.1-world-view.json"), "世界观");
+  const worldView = await readJson(path.join(workspace, "2.1-world-view.json"), "世界观", WORLD_VIEW_REDO_STEP);
   const sourceFile = userInput.project?.source_script?.output_path;
   if (typeof sourceFile !== "string" || !sourceFile.trim()) throw new Error("项目输入缺少原始剧本路径");
   return {
@@ -128,7 +131,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     const result = await getAdaptationContext(workspace);
     process.stdout.write(`${JSON.stringify({ ok: true, message: "已读取当前场景的改编上下文。", next_action: result.task_type === "novel" ? "只使用本次返回的小说解读生成故事梗概：未标记已确认合并的单元独立保留；标记已确认合并的单元必须按合并目标融入。adaptation_plan 只约束故事梗概单元容量。" : result.task_type === "replicate" ? "深度阅读 source_file 指向的爆款分析报告；以世界观为新外壳，保留报告中已明确的剧情功能、权力关系和冲突作用，不沿用具体人名、地点或专有设定。" : "以世界观和原始剧本为改写依据。", ...result }, null, 2)}\n`);
   } catch (error) {
-    process.stderr.write(`${JSON.stringify({ ok: false, tool: "get-adaptation-context", message: error.message, next_action: "检查场景类型和前置阶段文件后重试。" }, null, 2)}\n`);
+    process.stderr.write(`${JSON.stringify({ ok: false, tool: "get-adaptation-context", message: error.message, next_action: error.nextAction || "检查场景类型和前置阶段文件后重试。" }, null, 2)}\n`);
     process.exitCode = 1;
   }
 }

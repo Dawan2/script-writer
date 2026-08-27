@@ -13,6 +13,7 @@ const VALID_STATUSES = new Set([
   "skipped"
 ]);
 const APPROVAL_STAGES = new Set(["trial_generate", "foreign_review"]);
+const FINISHED_STATUSES = new Set(["completed", "approved"]);
 
 function parseArgs(argv) {
   const args = { output: [] };
@@ -30,12 +31,26 @@ function parseArgs(argv) {
   return args;
 }
 
+function actionableError(message, nextAction) {
+  const error = new Error(message);
+  error.nextAction = nextAction;
+  return error;
+}
+
 async function readJson(filePath, label) {
   try {
     return JSON.parse(await fs.readFile(filePath, "utf8"));
   } catch {
-    throw new Error(`${label}不存在或不是有效 JSON`);
+    throw actionableError(`读不到这个项目的${label}，内容缺失或已损坏。`, "确认项目目录完整后重试，或重新创建项目。");
   }
+}
+
+async function missingOutputs(workspaceDir, outputs) {
+  const checked = await Promise.all(outputs.map(async (relativePath) => ({
+    relativePath,
+    exists: await fs.stat(path.join(workspaceDir, relativePath)).then((stat) => stat.isFile()).catch(() => false)
+  })));
+  return checked.filter((item) => !item.exists).map((item) => item.relativePath);
 }
 
 async function writeJson(filePath, value) {
@@ -90,12 +105,21 @@ export async function updateProgress({
   const progressPath = path.join(workspaceDir, "1.2-project-progress.json");
   const userInputPath = path.join(workspaceDir, "1.1-user-input.json");
   const [progress, userInput] = await Promise.all([
-    readJson(progressPath, "1.2-project-progress.json"),
-    readJson(userInputPath, "1.1-user-input.json")
+    readJson(progressPath, "进度记录"),
+    readJson(userInputPath, "项目信息")
   ]);
   const now = new Date().toISOString();
   const current = progress.stages?.[stage] || {};
   const outputs = outputFiles.length ? [...new Set(outputFiles)] : current.output_files || [];
+  if (FINISHED_STATUSES.has(status)) {
+    const missing = await missingOutputs(workspaceDir, outputs);
+    if (!outputs.length || missing.length) {
+      throw actionableError(
+        `这一步的成果还没有落到项目里，缺少：${(missing.length ? missing : ["本步骤的成果文件"]).join("、")}。`,
+        "先生成并保存这一步的成果，再把它标记为完成。"
+      );
+    }
+  }
   const nextStage = { ...current, status, output_files: outputs, updated_at: now, updated_by: updatedBy };
   if (stage === "full_generate" && (
     status === "completed"
@@ -141,7 +165,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     });
     process.stdout.write(`${JSON.stringify({ ok: true, message: "项目进度已更新。", ...result }, null, 2)}\n`);
   } catch (error) {
-    process.stderr.write(`${JSON.stringify({ ok: false, tool: "update-progress", message: error.message, next_action: "检查工作区、Skill 名称和状态后重试。" }, null, 2)}\n`);
+    process.stderr.write(`${JSON.stringify({ ok: false, tool: "update-progress", message: error.message, next_action: error.nextAction || "检查工作区、Skill 名称和状态后重试。" }, null, 2)}\n`);
     process.exitCode = 1;
   }
 }
