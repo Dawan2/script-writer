@@ -537,8 +537,18 @@ def _maturity_target(value: object) -> str:
 def _atomic_write_text(path: Path, content: str) -> None:
     temp_path = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
     try:
-        temp_path.write_text(content, encoding="utf-8")
+        with temp_path.open("w", encoding="utf-8") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
         temp_path.replace(path)
+        # ``replace`` makes the swap atomic for readers, but only flushing the
+        # directory entry keeps the new content after an abrupt power loss.
+        directory_fd = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
     finally:
         temp_path.unlink(missing_ok=True)
 
@@ -2753,7 +2763,8 @@ def restore_file_version(
     rel_path = str(file_path.relative_to(settings.agents_dir))
     conn.execute("SAVEPOINT restore_file_version")
     try:
-        file_path.write_text(restored_content, encoding="utf-8")
+        # 先库后文件：进度先落盘，数据库写入全部完成后才落盘正文，
+        # 任何一步失败时磁盘上的正文都还是恢复前的内容。
         mark_semantic_edit_in_progress(
             workspace,
             stage,
@@ -2811,11 +2822,32 @@ def restore_file_version(
                 "sync_deferred": True,
             },
         )
-    except Exception:
-        file_path.write_text(old_content, encoding="utf-8")
-        progress_path.write_text(old_progress, encoding="utf-8")
+        _atomic_write_text(file_path, restored_content)
+    except Exception as exc:
         conn.execute("ROLLBACK TO SAVEPOINT restore_file_version")
         conn.execute("RELEASE SAVEPOINT restore_file_version")
+        try:
+            _atomic_write_text(progress_path, old_progress)
+        except Exception as rollback_error:
+            record_audit(
+                conn,
+                actor=user,
+                action="document.restore.rollback_failed",
+                target_type="project_document",
+                target_id=f"{project['id']}:{stage}",
+                target_label=project["name"],
+                project_id=int(project["id"]),
+                outcome="failure",
+                severity="error",
+                details={
+                    "stage": stage,
+                    "file_path": rel_path,
+                    "before_hash": old_hash,
+                    "attempted_hash": new_hash,
+                    "failure": str(exc),
+                    "rollback_failure": str(rollback_error),
+                },
+            )
         raise
     conn.execute("RELEASE SAVEPOINT restore_file_version")
     result = read_stage_file(project, stage)
@@ -3274,8 +3306,11 @@ def write_structured_stage_file(
     progress_path = workspace_progress_path(workspace)
     old_progress = progress_path.read_text(encoding="utf-8")
     impact = analyze_markdown_change(old_content, normalized_content)
-    file_path.write_text(normalized_content, encoding="utf-8")
+    new_hash = sha256_text(normalized_content)
+    rel_path = str(file_path.relative_to(settings.agents_dir))
+    conn.execute("SAVEPOINT write_structured_stage_file")
     try:
+        # 进度与正文无法一次原子替换，进度先落盘，此时正文仍是保存前的内容。
         mark_semantic_edit_in_progress(
             workspace,
             stage,
@@ -3283,81 +3318,116 @@ def write_structured_stage_file(
             impact,
             user["username"],
         )
-        run_stage_validation(workspace, stage, user["username"], None)
-        memory = sync_workspace_memory(
-            workspace,
-            actor=user["username"],
-            reason=f"{stage}_manual_save",
-            changed_file=stage_file_for_workspace(workspace, stage),
-            old_hash=old_hash,
-            impact=impact,
+        # 阶段检查与资料同步只读磁盘，新内容必须先落盘才能被它们看到；
+        # 检查通过后立即复原，正文的最终落盘留到全部数据库写入之后，
+        # 这样数据库写入失败时磁盘上的正文无需补偿即为保存前的内容。
+        _atomic_write_text(file_path, normalized_content)
+        try:
+            run_stage_validation(workspace, stage, user["username"], None)
+            memory = sync_workspace_memory(
+                workspace,
+                actor=user["username"],
+                reason=f"{stage}_manual_save",
+                changed_file=stage_file_for_workspace(workspace, stage),
+                old_hash=old_hash,
+                impact=impact,
+            )
+        finally:
+            if old_content:
+                _atomic_write_text(file_path, old_content)
+            else:
+                file_path.unlink(missing_ok=True)
+        record_file_version(
+            conn,
+            project_id=int(project["id"]),
+            stage=stage,
+            file_path=rel_path,
+            edited_by=int(user["id"]),
+            content=normalized_content,
+            previous_content=old_content,
+            change_kind=impact["change_kind"],
+            change_summary=impact["summary"],
+            operation="manual_save",
+            memory_revision=memory.get("revision"),
         )
+        conn.execute(
+            """
+            INSERT INTO artifact_changes (
+                project_id, stage, file_path, old_hash, new_hash, change_kind, impact_json, edited_by
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                project["id"],
+                stage,
+                rel_path,
+                old_hash,
+                new_hash,
+                impact["change_kind"],
+                json.dumps(impact, ensure_ascii=False),
+                user["id"],
+            ),
+        )
+        conn.execute(
+            "UPDATE projects SET current_stage = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (stage, project["id"]),
+        )
+        record_audit(
+            conn,
+            actor=user,
+            action="document.edit",
+            target_type="project_document",
+            target_id=f"{project['id']}:{stage}",
+            target_label=project["name"],
+            project_id=int(project["id"]),
+            details={
+                "stage": stage,
+                "file_path": rel_path,
+                "before_hash": old_hash,
+                "after_hash": new_hash,
+                "change_kind": impact["change_kind"],
+                "change_summary": impact["summary"],
+                "semantic_change": bool(impact.get("semantic_change")),
+                "memory_revision": memory.get("revision"),
+            },
+        )
+        _atomic_write_text(file_path, normalized_content)
     except Exception as exc:
-        if old_content:
-            file_path.write_text(old_content, encoding="utf-8")
-        else:
-            file_path.unlink(missing_ok=True)
-        progress_path.write_text(old_progress, encoding="utf-8")
+        conn.execute("ROLLBACK TO SAVEPOINT write_structured_stage_file")
+        conn.execute("RELEASE SAVEPOINT write_structured_stage_file")
+        try:
+            if old_content:
+                _atomic_write_text(file_path, old_content)
+            else:
+                file_path.unlink(missing_ok=True)
+            _atomic_write_text(progress_path, old_progress)
+        except Exception as rollback_error:
+            record_audit(
+                conn,
+                actor=user,
+                action="document.edit.rollback_failed",
+                target_type="project_document",
+                target_id=f"{project['id']}:{stage}",
+                target_label=project["name"],
+                project_id=int(project["id"]),
+                outcome="failure",
+                severity="error",
+                details={
+                    "stage": stage,
+                    "file_path": rel_path,
+                    "before_hash": old_hash,
+                    "attempted_hash": new_hash,
+                    "failure": str(exc),
+                    "rollback_failure": str(rollback_error),
+                },
+            )
         if isinstance(exc, HTTPException):
             raise
-        raise HTTPException(status_code=500, detail=f"{display_name}保存已回滚：{exc}") from exc
-
-    new_hash = sha256_text(normalized_content)
-    rel_path = str(file_path.relative_to(settings.agents_dir))
-    record_file_version(
-        conn,
-        project_id=int(project["id"]),
-        stage=stage,
-        file_path=rel_path,
-        edited_by=int(user["id"]),
-        content=normalized_content,
-        previous_content=old_content,
-        change_kind=impact["change_kind"],
-        change_summary=impact["summary"],
-        operation="manual_save",
-        memory_revision=memory.get("revision"),
-    )
-    conn.execute(
-        """
-        INSERT INTO artifact_changes (
-            project_id, stage, file_path, old_hash, new_hash, change_kind, impact_json, edited_by
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            project["id"],
-            stage,
-            rel_path,
-            old_hash,
-            new_hash,
-            impact["change_kind"],
-            json.dumps(impact, ensure_ascii=False),
-            user["id"],
-        ),
-    )
-    conn.execute(
-        "UPDATE projects SET current_stage = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-        (stage, project["id"]),
-    )
-    record_audit(
-        conn,
-        actor=user,
-        action="document.edit",
-        target_type="project_document",
-        target_id=f"{project['id']}:{stage}",
-        target_label=project["name"],
-        project_id=int(project["id"]),
-        details={
-            "stage": stage,
-            "file_path": rel_path,
-            "before_hash": old_hash,
-            "after_hash": new_hash,
-            "change_kind": impact["change_kind"],
-            "change_summary": impact["summary"],
-            "semantic_change": bool(impact.get("semantic_change")),
-            "memory_revision": memory.get("revision"),
-        },
-    )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{display_name}保存未完成，内容仍是修改前的版本，请稍后重试",
+        ) from exc
+    conn.execute("RELEASE SAVEPOINT write_structured_stage_file")
     result = read_stage_file(project, stage)
     result["memory"] = {
         "status": "fresh",
@@ -3442,8 +3512,11 @@ def write_stage_file(
     impact = analyze_markdown_change(old_content, content)
     progress_path = workspace_progress_path(workspace)
     old_progress = progress_path.read_text(encoding="utf-8")
-    file_path.write_text(content, encoding="utf-8")
+    rel_path = str(file_path.relative_to(settings.agents_dir))
+    conn.execute("SAVEPOINT write_stage_file")
     try:
+        # 先库后文件：进度先落盘，数据库写入全部完成后才落盘正文。
+        # 任何一步失败时磁盘上的正文都还是保存前的内容，无需补偿。
         if impact["semantic_change"]:
             mark_semantic_edit_in_progress(
                 workspace,
@@ -3454,61 +3527,89 @@ def write_stage_file(
                 previous_hash=old_hash,
                 source_hash=new_hash,
             )
-    except Exception as exc:
-        file_path.write_text(old_content, encoding="utf-8")
-        progress_path.write_text(old_progress, encoding="utf-8")
-        raise HTTPException(status_code=500, detail=f"文档保存已回滚：阶段状态更新失败：{exc}") from exc
-    rel_path = str(file_path.relative_to(settings.agents_dir))
-    record_file_version(
-        conn,
-        project_id=int(project["id"]),
-        stage=stage,
-        file_path=rel_path,
-        edited_by=int(user["id"]),
-        content=content,
-        previous_content=old_content,
-        change_kind=impact["change_kind"],
-        change_summary=impact["summary"],
-        operation="manual_save",
-    )
-    conn.execute(
-        """
-        INSERT INTO artifact_changes (
-            project_id, stage, file_path, old_hash, new_hash, change_kind, impact_json, edited_by
+        record_file_version(
+            conn,
+            project_id=int(project["id"]),
+            stage=stage,
+            file_path=rel_path,
+            edited_by=int(user["id"]),
+            content=content,
+            previous_content=old_content,
+            change_kind=impact["change_kind"],
+            change_summary=impact["summary"],
+            operation="manual_save",
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            project["id"],
-            stage,
-            rel_path,
-            old_hash,
-            new_hash,
-            impact["change_kind"],
-            json.dumps(impact, ensure_ascii=False),
-            user["id"],
-        ),
-    )
-    conn.execute("UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (project["id"],))
-    record_audit(
-        conn,
-        actor=user,
-        action="document.edit",
-        target_type="project_document",
-        target_id=f"{project['id']}:{stage}",
-        target_label=project["name"],
-        project_id=int(project["id"]),
-        details={
-            "stage": stage,
-            "file_path": rel_path,
-            "before_hash": old_hash,
-            "after_hash": new_hash,
-            "change_kind": impact["change_kind"],
-            "change_summary": impact["summary"],
-            "semantic_change": bool(impact.get("semantic_change")),
-            "memory_revision": None,
-        },
-    )
+        conn.execute(
+            """
+            INSERT INTO artifact_changes (
+                project_id, stage, file_path, old_hash, new_hash, change_kind, impact_json, edited_by
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                project["id"],
+                stage,
+                rel_path,
+                old_hash,
+                new_hash,
+                impact["change_kind"],
+                json.dumps(impact, ensure_ascii=False),
+                user["id"],
+            ),
+        )
+        conn.execute("UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (project["id"],))
+        record_audit(
+            conn,
+            actor=user,
+            action="document.edit",
+            target_type="project_document",
+            target_id=f"{project['id']}:{stage}",
+            target_label=project["name"],
+            project_id=int(project["id"]),
+            details={
+                "stage": stage,
+                "file_path": rel_path,
+                "before_hash": old_hash,
+                "after_hash": new_hash,
+                "change_kind": impact["change_kind"],
+                "change_summary": impact["summary"],
+                "semantic_change": bool(impact.get("semantic_change")),
+                "memory_revision": None,
+            },
+        )
+        _atomic_write_text(file_path, content)
+    except Exception as exc:
+        conn.execute("ROLLBACK TO SAVEPOINT write_stage_file")
+        conn.execute("RELEASE SAVEPOINT write_stage_file")
+        try:
+            _atomic_write_text(progress_path, old_progress)
+        except Exception as rollback_error:
+            record_audit(
+                conn,
+                actor=user,
+                action="document.edit.rollback_failed",
+                target_type="project_document",
+                target_id=f"{project['id']}:{stage}",
+                target_label=project["name"],
+                project_id=int(project["id"]),
+                outcome="failure",
+                severity="error",
+                details={
+                    "stage": stage,
+                    "file_path": rel_path,
+                    "before_hash": old_hash,
+                    "attempted_hash": new_hash,
+                    "failure": str(exc),
+                    "rollback_failure": str(rollback_error),
+                },
+            )
+        if isinstance(exc, HTTPException):
+            raise
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="保存未完成，文档仍是修改前的内容，请稍后重试",
+        ) from exc
+    conn.execute("RELEASE SAVEPOINT write_stage_file")
     result = read_stage_file(project, stage)
     result["memory"] = {
         "status": "pending_sync",
