@@ -35,12 +35,13 @@ import type {
   ScriptSourceChunk
 } from "@/lib/admin-types";
 import type { AgentDebugSession } from "@/lib/types";
+import { apiErrorFromResponse } from "@/lib/api-error";
 
 async function parseJson<T>(responseOrPromise: Response | Promise<Response>): Promise<T> {
   const response = await responseOrPromise;
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload.detail || payload.message || `Request failed: ${response.status}`);
+    throw apiErrorFromResponse(response.status, payload, response.headers.get("x-request-id"));
   }
   return payload as T;
 }

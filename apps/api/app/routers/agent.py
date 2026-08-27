@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
+from app.core.errors import APIError
 from app.db.session import get_connection, get_db
 from app.dependencies import admin_feature_user, current_user
 from app.services.audit_service import record_audit
@@ -360,7 +361,7 @@ def post_cancel_agent_job(
 ) -> dict:
     job = get_job_or_404(conn, job_id, user, required_permission="edit")
     if job["status"] in TERMINAL_STATUSES:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Job already finished")
+        raise APIError("JOB_ALREADY_FINISHED")
     previous_status = job["status"]
     cancel_job(conn, job_id)
     updated = conn.execute("SELECT * FROM agent_jobs WHERE id = ?", (job_id,)).fetchone()

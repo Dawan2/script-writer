@@ -11,6 +11,7 @@ from pathlib import Path
 from fastapi import HTTPException, status
 
 from app.core.config import settings
+from app.core.errors import APIError, is_user_facing_text
 
 
 EPISODE_RE = re.compile(r"(?:第\s*(\d+)\s*[集章]|(?:EP(?:ISODE)?)[ ._-]*(\d+))", re.IGNORECASE)
@@ -524,6 +525,30 @@ def _approval_conflict(detail: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
 
+def _stage_check_failure(primary_output: str, secondary_output: str) -> APIError:
+    """阶段检查未通过：未通过项结构化下发，检查脚本的原始输出只进日志。"""
+    payload: dict = {}
+    for stream in (primary_output, secondary_output):
+        if not stream.strip():
+            continue
+        try:
+            parsed = _parse_cli_json(stream)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            continue
+        if isinstance(parsed, dict):
+            payload = parsed
+            break
+    raw_issues = payload.get("issues") if isinstance(payload.get("issues"), list) else []
+    issues = [str(item).strip() for item in raw_issues if str(item).strip()]
+    tool_message = payload.get("message")
+    return APIError(
+        "STAGE_CHECK_FAILED",
+        message=tool_message if isinstance(tool_message, str) and is_user_facing_text(tool_message) else None,
+        details={"issues": issues} if issues else None,
+        root_cause=f"{primary_output}\n{secondary_output}",
+    )
+
+
 def _read_json_for_approval(file_path: Path, label: str) -> dict:
     try:
         payload = json.loads(file_path.read_text(encoding="utf-8"))
@@ -1003,14 +1028,13 @@ def run_stage_validation(
             timeout=timeout,
         )
         if process.returncode != 0:
-            detail = (process.stderr.strip() or process.stdout.strip() or f"{stage} check failed")[-2000:]
-            raise _approval_conflict(f"阶段检查未通过：{detail}")
+            raise _stage_check_failure(process.stderr, process.stdout)
         try:
             result = _parse_cli_json(process.stdout)
         except (json.JSONDecodeError, TypeError) as exc:
             raise RuntimeError(f"无法解析 {stage} check 结果") from exc
         if result.get("ok") is not True:
-            raise _approval_conflict(f"阶段 {stage} 检查未通过")
+            raise _stage_check_failure(process.stdout, "")
         return result
 
     command = ["node", str(entrypoint), "--workspace", str(workspace), "--updated-by", actor]

@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.core.errors import register_error_handlers
 from app.core.time_utils import UtcJSONResponse
 from app.db.session import get_connection, init_db
 from app.routers import admin, agent, auth, batch_tasks, credits, internal_agent_tools, notifications, openclaw_api, preferences, projects
@@ -60,6 +61,9 @@ app.add_middleware(
 async def bind_audit_request_context(request: Request, call_next):
     request_id = (request.headers.get("x-request-id") or uuid4().hex)[:128]
     source = "openclaw" if request.url.path.startswith("/openclaw/") else "web" if request.headers.get("x-audit-source") == "web" else "api"
+    # 号先绑到请求上：未捕获异常会让审计上下文在异常处理器之前被释放，
+    # 而最需要追踪号的正是这条 500 出口。
+    request.state.request_id = request_id
     token = set_audit_context(request_id=request_id, source=source)
     try:
         response = await call_next(request)
@@ -293,3 +297,5 @@ app.include_router(openclaw_api.router)
 app.include_router(notifications.router)
 app.include_router(admin.router)
 app.include_router(internal_agent_tools.router)
+
+register_error_handlers(app)

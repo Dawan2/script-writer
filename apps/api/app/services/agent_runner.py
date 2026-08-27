@@ -20,6 +20,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 
 from app.core.config import settings
+from app.core.errors import APIError
 from app.core.time_utils import utc_isoformat
 from app.db.session import get_connection
 from app.services.agent_evolution_service import create_evolution_review
@@ -1542,10 +1543,10 @@ def get_job_or_404(
 ) -> sqlite3.Row:
     job = conn.execute("SELECT * FROM agent_jobs WHERE id = ?", (job_id,)).fetchone()
     if not job:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise APIError("JOB_NOT_FOUND")
     project = conn.execute("SELECT * FROM projects WHERE id = ?", (job["project_id"],)).fetchone()
     if not project:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise APIError("PROJECT_NOT_FOUND")
     allowed = can_edit_project(conn, user, project) if required_permission == "edit" else can_access_project(conn, user, project)
     if not allowed:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="你没有此项目的操作权限")
@@ -1701,7 +1702,7 @@ def planned_stages(project: sqlite3.Row, requested_stage: str) -> list[str]:
             return ["foreign_review"]
         if requested_stage == "chat_edit":
             return ["chat_edit"]
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported stage for review task")
+        raise APIError("STAGE_UNSUPPORTED_FOR_REVIEW")
     if requested_stage == "next":
         progress = load_progress(project["workspace_dir"])
         current = progress.get("current_stage") or project["current_stage"]
@@ -1753,7 +1754,7 @@ def planned_stages(project: sqlite3.Row, requested_stage: str) -> list[str]:
                     detail="完整剧本尚未确认通过，请先确认完整剧本，再重新进行 AI 审稿",
                 )
         return [requested_stage]
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported stage")
+    raise APIError("STAGE_UNSUPPORTED")
 
 
 def prompt_with_regeneration_reference(
@@ -2073,7 +2074,7 @@ def create_job(
     if "status" in project.keys() and project["status"] == "completed":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="项目已归档，请先重新开启")
     if not is_supported_stage(stage):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported stage")
+        raise APIError("STAGE_UNSUPPORTED")
     if optimization_scope:
         if optimization_scope != REVIEW_P0_OPTIMIZATION_SCOPE:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="不支持的优化范围")
@@ -2081,14 +2082,14 @@ def create_job(
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="P0 一键优化只能调整完整剧本")
         review_p0_optimization_context(project)
     if row_task_type(project) == TASK_TYPE_REVIEW and stage not in {"next", "all", "chat_edit", "foreign_review"}:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported stage for review task")
+        raise APIError("STAGE_UNSUPPORTED_FOR_REVIEW")
     if row_task_type(project) == TASK_TYPE_TRANSLATE and stage not in {"next", "all", "chat_edit", "dialogue_translate"}:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported stage for translation task")
+        raise APIError("STAGE_UNSUPPORTED_FOR_TRANSLATION")
     if row_task_type(project) == TASK_TYPE_HUMANIZE and stage not in {"next", "all", "chat_edit", "humanizer_zh"}:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="剧本润色场景不支持该步骤")
     running = active_job_for_project(conn, project["id"])
     if running:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Project already has running job #{running['id']}")
+        raise APIError("PROJECT_JOB_RUNNING", root_cause=f"running_job={running['id']}")
     if stage == "chat_edit":
         resolved_stage = target_stage or project["current_stage"]
         if resolved_stage not in STAGE_FILES:
@@ -2177,9 +2178,9 @@ def create_job(
             ) from exc
         running = active_job_for_project(conn, project["id"])
         if running:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Project already has running job #{running['id']}",
+            raise APIError(
+                "PROJECT_JOB_RUNNING",
+                root_cause=f"running_job={running['id']}",
             ) from exc
         raise
     try:
@@ -9511,7 +9512,7 @@ def resume_failed_continuation_job(
     workspace = resolve_workspace(workspace_dir)
     active = active_job_for_project(conn, int(job["project_id"]))
     if active:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Project already has running job #{active['id']}")
+        raise APIError("PROJECT_JOB_RUNNING", root_cause=f"running_job={active['id']}")
     ensure_concurrent_job_capacity(conn, user_id=int(job["user_id"]))
 
     columns = agent_job_columns(conn)
@@ -9542,9 +9543,9 @@ def resume_failed_continuation_job(
             ) from exc
         active = active_job_for_project(conn, int(job["project_id"]))
         if active:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Project already has running job #{active['id']}",
+            raise APIError(
+                "PROJECT_JOB_RUNNING",
+                root_cause=f"running_job={active['id']}",
             ) from exc
         raise
     if result.rowcount != 1:

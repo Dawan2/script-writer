@@ -1,0 +1,1265 @@
+{
+  "categories": [
+    "auth",
+    "permission",
+    "input",
+    "conflict",
+    "capacity",
+    "billing",
+    "quality",
+    "runtime"
+  ],
+  "allowed_latin_words": [],
+  "status_fallback": {
+    "400": "REQUEST_INVALID",
+    "401": "AUTH_REQUIRED",
+    "402": "BILLING_LIMIT",
+    "403": "PERMISSION_DENIED",
+    "404": "RESOURCE_NOT_FOUND",
+    "405": "METHOD_NOT_ALLOWED",
+    "409": "STATE_CONFLICT",
+    "413": "PAYLOAD_TOO_LARGE",
+    "422": "REQUEST_UNPROCESSABLE",
+    "429": "RATE_LIMITED",
+    "500": "SERVER_ERROR",
+    "502": "UPSTREAM_ERROR",
+    "503": "SERVICE_UNAVAILABLE",
+    "504": "UPSTREAM_TIMEOUT"
+  },
+  "validation_code": "VALIDATION_FAILED",
+  "http_codes": {
+    "REQUEST_INVALID": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "提交的内容不符合要求。",
+      "hint": "对照页面上的提示修改后重新提交。"
+    },
+    "VALIDATION_FAILED": {
+      "status": 422,
+      "category": "input",
+      "retryable": false,
+      "message": "填写的内容还不完整。",
+      "hint": "按提示逐项补齐后重新提交。"
+    },
+    "REQUEST_UNPROCESSABLE": {
+      "status": 422,
+      "category": "input",
+      "retryable": false,
+      "message": "提交的内容暂时无法处理。",
+      "hint": "对照页面上的提示补齐必填项后重新提交。"
+    },
+    "PAYLOAD_TOO_LARGE": {
+      "status": 413,
+      "category": "input",
+      "retryable": false,
+      "message": "上传的内容超过了允许的大小。",
+      "hint": "压缩或拆成几份后重新上传。"
+    },
+    "RESOURCE_NOT_FOUND": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "要找的内容不存在。",
+      "hint": "返回上一层列表重新选择。"
+    },
+    "METHOD_NOT_ALLOWED": {
+      "status": 405,
+      "category": "input",
+      "retryable": false,
+      "message": "这个地址不支持当前操作。",
+      "hint": "返回上一页，从界面里的入口重新操作。"
+    },
+    "STATE_CONFLICT": {
+      "status": 409,
+      "category": "conflict",
+      "retryable": false,
+      "message": "当前状态和这次操作有冲突。",
+      "hint": "先查看最新状态，再决定继续修改还是放弃这次操作。"
+    },
+    "RATE_LIMITED": {
+      "status": 429,
+      "category": "capacity",
+      "retryable": true,
+      "message": "当前使用量已经到上限。",
+      "hint": "稍等几分钟再试；如果长期不够用，联系团队管理员调整。"
+    },
+    "BILLING_LIMIT": {
+      "status": 402,
+      "category": "billing",
+      "retryable": false,
+      "message": "创作额度已经用完。",
+      "hint": "打开额度页面查看剩余量和补充方式。"
+    },
+    "SERVER_ERROR": {
+      "status": 500,
+      "category": "runtime",
+      "retryable": true,
+      "message": "服务出了点问题，这次操作没有完成。",
+      "hint": "重试一次；如果还不行，把提示里的追踪号发给客服。"
+    },
+    "UPSTREAM_ERROR": {
+      "status": 502,
+      "category": "runtime",
+      "retryable": true,
+      "message": "创作服务这次没有正常返回。",
+      "hint": "稍后重试；如果反复出现，把提示里的追踪号发给客服。"
+    },
+    "SERVICE_UNAVAILABLE": {
+      "status": 503,
+      "category": "capacity",
+      "retryable": true,
+      "message": "服务正忙，这次操作没有排上。",
+      "hint": "稍等一会儿再试。"
+    },
+    "UPSTREAM_TIMEOUT": {
+      "status": 504,
+      "category": "runtime",
+      "retryable": true,
+      "message": "这次操作等待太久已经中断。",
+      "hint": "稍后重试；内容多的时候可以拆成几次提交。"
+    },
+    "AUTH_REQUIRED": {
+      "status": 401,
+      "category": "auth",
+      "retryable": false,
+      "message": "还没有登录，暂时打不开这个内容。",
+      "hint": "回到首页登录后再继续。"
+    },
+    "SESSION_EXPIRED": {
+      "status": 401,
+      "category": "auth",
+      "retryable": false,
+      "message": "登录状态已经到期。",
+      "hint": "重新登录一次就能接着用；正在编辑的内容请先复制备份。"
+    },
+    "SESSION_INVALID": {
+      "status": 401,
+      "category": "auth",
+      "retryable": false,
+      "message": "登录状态无法识别。",
+      "hint": "重新登录一次；如果反复出现，换回常用浏览器再试。"
+    },
+    "SESSION_SUPERSEDED": {
+      "status": 401,
+      "category": "auth",
+      "retryable": false,
+      "message": "这个账号在别处改过密码或被要求重新登录。",
+      "hint": "用新密码重新登录；如果不是本人操作，联系团队管理员。"
+    },
+    "ACCOUNT_DISABLED": {
+      "status": 401,
+      "category": "permission",
+      "retryable": false,
+      "message": "这个账号已经停用。",
+      "hint": "联系团队管理员恢复使用权限。"
+    },
+    "LOGIN_FAILED": {
+      "status": 401,
+      "category": "auth",
+      "retryable": false,
+      "message": "账号或密码不正确。",
+      "hint": "确认大小写和多余空格后重新输入；忘记密码可以联系团队管理员重置。"
+    },
+    "PERMISSION_DENIED": {
+      "status": 403,
+      "category": "permission",
+      "retryable": false,
+      "message": "当前账号没有使用这个功能的权限。",
+      "hint": "联系团队管理员为你开通对应权限。"
+    },
+    "STAGE_UNKNOWN": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "这个阶段不在当前项目的流程里。",
+      "hint": "回到阶段列表，从列出的阶段里重新选择。"
+    },
+    "STAGE_FILE_MISSING": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "这个阶段的文档还没有生成，暂时打不开。",
+      "hint": "回到阶段列表，先完成前一个阶段，再回来查看这一份。"
+    },
+    "DELIVERY_STAGE_UNKNOWN": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "这份交付内容不在当前项目的范围里。",
+      "hint": "回到项目页，从可下载的交付列表里重新选择。"
+    },
+    "PROJECT_INPUT_MISSING": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "这个项目的基础信息还没有建立。",
+      "hint": "回到项目页重新初始化项目，再继续这一步。"
+    },
+    "PROGRESS_FILE_MISSING": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "这个项目的进度还没有建立。",
+      "hint": "回到项目页重新初始化项目，再查看进度。"
+    },
+    "WORKSPACE_PATH_INVALID": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "这个项目的存放位置不在允许的范围内。",
+      "hint": "回到项目列表重新打开这个项目；如果一直失败，联系团队管理员。"
+    },
+    "TASK_TYPE_UNSUPPORTED": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "这种项目类型暂时不支持。",
+      "hint": "回到新建项目页，从列出的类型里重新选择。"
+    },
+    "FILE_TYPE_UNSUPPORTED": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "这种文件格式暂时不支持。",
+      "hint": "换成常见的文本或文档格式后重新上传。"
+    },
+    "AGENT_OUTPUT_UNREADABLE": {
+      "status": 500,
+      "category": "runtime",
+      "retryable": true,
+      "message": "创作服务这次返回的结果无法读取。",
+      "hint": "重试一次；如果还不行，把提示里的追踪号发给客服。"
+    },
+    "PROJECT_INIT_FAILED": {
+      "status": 500,
+      "category": "runtime",
+      "retryable": true,
+      "message": "项目初始化没有完成。",
+      "hint": "重试一次；如果还不行，把提示里的追踪号发给客服。"
+    },
+    "JOB_NOT_FOUND": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "这条执行记录不存在。",
+      "hint": "回到任务列表重新选择。"
+    },
+    "PROJECT_NOT_FOUND": {
+      "status": 404,
+      "category": "input",
+      "retryable": false,
+      "message": "这个项目不存在或已经被移出。",
+      "hint": "回到项目列表重新选择。"
+    },
+    "STAGE_UNSUPPORTED": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "这个阶段不能执行当前操作。",
+      "hint": "回到阶段列表，选择现在可以执行的阶段。"
+    },
+    "STAGE_UNSUPPORTED_FOR_REVIEW": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "审稿项目不支持这个阶段。",
+      "hint": "回到阶段列表，选择审稿流程里的阶段。"
+    },
+    "STAGE_UNSUPPORTED_FOR_TRANSLATION": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "台词翻译项目不支持这个阶段。",
+      "hint": "回到阶段列表，选择台词翻译流程里的阶段。"
+    },
+    "PROJECT_JOB_RUNNING": {
+      "status": 409,
+      "category": "conflict",
+      "retryable": false,
+      "message": "这个项目还有一项创作正在进行。",
+      "hint": "等当前创作结束，或者先取消它，再开始新的一项。"
+    },
+    "JOB_ALREADY_FINISHED": {
+      "status": 409,
+      "category": "conflict",
+      "retryable": false,
+      "message": "这项创作已经结束，不能再取消。",
+      "hint": "直接查看结果；需要改动就发起新的一次创作。"
+    },
+    "DISTRIBUTION_BRIEF_UPDATE_FAILED": {
+      "status": 422,
+      "category": "runtime",
+      "retryable": true,
+      "message": "发行任务书这次没有更新成功。",
+      "hint": "重试一次；如果还不行，把提示里的追踪号发给客服。"
+    },
+    "PROJECT_BRIEF_COMPLETION_FAILED": {
+      "status": 422,
+      "category": "runtime",
+      "retryable": true,
+      "message": "项目任务书这次没有补全成功。",
+      "hint": "确认项目的基础信息都已填写，再重试一次。"
+    },
+    "LOCALE_CONTRACT_FAILED": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "目标地区和语言的组合暂时无法识别。",
+      "hint": "回到项目设置，重新选择目标地区。"
+    },
+    "STAGE_APPROVAL_FAILED": {
+      "status": 409,
+      "category": "conflict",
+      "retryable": false,
+      "message": "这个阶段这次没有确认成功。",
+      "hint": "查看阶段的最新状态，按提示处理后再确认。"
+    },
+    "SCRIPT_TITLE_SYNC_FAILED": {
+      "status": 409,
+      "category": "conflict",
+      "retryable": false,
+      "message": "剧本名称这次没有同步成功。",
+      "hint": "确认名称没有和其他剧本重复，再试一次。"
+    },
+    "DOCUMENT_CONVERT_FAILED": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "这份文档无法读取。",
+      "hint": "用编辑软件另存为常见文档格式后重新上传。"
+    },
+    "LEGACY_DOCUMENT_UNREADABLE": {
+      "status": 400,
+      "category": "input",
+      "retryable": false,
+      "message": "这份旧版文档无法读取。",
+      "hint": "用编辑软件另存为新版文档格式后重新上传。"
+    },
+    "NOVEL_SOURCE_UNREADABLE": {
+      "status": 409,
+      "category": "conflict",
+      "retryable": false,
+      "message": "小说原文暂时无法读取。",
+      "hint": "确认上传的文件完整可以打开，再重新上传。"
+    },
+    "STAGE_CHECK_FAILED": {
+      "status": 409,
+      "category": "quality",
+      "retryable": false,
+      "message": "这个阶段的内容检查没有通过。",
+      "hint": "按列出的未通过项修改内容，再重新提交确认。"
+    }
+  },
+  "client_codes": {
+    "RESPONSE_UNREADABLE": {
+      "category": "runtime",
+      "retryable": true,
+      "message": "这次请求的返回内容无法读取。",
+      "hint": "重试一次；如果还不行，把提示里的追踪号发给客服。"
+    },
+    "BACKEND_UNREACHABLE": {
+      "category": "runtime",
+      "retryable": true,
+      "message": "服务暂时连不上，不是这次操作有问题。",
+      "hint": "稍等一会儿重试；如果长时间连不上，联系团队管理员。"
+    },
+    "BACKEND_TIMEOUT": {
+      "category": "runtime",
+      "retryable": true,
+      "message": "这次请求等待太久已经中断。",
+      "hint": "稍后重试；内容多的时候可以拆成几次提交。"
+    }
+  },
+  "agent_codes": {
+    "AGENT_CANDIDATE_CHECK": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "完整剧本候选经过自动检查与修订后仍未通过，已保留本次候选内容。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "AGENT_CANDIDATE_CHECK_STALE": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "AUTHORING_SESSION_UNAVAILABLE": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本无法找到已批准试稿的创作会话，尚未开始生成。请重新生成试稿并完成审批后再试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "BILINGUAL_CONTINUATION_CHECK": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "BILLING_EXHAUSTED": {
+      "categories": [
+        "billing"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前额度不足，任务进度已保留。请补充额度后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CHILD_SESSION_CAPACITY": {
+      "categories": [
+        "capacity"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "当前并发任务较多，请稍后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CLAUDE_RESPONSE_STALLED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "创作引擎长时间未响应，正在从已保存内容恢复。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTEXT_BUDGET": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "当前剧情段需要携带的已确认剧情资料过多，暂时无法继续。重新生成后系统会按更小的剧情段续写，已批准的阶段内容会保留。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTEXT_LIMIT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "当前创作会话上下文已满，系统将先自动整理后继续处理。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_ASSEMBLY": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "连续创作拼装后的候选剧本没有绑定当前内容，尚未进入整体校验。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_HANDOFF": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前范围的剧情承接未能保存，尚未继续后续集数。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_INCOMPLETE": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_RECONCILE": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "候选稿修订后有单集未达到正文承载或双语配对要求，已保留当前内容。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_RECORD": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "连续创作进度格式无效，尚未继续生成。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_REPLAN": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前剧情范围无法自动调整，尚未继续生成。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_SEED": {
+      "categories": [
+        "input",
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本缺少可验证的试稿交接资料，尚未继续生成。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUATION_SOURCE_CHECK": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "CONTINUOUS_SCREENPLAY_TOOL": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "DIALOGUE_REVIEW_TOOL": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "台词语义审读模板建立失败。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "EPISODE_PLAYABILITY_FLOOR": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "EXECUTION_INTERRUPTED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "任务执行被系统中止，未完成内容没有发布。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_ADVISORY_NOT_ALLOWED": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前问题不允许跳过完整剧本的系统准出，未发布当前内容。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_ADVISORY_PUBLISH": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本候选与当前正文不一致，未发布当前内容。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_ADVISORY_STATE": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本已生成，但项目状态无法更新，未发布当前内容。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_DRAFT_MANIFEST": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本的分批清单没有绑定当前候选文件，候选文件未发布。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_DRAFT_PROMOTION": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本候选与待发布正文不一致，候选文件未发布。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_GENERATION_RECORD": {
+      "categories": [
+        "input",
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本运行记录没有绑定当前候选文件，无法保存恢复进度。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_REPAIR_RECOVERY": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "定向修订已改变候选稿，但没有形成可验证的自检证明；为避免重复修订，已保留候选内容。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_SCENE_REVIEW_PLAN": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "完整剧本没有可审读的后续正文，无法完成本次生成。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_SCENE_REVIEW_RECORD": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "场景审读结果缺少可定位到正文的依据，无法安全执行定向修订。已保留本次候选内容，请稍后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "FULL_SCENE_REVIEW_SUMMARY": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "场景审读汇总没有写入完成，无法继续完整剧本。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "GENERATION_BRIEF_MISSING": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "当前剧情资料没有成功写入，尚未开始创作。请重新尝试当前范围。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "INPUT_CONTRACT": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前材料或审批状态不满足执行条件，请补齐后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "INPUT_TRANSPORT_LIMIT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前任务资料过长，命令无法启动。已保留任务资料，请重新执行；系统会从已保存的资料文件继续读取。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "JOB_LEASE_LOST": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "任务已由恢复后的服务接管，当前执行已安全停止。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "JOB_NOT_ACTIVE": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "任务已结束，候选文件未发布。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "JOB_NOT_FOUND": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "任务记录不存在，无法开始完整剧本生成。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "MODEL_INPUT_CHECKPOINT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "任务资料无法安全保存，尚未启动处理。请检查项目工作区后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "NARRATIVE_REVIEW_TOOL": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "叙事质量审读模板建立失败。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "NETWORK_TRANSIENT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "服务连接暂时异常，系统将按间隔自动恢复。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "NOVEL_ANALYSIS_CHECKPOINT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "小说解读结果无法安全保存，尚未进入下一步。请检查项目工作区后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "NOVEL_ANALYSIS_PREPARATION": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "小说全文解读未完成，请重新执行小说解读。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "NOVEL_ANALYSIS_TOOL_AUTH": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前任务无法调用小说全文阅读，请重新执行小说解读。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "NOVEL_ANALYSIS_TOOL_CONTEXT": {
+      "categories": [
+        "input",
+        "runtime"
+      ],
+      "retryable": [
+        false,
+        true
+      ],
+      "message": "当前任务不是小说解读，无法阅读小说全文。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "NOVEL_ANALYSIS_TOOL_NOT_STARTED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "小说全文阅读尚未启动，请重新执行小说解读。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "OUTPUT_MISSING": {
+      "categories": [
+        "quality",
+        "runtime"
+      ],
+      "retryable": [
+        false,
+        true
+      ],
+      "message": "候选交付文件不完整，未发布到用户文件。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "PREFERENCE_CONTEXT_MISMATCH": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前文档的用户偏好与目标阶段不匹配，尚未开始修改。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "PROCESS_EXIT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "QUALITY_CONTEXT_BLOCKED": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "当前检查发现项目资料不同步，不能靠修改当前内容解决。系统已停止无效修订，请同步项目资料后再执行。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "QUALITY_GATE": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false,
+        true
+      ],
+      "message": "内容未通过质量检查，问题与进度已保留。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "QUALITY_REPAIR_LIMIT": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "QUALITY_REPAIR_NO_ACTION": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "检查未通过，但没有可执行的正文修订项，已停止无效修订。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "QUALITY_REPAIR_NO_PROGRESS": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "定向修订没有改动完整剧本，未发布本次生成。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "REVIEW_SCOPE_VIOLATION": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "叙事审读越权修改了正文，已拒绝本次交付。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SCENE_REVIEW_CHECKPOINT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "场景审读结果无法安全保存，完整剧本尚未发布。请检查项目工作区后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SCREENPLAY_FORMAT": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SCRIPT_PROFILE_RESOLUTION_FAILED": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SERVICE_RESTARTED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "服务重启导致本次处理被中断，未完成内容没有发布。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SESSION_COMPACTION_FAILED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SESSION_COMPACTION_UNAVAILABLE": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "当前创作会话无法整理。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SESSION_IN_USE": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "当前会话仍在使用，请稍后重试。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "SESSION_NOT_FOUND": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "旧会话已失效，正在从当前项目文件重新连接。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "STAGE_EXECUTION_CONTRACT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "STAGE_SCRIPT_STALLED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "STAGE_STRATEGY_FAILED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "STAGE_STRATEGY_OUTPUT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "STAGE_STRATEGY_TIMEOUT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "TOOL_FAILED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "TOOL_PROTOCOL": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "全稿批次工具返回了无法读取的结果。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "TRIAL_APPROVAL_REQUIRED": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "剧本试稿已更新，需先确认试稿后才能生成完整剧本。请在剧本试稿页点击“确认并继续”。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "TRIAL_CANDIDATE": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "试稿候选路径与本次任务不一致，尚未开始生成。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "VALIDATOR_RUNTIME": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "WORKER_CANCELLED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "WORKER_RESPONSE_STALLED": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "创作引擎长时间未响应，正在进行自动恢复。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "WORKER_STRUCTURED_OUTPUT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        true
+      ],
+      "message": "创作引擎没有返回有效审读结果，正在进行自动恢复。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "WORKSPACE_TOOL_FAILED": {
+      "categories": [
+        "input"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "WORKSPACE_TOOL_OUTPUT": {
+      "categories": [
+        "runtime"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "台词译稿合并工具返回了无效结果。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    },
+    "WRITE_SCOPE_VIOLATION": {
+      "categories": [
+        "quality"
+      ],
+      "retryable": [
+        false
+      ],
+      "message": "本次创作修改了未授权的项目文件，候选交付已拒绝。",
+      "hint": "",
+      "hint_owner": "C1-W1-42"
+    }
+  },
+  "legacy_literal_detail_budget": {
+    "apps/api/app/routers/admin.py": 7,
+    "apps/api/app/routers/agent.py": 4,
+    "apps/api/app/routers/batch_tasks.py": 6,
+    "apps/api/app/routers/openclaw_api.py": 7,
+    "apps/api/app/routers/projects.py": 11,
+    "apps/api/app/services/admin_service.py": 25,
+    "apps/api/app/services/agent_runner.py": 38,
+    "apps/api/app/services/auth_service.py": 6,
+    "apps/api/app/services/batch_task_service.py": 22,
+    "apps/api/app/services/credit_service.py": 17,
+    "apps/api/app/services/document_comment_service.py": 3,
+    "apps/api/app/services/model_config_service.py": 22,
+    "apps/api/app/services/novel_analysis_admission.py": 5,
+    "apps/api/app/services/project_lifecycle_service.py": 4,
+    "apps/api/app/services/project_trash_service.py": 2,
+    "apps/api/app/services/region_admin_service.py": 5,
+    "apps/api/app/services/role_service.py": 19,
+    "apps/api/app/services/script_knowledge_service.py": 1,
+    "apps/api/app/services/script_library_service.py": 17,
+    "apps/api/app/services/system_agent_evolution_service.py": 10,
+    "apps/api/app/services/workspace_service.py": 100,
+    "apps/api/app/services/writer_preference_service.py": 22
+  }
+}

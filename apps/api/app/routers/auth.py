@@ -3,6 +3,7 @@ import sqlite3
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from app.core.errors import APIError
 from app.core.security import create_access_token
 from app.db.session import get_db
 from app.dependencies import current_user
@@ -27,7 +28,7 @@ class ChangePasswordRequest(BaseModel):
 def login(payload: LoginRequest, conn: sqlite3.Connection = Depends(get_db)) -> dict:
     user = authenticate_user(conn, payload.username, payload.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+        raise APIError("LOGIN_FAILED")
     record_audit(
         conn,
         actor=user,

@@ -4,10 +4,11 @@ import hmac
 import sqlite3
 from typing import Annotated, Optional
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header
 
 from app.core.config import LOCAL_SCRIPT_SYNC_INTERNAL_TOKEN, settings
-from app.core.security import decode_access_token
+from app.core.errors import APIError
+from app.core.security import TOKEN_EXPIRED, read_access_token
 from app.db.session import get_db
 from app.services.audit_service import record_audit
 from app.services.auth_service import get_user_by_id
@@ -51,17 +52,17 @@ def current_user(
         if service_user:
             return service_user
     if not authorization or not authorization.lower().startswith("bearer "):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise APIError("AUTH_REQUIRED")
     token = authorization.split(" ", 1)[1]
-    payload = decode_access_token(token)
+    payload, reason = read_access_token(token)
     if not payload:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise APIError("SESSION_EXPIRED" if reason == TOKEN_EXPIRED else "SESSION_INVALID")
     user = get_user_by_id(conn, int(payload["sub"]))
     if not user or not user["is_active"]:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user")
+        raise APIError("ACCOUNT_DISABLED")
     auth_version = user["auth_version"] if "auth_version" in user.keys() else 0
     if int(payload.get("ver", 0)) != int(auth_version):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
+        raise APIError("SESSION_SUPERSEDED")
     return user
 
 
@@ -84,7 +85,7 @@ def admin_user(
                 severity="warning",
                 details={"required_role": "admin"},
             )
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="仅管理员可使用此功能")
+        raise APIError("PERMISSION_DENIED", message="这个功能只对管理员开放。")
     return user
 
 

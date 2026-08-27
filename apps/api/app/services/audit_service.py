@@ -18,6 +18,11 @@ def reset_audit_context(token: Token) -> None:
     _audit_context.reset(token)
 
 
+def current_request_id() -> str:
+    """本次请求的追踪号，供错误响应与日志取同一个值。"""
+    return str(_audit_context.get().get("request_id") or "")
+
+
 def content_fingerprint(value: str | bytes | None) -> dict[str, int | str] | None:
     if value is None:
         return None

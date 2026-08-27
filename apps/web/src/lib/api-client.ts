@@ -36,40 +36,14 @@ import type {
   WriterPreferencesBackup,
   WriterPreferencesPayload
 } from "@/lib/types";
+import { apiErrorFromResponse } from "@/lib/api-error";
 
 async function parseJson<T>(response: Response): Promise<T> {
-  const payload = await response.json().catch(() => ({})) as {
-    detail?: unknown;
-    message?: unknown;
-  };
+  const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(apiErrorMessage(payload.detail ?? payload.message, response.status));
+    throw apiErrorFromResponse(response.status, payload, response.headers.get("x-request-id"));
   }
   return payload as T;
-}
-
-function apiErrorMessage(detail: unknown, status: number): string {
-  if (typeof detail === "string" && detail.trim()) return detail;
-  if (Array.isArray(detail)) {
-    const messages = detail.map((item) => {
-      if (!item || typeof item !== "object") return String(item);
-      const issue = item as { loc?: unknown; msg?: unknown };
-      const location = Array.isArray(issue.loc)
-        ? issue.loc.filter((part) => part !== "body").join(".")
-        : "";
-      const message = typeof issue.msg === "string" ? issue.msg : JSON.stringify(item);
-      return location ? `${location}：${message}` : message;
-    }).filter(Boolean);
-    if (messages.length) return messages.join("；");
-  }
-  if (detail && typeof detail === "object") {
-    try {
-      return JSON.stringify(detail);
-    } catch {
-      // Fall through to the status-based message.
-    }
-  }
-  return `请求失败（${status}）`;
 }
 
 export async function login(username: string, password: string): Promise<User> {

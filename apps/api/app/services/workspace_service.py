@@ -16,6 +16,7 @@ import fcntl
 from fastapi import HTTPException, UploadFile, status
 
 from app.core.config import settings
+from app.core.errors import APIError, stage_file_missing_error, tool_failure_error, unknown_stage_error
 from app.services.audit_service import record_audit
 from app.services.memory_sync_service import (
     analyze_markdown_change,
@@ -225,7 +226,7 @@ def resolve_workspace(workspace_dir: str) -> Path:
     base = settings.agents_dir.resolve()
     target = (base / workspace_dir).resolve()
     if not target.is_relative_to(settings.workspaces_dir.resolve()):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid workspace path")
+        raise APIError("WORKSPACE_PATH_INVALID")
     return target
 
 
@@ -304,7 +305,7 @@ def stage_file_for_workspace(workspace: Path, stage: str) -> str:
     try:
         default_file = files[stage]
     except KeyError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage") from exc
+        raise unknown_stage_error(stage) from exc
     if stage == "project_init":
         return _project_init_file_for_workspace(workspace)
     suffix = NAMED_SCRIPT_OUTPUTS.get(stage)
@@ -448,7 +449,7 @@ def load_progress(workspace_dir: str) -> dict:
     workspace = resolve_workspace(workspace_dir)
     progress_path = workspace_progress_path(workspace)
     if not progress_path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Progress file not found")
+        raise APIError("PROGRESS_FILE_MISSING")
     progress = json.loads(progress_path.read_text(encoding="utf-8"))
     if _migrate_legacy_foreign_review_route(workspace, progress):
         _atomic_write_text(progress_path, f"{json.dumps(progress, ensure_ascii=False, indent=2)}\n")
@@ -759,8 +760,10 @@ def _run_distribution_brief_tool(
         timeout=60,
     )
     if result.returncode != 0:
-        detail = result.stderr.strip() or result.stdout.strip() or "发行任务书更新失败"
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail)
+        raise tool_failure_error(
+            "DISTRIBUTION_BRIEF_UPDATE_FAILED",
+            root_cause=result.stderr.strip() or result.stdout.strip(),
+        )
     try:
         return parse_agent_json(result.stdout)
     except (ValueError, json.JSONDecodeError) as exc:
@@ -807,8 +810,10 @@ def infer_reinitialized_distribution_brief(
         timeout=60,
     )
     if process.returncode != 0:
-        detail = process.stderr.strip() or process.stdout.strip() or "project_init 任务书补全失败"
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail)
+        raise tool_failure_error(
+            "PROJECT_BRIEF_COMPLETION_FAILED",
+            root_cause=process.stderr.strip() or process.stdout.strip(),
+        )
     try:
         payload = parse_agent_json(process.stdout)
         brief = payload["brief"]
@@ -1076,8 +1081,10 @@ def resolve_distribution_locale_contract(
         timeout=30,
     )
     if process.returncode != 0:
-        detail = process.stderr.strip() or process.stdout.strip() or "国家-locale 契约解析失败"
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+        raise tool_failure_error(
+            "LOCALE_CONTRACT_FAILED",
+            root_cause=process.stderr.strip() or process.stdout.strip(),
+        )
     try:
         payload = parse_agent_json(process.stdout)
     except (ValueError, json.JSONDecodeError) as exc:
@@ -1091,7 +1098,7 @@ def distribution_brief_for_project(project: sqlite3.Row | dict) -> dict:
     project_values = dict(project)
     user_input = load_user_input(project["workspace_dir"])
     if user_input is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{PROJECT_INPUT_FILE} not found")
+        raise APIError("PROJECT_INPUT_MISSING", root_cause=f"missing={PROJECT_INPUT_FILE}")
     raw_brief = user_input.get("project", {}).get("distribution_brief")
     source_input = user_input.get("project", {}).get("source_script")
     source = {
@@ -1355,8 +1362,10 @@ def approve_new_stage(workspace: Path, *, stage: str, actor: str, artifact_hash:
         timeout=60,
     )
     if result.returncode != 0:
-        detail = result.stderr.strip() or result.stdout.strip() or "阶段确认失败"
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
+        raise tool_failure_error(
+            "STAGE_APPROVAL_FAILED",
+            root_cause=result.stderr.strip() or result.stdout.strip(),
+        )
     try:
         payload = parse_agent_json(result.stdout)
     except (ValueError, json.JSONDecodeError) as exc:
@@ -1381,7 +1390,7 @@ def stage_label(stage: str) -> str:
 def normalize_task_type(task_type: str | None) -> str:
     value = (task_type or TASK_TYPE_REWRITE).strip()
     if value not in TASK_TYPES:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported task type")
+        raise APIError("TASK_TYPE_UNSUPPORTED")
     return value
 
 
@@ -2224,7 +2233,7 @@ def character_relationship_graph_for_workspace(workspace: Path) -> dict | None:
 
 def read_stage_file(project: sqlite3.Row, stage: str) -> dict:
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     workspace = resolve_workspace(project["workspace_dir"])
     file_name = stage_file_for_workspace(workspace, stage)
     progress = load_progress(project["workspace_dir"])
@@ -2257,7 +2266,7 @@ def read_stage_file(project: sqlite3.Row, stage: str) -> dict:
         return result
     file_path = workspace / file_name
     if not file_path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage file not found")
+        raise stage_file_missing_error(stage)
     content = file_path.read_text(encoding="utf-8")
     display_content = _display_script_episode_titles(workspace, stage, content)
     result = {
@@ -2348,9 +2357,12 @@ def _run_script_title_rename(
     except (ValueError, json.JSONDecodeError):
         payload = {}
     if result.returncode != 0 or payload.get("ok") is not True:
-        detail = payload.get("message") if isinstance(payload.get("message"), str) else ""
-        detail = detail.strip() or result.stderr.strip() or result.stdout.strip() or "剧本名称同步失败"
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
+        tool_message = payload.get("message") if isinstance(payload.get("message"), str) else ""
+        raise APIError(
+            "SCRIPT_TITLE_SYNC_FAILED",
+            message=tool_message.strip() or None,
+            root_cause=result.stderr.strip() or result.stdout.strip(),
+        )
     return payload
 
 
@@ -2582,11 +2594,11 @@ def _ensure_current_file_version(
     stage: str,
 ) -> tuple[str, int]:
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     workspace = resolve_workspace(project["workspace_dir"])
     file_path = workspace / stage_file_for_workspace(workspace, stage)
     if not file_path.is_file():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage file not found")
+        raise stage_file_missing_error(stage)
     content = file_path.read_text(encoding="utf-8")
     content_hash = sha256_text(content)
     current = conn.execute(
@@ -2708,7 +2720,7 @@ def restore_file_version(
     if "status" in project.keys() and project["status"] == "completed":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="项目已归档，请先重新开启")
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     if stage_delivery_in_progress(project, stage):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="该文件正在生成，完成后再恢复版本")
     active_job = conn.execute(
@@ -2730,7 +2742,7 @@ def restore_file_version(
     workspace = resolve_workspace(project["workspace_dir"])
     file_path = workspace / stage_file_for_workspace(workspace, stage)
     if not file_path.is_file():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage file not found")
+        raise stage_file_missing_error(stage)
     old_content = file_path.read_text(encoding="utf-8")
     old_hash = sha256_text(old_content)
     if expected_hash != old_hash:
@@ -3069,7 +3081,7 @@ def _script_delivery_for_project(project: sqlite3.Row, script_stage: str) -> dic
         },
     }.get(script_stage)
     if delivery_config is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown delivery stage")
+        raise APIError("DELIVERY_STAGE_UNKNOWN")
 
     download_name = delivery_config["download_name"]
     script_label = delivery_config["script_label"]
@@ -3418,7 +3430,7 @@ def write_stage_file(
     if "status" in project.keys() and project["status"] == "completed":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="项目已归档，请先重新开启")
     if stage not in STAGE_FILES:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown stage")
+        raise unknown_stage_error(stage)
     if stage_delivery_in_progress(project, stage):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="该阶段正在生成，完成后再保存修改")
     if stage == "world_view":
@@ -3428,7 +3440,7 @@ def write_stage_file(
     workspace = resolve_workspace(project["workspace_dir"])
     file_path = workspace / stage_file_for_workspace(workspace, stage)
     if not file_path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage file not found")
+        raise stage_file_missing_error(stage)
     old_content = file_path.read_text(encoding="utf-8")
     old_hash = sha256_text(old_content)
     if expected_hash and expected_hash != old_hash:
@@ -3558,7 +3570,7 @@ def import_workspace(conn: sqlite3.Connection, workspace_dir: Path, owner_user_i
 def save_upload(upload: UploadFile, user_id: int, *, max_bytes: int | None = None) -> Path:
     suffix = Path(upload.filename or "").suffix.lower()
     if suffix not in ALLOWED_UPLOAD_SUFFIXES:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported file type")
+        raise APIError("FILE_TYPE_UNSUPPORTED")
     user_upload_dir = settings.upload_dir / str(user_id)
     user_upload_dir.mkdir(parents=True, exist_ok=True)
     file_path = user_upload_dir / f"{uuid.uuid4().hex}{suffix}"
@@ -3754,15 +3766,15 @@ def create_project_from_source_path(
         timeout=180,
     )
     if result.returncode != 0:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=result.stderr.strip() or result.stdout.strip() or "Agent project initialization failed",
+        raise tool_failure_error(
+            "PROJECT_INIT_FAILED",
+            root_cause=result.stderr.strip() or result.stdout.strip(),
         )
     try:
         payload = parse_agent_json(result.stdout)
         workspace_dir = Path(payload["workspace_dir"])
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Failed to parse Agent output: {exc}") from exc
+        raise APIError("AGENT_OUTPUT_UNREADABLE", root_cause=str(exc)) from exc
     rel_workspace = _relative_workspace_dir(workspace_dir)
     mark_workspace_task_type(rel_workspace, task_type)
     if task_type == TASK_TYPE_REVIEW:
