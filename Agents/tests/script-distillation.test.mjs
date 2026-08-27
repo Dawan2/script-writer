@@ -16,6 +16,11 @@ const sourceSections = [
   "终局。周淮公开放弃以继承权交换沉默的条件，林夏取得项目决策权但保留独立团队。两人的关系不是靠一句道歉恢复，而是在共同承担损失、完成责任清算后进入新的合作状态。"
 ];
 
+// 校验要求 creative_decision、creative_problem 与 usage_scenario 完全一致，
+// expected_effect 与 goal 完全一致，因此这两组文案各只写一份。
+const FORMULA_USAGE_SCENARIO = "开篇需要用一次公开误判快速建立压迫，并把它转化为可持续推进的反证行动线。";
+const FORMULA_GOAL = "建立一个会迫使主角行动的未解状态，并让后续反转真正改变责任和行动权。";
+
 function indexedSource() {
   return sourceSections.map((content, index) => {
     const repeated = `${content}\n${content}\n${content}`;
@@ -165,14 +170,17 @@ async function fixture() {
       category: "hook_information",
       name: "公开误判后的可验证反证",
       stages: ["trial_generate", "full_generate"],
-      creative_decision: "怎样把开篇误判变成可以持续推进的反证行动线。",
-      creative_problem: "让开篇压迫快速成立，同时为后续反转建立持续行动线。",
-      goal: "建立一个会迫使主角行动的未解状态，并让后续反转真正改变责任和行动权。",
+      usage_scenario: FORMULA_USAGE_SCENARIO,
+      not_applicable: ["场内不存在能够公开定性的裁判规则时不适用", "主角没有可以逐步验证的事实资源时不适用"],
+      creative_decision: FORMULA_USAGE_SCENARIO,
+      creative_problem: FORMULA_USAGE_SCENARIO,
+      goal: FORMULA_GOAL,
+      core_formula: "公开定性锁定立场，被误判者转向可积累的验证行动，分层扩大证据的独立性与见证范围，最后用同一裁判规则重新分配责任与行动权。",
       conditions: ["场内存在能够公开定性的裁判规则", "主角拥有暂未被承认但可以逐步验证的事实资源"],
       variables: ["被误判者", "定性者", "裁判规则", "可验证事实"],
       steps: ["先让定性者在公开规则下锁定立场", "让被误判者选择能够积累证据的行动而非立即争辩", "分层扩大证据的独立性和见证范围", "用同一裁判规则改变责任与行动权"],
       mechanism: "公开立场提高反悔成本，可验证事实逐层扩大判断者范围，使期待最终落实为权力和责任的重新分配。",
-      expected_effect: "开篇问题能够延伸为连续行动线，后续反转不依赖突然出现的身份或口头宣布。",
+      expected_effect: FORMULA_GOAL,
       observable_checks: ["开篇已经明确谁拥有定性权以及主角下一步要验证什么", "兑现后至少一项资源、责任或关系发生不可逆变化"],
       failure_modes: ["证据缺少前置来源时会成为机械翻盘", "裁判规则从未生效时公开定性不会产生真实压力"],
       rewrite_usage: "保留原剧的误判原因、人物关系和主线结果，只检查开篇是否明确裁判权、验证目标和后续行动线。",
