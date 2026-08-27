@@ -16,7 +16,9 @@
 7. `full_generate`：以已通过的试稿为前置，按剧情单元生成并合并完整中文剧本，输出 `output/剧本全稿.md`；小说改编按当前单元索引读取必要原文。
 8. `dialogue_translate`：基于完整中文剧本统一翻译台词，输出以剧本名称命名的 `output/*-台词译稿.md`；也可作为独立台词翻译场景运行。
 9. `foreign_review`：审读完整剧本及台词译稿，形成六维评分、正文证据、风险和返修路径，输出 `review-scorecard.json` 与 `output/审稿报告.md`。
+10. `humanizer-zh`：仅用于独立“剧本润色”任务；对中文剧本做去AI味修订，输出 `output/去AI味剧本.md`。
+11. `document-sync`：用户手工保存阶段文档后，把当前 Markdown 同步回同阶段后台资料，不改写用户文档。
 
 # 执行要求
 
-1. `skills/{{skill名称}}/scripts/`目录下的工具脚本，只允许调用，不允许读取；
+1. `.claude/skills/{{skill名称}}/scripts/`与`skills/{{skill名称}}/scripts/`目录下的工具脚本，只允许调用，不允许读取；
