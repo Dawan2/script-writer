@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import {
-  ArrowLeft,
   ChevronDown,
   CirclePause,
   Copy,
@@ -22,6 +20,7 @@ import {
   X
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AppNav } from "@/components/navigation/app-nav";
 import { PageLoading } from "@/components/ui/page-loading";
 import { formatDateTime } from "@/lib/date-time";
 import { DEFAULT_MATURITY_TARGET, MATURITY_TARGET_OPTIONS } from "@/lib/maturity-targets";
@@ -354,7 +353,7 @@ export function BatchTasksPage({ user }: { user: User }) {
     <main className={styles.shell}>
       <header className={styles.header}>
         <div className={styles.heading}>
-          <Link className={styles.backLink} href="/workspace" title="返回工作台" aria-label="返回工作台"><ArrowLeft size={18} /></Link>
+          <AppNav current="batch-tasks" user={user} />
           <span className={styles.headingIcon}><ListChecks size={20} /></span>
           <div><h1>批量任务</h1><p>同时执行 {maxParallel} 个任务，其余任务会依次进入处理队列</p></div>
         </div>

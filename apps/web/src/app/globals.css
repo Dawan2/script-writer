@@ -134,23 +134,6 @@
   padding: 14px 10px;
 }
 
-.preferences-back-link {
-  align-items: center;
-  border-bottom: 1px solid var(--grid-line);
-  color: var(--muted);
-  display: flex;
-  font-family: var(--font-mono);
-  font-size: var(--text-meta);
-  gap: 8px;
-  min-height: 36px;
-  padding: 0 8px 9px;
-  text-decoration: none;
-}
-
-.preferences-back-link:hover {
-  color: var(--ocean);
-}
-
 .preferences-scope-nav {
   align-content: start;
   display: grid;
@@ -897,15 +880,6 @@ button {
   padding: 10px;
 }
 
-.top-nav {
-  align-items: center;
-  border: 1px solid var(--grid-line);
-  display: flex;
-  gap: 10px;
-  min-height: 48px;
-  padding: 7px 10px;
-}
-
 .brand-mark {
   align-items: center;
   background: var(--paper);
@@ -1004,13 +978,6 @@ button {
   line-height: var(--leading-meta);
   letter-spacing: 0;
   text-transform: uppercase;
-}
-
-.nav-actions {
-  align-items: center;
-  display: flex;
-  gap: 6px;
-  margin-left: auto;
 }
 
 .icon-button,
@@ -11058,17 +11025,8 @@ img:hover {
     padding: 10px;
   }
 
-  .top-nav {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
   .brand-copy span {
     display: none;
-  }
-
-  .nav-actions {
-    width: 100%;
   }
 
   .workspace-grid {

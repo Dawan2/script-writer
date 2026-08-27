@@ -74,7 +74,6 @@
   padding-left: 13px;
 }
 
-.backLink,
 .iconButton,
 .dangerIconButton {
   align-items: center;
@@ -92,7 +91,6 @@
   width: 34px;
 }
 
-.backLink:hover,
 .iconButton:hover { background: #f4f8f6; border-color: #8fb9b0; color: var(--teal); }
 .dangerIconButton { color: var(--red); }
 .dangerIconButton:hover { background: var(--red-soft); border-color: #e5b5a7; }
@@ -128,7 +126,6 @@
 .dangerIconButton:disabled,
 .draftActions button:disabled { cursor: not-allowed; opacity: .42; }
 
-.backLink:focus-visible,
 .iconButton:focus-visible,
 .dangerIconButton:focus-visible,
 .primaryButton:focus-visible,

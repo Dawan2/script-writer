@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import {
   Activity,
   BrainCircuit,
-  ArrowLeft,
   CloudUpload,
   Coins,
   Cpu,
@@ -19,6 +17,7 @@ import {
   Users
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AppNav } from "@/components/navigation/app-nav";
 import type { User } from "@/lib/types";
 import { AdminAuditView } from "./audit-view";
 import { AdminAgentEvolutionView } from "./agent-evolution-view";
@@ -95,7 +94,6 @@ export function AdminConsole({ user }: { user: User }) {
           })}
         </nav>
         <div className={styles.sidebarFooter}>
-          <Link href="/workspace"><ArrowLeft size={16} />返回工作台</Link>
           <div className={styles.adminIdentity}>
             <span>{user.display_name?.[0] ?? user.username[0]}</span>
             <div><strong>{user.display_name}</strong><small>@{user.username}</small></div>
@@ -108,6 +106,7 @@ export function AdminConsole({ user }: { user: User }) {
             <current.icon size={19} />
             <h1>{current.label}</h1>
           </div>
+          <AppNav current="admin" user={user} />
           <span className={styles.liveStatus}><i />系统在线</span>
         </header>
         <div className={styles.content}>

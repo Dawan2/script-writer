@@ -115,18 +115,6 @@
   padding: 13px 5px 0;
 }
 
-.sidebarFooter > a {
-  align-items: center;
-  color: rgb(237 244 239 / 72%);
-  display: flex;
-  font-size: 12px;
-  gap: 7px;
-  min-height: 28px;
-  text-decoration: none;
-}
-
-.sidebarFooter > a:hover { color: #fff; }
-
 .adminIdentity {
   align-items: center;
   display: grid;

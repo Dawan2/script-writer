@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   Archive,
-  ArrowLeft,
   ChevronDown,
   ChevronUp,
   CircleUserRound,
@@ -26,6 +25,7 @@ import {
   X
 } from "lucide-react";
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AppNav } from "@/components/navigation/app-nav";
 import { ConfirmationDialog } from "@/components/workspace/project-trash-dialog";
 import { PageLoading } from "@/components/ui/page-loading";
 import {
@@ -457,6 +457,7 @@ export default function PreferencesPage() {
           </span>
           <strong>出海剧作家</strong>
         </Link>
+        <AppNav current="preferences" user={user} />
         <span className="preferences-location">
           <Settings2 size={15} />
           创作偏好
@@ -474,10 +475,6 @@ export default function PreferencesPage() {
 
       <div className="preferences-workbench">
         <aside className="preferences-sidebar" aria-label="偏好层级">
-          <Link className="preferences-back-link" href="/workspace">
-            <ArrowLeft size={15} />
-            返回工作台
-          </Link>
           <nav className="preferences-scope-nav">
             <button
               id="scope-global"

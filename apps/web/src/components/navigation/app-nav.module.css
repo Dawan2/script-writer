@@ -1,0 +1,57 @@
+.nav {
+  align-items: center;
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+.item {
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgb(58 58 56 / 20%);
+  border-radius: 2px;
+  color: rgb(31 33 31 / 62%);
+  display: inline-flex;
+  font-size: 13px;
+  gap: 7px;
+  justify-content: center;
+  line-height: 1;
+  min-height: 30px;
+  padding: 0 11px;
+  text-decoration: none;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
+  white-space: nowrap;
+}
+
+.item:hover {
+  background: #efefeb;
+  border-color: rgb(58 58 56 / 42%);
+  color: #1a344a;
+}
+
+.item:focus-visible {
+  outline: 2px solid #1a344a;
+  outline-offset: 1px;
+}
+
+.current,
+.current:hover {
+  background: #1a344a;
+  border-color: #1a344a;
+  color: #f7f7f5;
+}
+
+/* 项目栏只有约 30px 富余宽度，展开与收起两态都用图标态 */
+.compact {
+  gap: 3px;
+  margin: 0 6px;
+}
+
+.compact .item {
+  gap: 0;
+  min-height: 24px;
+  padding: 0;
+  width: 24px;
+}

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Archive, Bot, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, CircleHelp, Coins, FileText, GripVertical, Home, KeyRound, ListChecks, ListFilter, LogOut, MoreVertical, Pencil, Pin, Plus, Search, Settings2, ShieldCheck, Trash2, UserRound, UsersRound } from "lucide-react";
+import { Archive, Bot, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, CircleHelp, Coins, FileText, GripVertical, Home, KeyRound, ListFilter, LogOut, MoreVertical, Pencil, Pin, Plus, Search, Trash2, UserRound, UsersRound } from "lucide-react";
 import { type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import { AppNav } from "@/components/navigation/app-nav";
 import { ChangePasswordDialog } from "@/components/workspace/change-password-dialog";
 import { NotificationCenter } from "@/components/workspace/notification-center";
 import { ProjectPermissionsDialog } from "@/components/workspace/project-permissions-dialog";
@@ -185,10 +186,7 @@ export function ProjectList({
   const userMenuShellRef = useRef<HTMLDivElement>(null);
   const userMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const firstUserMenuItemRef = useRef<HTMLAnchorElement>(null);
-  const preferencesUserMenuItemRef = useRef<HTMLAnchorElement>(null);
   const changePasswordUserMenuItemRef = useRef<HTMLButtonElement>(null);
-  const batchTasksUserMenuItemRef = useRef<HTMLAnchorElement>(null);
-  const adminUserMenuItemRef = useRef<HTMLAnchorElement>(null);
   const trashUserMenuItemRef = useRef<HTMLButtonElement>(null);
   const lastUserMenuItemRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -383,10 +381,7 @@ export function ProjectList({
     event.preventDefault();
     const items = [
       firstUserMenuItemRef.current,
-      preferencesUserMenuItemRef.current,
       changePasswordUserMenuItemRef.current,
-      batchTasksUserMenuItemRef.current,
-      adminUserMenuItemRef.current,
       trashUserMenuItemRef.current,
       lastUserMenuItemRef.current
     ].filter(Boolean) as HTMLElement[];
@@ -431,10 +426,6 @@ export function ProjectList({
         <Home size={15} />
         首页
       </Link>
-      <Link ref={preferencesUserMenuItemRef} href="/preferences" role="menuitem" onClick={() => setUserMenuOpen(false)}>
-        <Settings2 size={15} />
-        创作偏好
-      </Link>
       <button
         ref={changePasswordUserMenuItemRef}
         type="button"
@@ -447,18 +438,6 @@ export function ProjectList({
         <KeyRound size={15} />
         修改密码
       </button>
-      {user?.permissions.includes("batch_tasks") ? (
-        <Link ref={batchTasksUserMenuItemRef} href="/batch-tasks" role="menuitem" onClick={() => setUserMenuOpen(false)}>
-          <ListChecks size={15} />
-          批量任务
-        </Link>
-      ) : null}
-      {user?.permissions.some((permission) => permission.startsWith("admin:")) ? (
-        <Link ref={adminUserMenuItemRef} href="/admin" role="menuitem" onClick={() => setUserMenuOpen(false)}>
-          <ShieldCheck size={15} />
-          管理后台
-        </Link>
-      ) : null}
       <button
         ref={trashUserMenuItemRef}
         type="button"
@@ -501,6 +480,7 @@ export function ProjectList({
             <div className="brand-mark rail-brand-mark" aria-hidden="true">
               <img className="brand-logo" src="/logo.png" alt="" />
             </div>
+            <AppNav current="workspace" user={user} compact />
             <a
               className="rail-icon-button manual-help-button"
               href={OPERATION_MANUAL_URL}
@@ -602,6 +582,7 @@ export function ProjectList({
             <strong>出海剧作家</strong>
           </div>
         </div>
+        <AppNav current="workspace" user={user} compact />
         <div className="project-brand-actions">
           <a
             className="icon-button manual-help-button"
