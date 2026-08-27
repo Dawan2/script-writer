@@ -1,0 +1,27 @@
+===== 1. 后端错误体的形状与语言 =====
+  无凭据      ：HTTP/1.1 401 Unauthorized  {"detail":"Not authenticated"}
+  凭据无效    ：HTTP/1.1 401 Unauthorized  {"detail":"Invalid token"}
+  项目不存在  ：HTTP/1.1 404 Not Found  {"detail":"未找到项目"}
+  任务不存在  ：HTTP/1.1 404 Not Found  {"detail":"Job not found"}
+  路径不存在  ：HTTP/1.1 404 Not Found  {"detail":"Not Found"}
+  登录口令错误：HTTP/1.1 401 Unauthorized  {"detail":"Incorrect username or password"}
+  按 id 取项目：HTTP/1.1 405 Method Not Allowed  {"detail":"Method Not Allowed"}
+
+===== 2. 校验失败把提交内容原样回显（含口令） =====
+{"detail":[{"type":"missing","loc":["body","username"],"msg":"Field required","input":{"password":"super-secret-value"}}]}
+可触发校验失败的接口数量：
+  138 / 140
+
+===== 3. 追踪号在代理层丢失 =====
+  后端 x-request-id 命中数：1
+  代理 x-request-id 命中数：0
+
+===== 4. 会话过期：页面照常渲染，数据请求全失败 =====
+  带过期会话打开工作台：HTTP 200
+  同一会话读项目列表：  {"detail":"Invalid token"}
+  完全没有会话打开工作台：HTTP 307（中间件跳登录）
+
+===== 5. 后端不可用时代理层的响应 =====
+  停掉 API 后重跑下面两行即可复现：
+    curl -s -D - -b <cookie> http://127.0.0.1:3000/api/projects
+    curl -s -D - -X POST http://127.0.0.1:3000/api/auth/login -H 'content-type: application/json' -d '{"username":"x","password":"y"}'
