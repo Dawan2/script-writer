@@ -36,6 +36,13 @@
 | [`wave-02/work-workflow-engine.md`](./wave-02/work-workflow-engine.md) | W2 实现槽：SPEC-02 工作流引擎最小版落地说明（恢复式引擎 / 原子写 / sw status / 并行槽合并注意） | `cursor/w2-workflow-engine-4cad` |
 | [`wave-02/work-init-wizard.md`](./wave-02/work-init-wizard.md) | W2 实现槽：SPEC-01 `sw init` 向导落地说明（验收对照 / GAP-03·06 对照 / 偏差登记 / 交接） | `cursor/w2-init-wizard-87b4` |
 
+## 波次工作文档（wave-03）
+
+| 文档 | 内容一句话 | 所在分支 @ commit |
+| --- | --- | --- |
+| [`wave-03/integration-map.md`](./wave-03/integration-map.md) | W2 四实现分支集成顺序、文件级冲突面与语义冲突清单 7 项（W3 计划槽） | `cursor/w3-integration-map-bf24 @ 43a6ecf`（W3 集成并入） |
+| [`wave-03/ready-tasks.md`](./wave-03/ready-tasks.md) | Wave-03 就绪任务队列（WAVE03-PLAN 分区：W3-PLAN-T01…T05 集成任务） | `cursor/w3-integration-map-bf24 @ 43a6ecf`（W3 集成并入） |
+
 ## 决策与用户文档（W2 起建立）
 
 | 文档 | 内容一句话 | 说明 |
