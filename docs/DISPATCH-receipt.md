@@ -612,3 +612,18 @@
   3. 取数面纪律：正文走 P1 store 层；bible v1 目录优先级 story-bible/ > characters/（P3-06 落地后切换，描述不变）。
 - **阻塞**：BLK-W1-02 仍开放。
 - **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。
+---
+
+## 回执：P3 / Story Bible + 上下文组装器 v1（TASK-P3-06）
+
+- **日期**：2026-08-28（UTC）
+- **分支**：`cursor/w4-help-registry-impl`（已 push，未开 PR）
+- **产出**：
+  - `story-bible/`（README schema 定稿 + li-mei.yaml 样例）— 人物卡/地点/伏笔布局 + facts 纪律
+  - `src/agent/context/assembler.ts` — 六槽位预算表组装、确定性检出、超预算截断不丢槽位、contextSlots ≡ trace 形态
+  - `tests/agent/assembler.spec.ts` 9 例；`docs/wave-05/work-context-assembler.md`、本回执
+- **关键结论**：
+  1. 测试 501 → 510（509 过 + 1 todo）；CI 八门全绿。
+  2. E3 达成；E4 一致性锚点断言常驻，真 run 待 BLK-W1-02。
+- **阻塞**：BLK-W1-02 仍开放。
+- **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。

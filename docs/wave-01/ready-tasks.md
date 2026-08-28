@@ -213,6 +213,8 @@ flowchart LR
 - **验收（二值）**：E3 组装器测试：给定场号与人物，产物包含目标场全文、相邻场概要、对应人物卡，且各槽位不超预算；E4 trace 中 `context_slots` 字段与实际一致。
 - **依赖**：TASK-P3-05。
 
+> 状态：完成（v1） —— P3 实现槽（Story Bible + 上下文组装器） / 2026-08-28 / `cursor/w4-help-registry-impl`（E3 逐槽断言全绿；E4 contextSlots 锚点常驻，真 run 待 BLK-W1-02；落地说明 `docs/wave-05/work-context-assembler.md`）
+
 #### TASK-P3-07 工作流引擎
 
 - **目标**：静态计划模板实例化与执行（步骤类型 `tool/skill/human`）；`human:*` 节点挂起→序列化→续跑；预算硬顶（F4）生效。
