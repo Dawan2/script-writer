@@ -15,11 +15,12 @@ import {
 import { formatTemplate, renderError, renderHint } from '../../src/app/errors/render.js';
 
 describe('app/errors/registry：错误码注册表（SPEC-03）', () => {
-  it('恰好收录 SPEC-01/02 实际触达的错误码（「禁止预填未用码」回归锁，W1-P1-T06 风险条款；W3 集成追加引擎触达的 E021/E022、init 触达的 E013/E031 与 draft/export 触达的 E032/E033/E034）', () => {
+  it('恰好收录 SPEC-01/02 实际触达的错误码（「禁止预填未用码」回归锁，W1-P1-T06 风险条款；W3 集成追加引擎触达的 E021/E022、init 触达的 E013/E031、draft/export 触达的 E032/E033/E034 与 doctor 触达的 E014）', () => {
     expect([...ERROR_CODES].sort()).toEqual([
       'SW-E010',
       'SW-E011',
       'SW-E013',
+      'SW-E014',
       'SW-E020',
       'SW-E021',
       'SW-E022',

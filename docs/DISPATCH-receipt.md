@@ -469,3 +469,23 @@
 - **复用声明**：只引用不重做——normalizeSceneId/findSceneFileById/readSceneFiles（draft 槽）、recordSceneDone 同构先例、hint 注册表、failProject 映射原样消费。
 - **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
 - **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。
+
+---
+
+## 回执：W3 / 实现槽「doctor 诊断命令」（W1-P1-T08，移植自 cursor/w3-doctor-3e3d）
+
+- **日期**：2026-08-28（UTC）
+- **槽位**：第 3 波 / 实现槽「doctor 诊断命令」（移植源分支并适配集成分支体系）
+- **分支**：`cursor/w4-help-registry-impl`（含 help 注册表与五步主链全部落地；已 push，未开 PR）
+- **产出**：
+  - `src/app/diagnostics/{checks,validate,doctor}.ts`（移植+适配）— 七项可注册检查项原样保留；子集解析器按源分支交接注记整体退役，改消费引擎 parseProjectMeta
+  - `src/cli/commands/doctor.ts` — 错误面重写为 fail('SW-E014')；注册表 doctor planned→available（aux 组无别名）
+  - 撞号裁定（勘误）：源分支 E013 红项聚合 → 顺延 SW-E014（E013 已被 init 先落地占用、012 号为 GAP-04 锁预留），同提交登记
+  - scenes-done 修复文案指向 `sw draft <id>`（SPEC-05 §8.2 交接核销）；layout 红项 outline 修复改指 `sw outline`
+  - `docs/wave-03/work-doctor.md`（落地说明：验收 ①②③ 核销 + 适配登记）、本回执
+- **关键结论**：
+  1. W1-P1-T08 验收 ①②③ 全项核销；CI 七门全绿；测试 374 → 402（401 过 + 1 todo），只增不减。
+  2. 真实 CLI 走查：健康项目 6 绿 0 红 exit 0；删 project.yaml 得红项 + 修复命令 + SW-E014 三段式 exit 1。
+- **复用声明**：只引用不重做——DOCTOR_CHECKS 七项检查与报告渲染自源分支原样移植；引擎 readProjectFileRaw/parseProjectMeta/inspectDir、CliIo、fail() 框架原样消费。
+- **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放；ai-key 检查按调度指令报「未实现」跳过。
+- **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。

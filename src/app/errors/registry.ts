@@ -32,6 +32,8 @@ export interface ErrorContexts {
    * 与「目录非空」文案语义不同，拆码而非同码双文案；SW-E012 留给 GAP-04 文件锁既定规划）。
    */
   'SW-E013': { target: string };
+  /** W1-P1-T08：sw doctor 红项聚合（E013 已被 init 占用、E012 为 GAP-04 锁预留，顺延取 E014——撞号裁定见 work-doctor.md）。 */
+  'SW-E014': { count: number; findings: readonly string[] };
   /** SPEC-02：project.yaml schema 版本不兼容。 */
   'SW-E020': { found: string | number; supported: number };
   /** SPEC-02：project.yaml 存在但不是合法 YAML（引擎 loadProject 的 invalid-yaml 分支，W3 集成登记）。 */
@@ -92,6 +94,12 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     why: '{target} 是一个文件，无法作为项目目录。',
     fix: '换一个目录名，或移走该文件后重试 `sw init <dir>`。',
     example: { target: './my-script' },
+  },
+  'SW-E014': {
+    what: '项目自检未通过（{count} 个红项）',
+    why: 'sw doctor 发现需要处理的问题：{findings}。',
+    fix: '按报告各红项的「修复」命令逐项处理后重跑 `sw doctor`。',
+    example: { count: 2, findings: ['项目文件', '目录布局'] },
   },
   'SW-E020': {
     what: 'project.yaml 的 schema 版本不兼容',

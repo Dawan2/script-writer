@@ -21,6 +21,7 @@ import { registerOutlineCommand } from './commands/outline.js';
 import { registerDraftCommand } from './commands/draft.js';
 import { registerReviseCommand } from './commands/revise.js';
 import { registerExportCommand } from './commands/export.js';
+import { registerDoctorCommand } from './commands/doctor.js';
 import { registerHelpCommand } from './commands/help.js';
 
 export interface CommandSpec {
@@ -101,10 +102,11 @@ export const COMMAND_REGISTRY: readonly CommandSpec[] = [
   },
   {
     name: 'doctor',
-    summary: '诊断配置与项目文件健康',
+    summary: '诊断配置与项目文件健康（逐项绿/红 + 修复命令）',
     group: 'aux',
-    status: 'planned',
+    status: 'available',
     taskId: 'W1-P1-T08',
+    register: registerDoctorCommand,
   },
   {
     name: 'help',
