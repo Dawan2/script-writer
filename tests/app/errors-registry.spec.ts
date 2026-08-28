@@ -15,7 +15,7 @@ import {
 import { formatTemplate, renderError, renderHint } from '../../src/app/errors/render.js';
 
 describe('app/errors/registry：错误码注册表（SPEC-03）', () => {
-  it('恰好收录 SPEC-01/02 实际触达的错误码（「禁止预填未用码」回归锁，W1-P1-T06 风险条款；W3 集成追加引擎触达的 E021/E022、init 触达的 E013/E031、draft/export 触达的 E032/E033/E034、doctor 触达的 E014 与文件锁触达的 E012）', () => {
+  it('恰好收录 SPEC-01/02 实际触达的错误码（「禁止预填未用码」回归锁，W1-P1-T06 风险条款；W3 集成追加引擎触达的 E021/E022、init 触达的 E013/E031、draft/export 触达的 E032/E033/E034、doctor 触达的 E014 与文件锁触达的 E012、模型网关触达的 E040/E041）', () => {
     expect([...ERROR_CODES].sort()).toEqual([
       'SW-E010',
       'SW-E011',
@@ -30,9 +30,15 @@ describe('app/errors/registry：错误码注册表（SPEC-03）', () => {
       'SW-E032',
       'SW-E033',
       'SW-E034',
+      'SW-E040',
+      'SW-E041',
     ]);
-    // AI 段 SW-E04x 在 AI 适配器落地前不得登记；SW-E012 已由 GAP-04 文件锁落地登记（W4-LOCK-T01，断言迁移）
-    expect(ERROR_CODES.some((code) => code.startsWith('SW-E04'))).toBe(false);
+    // AI 段 SW-E04x 已随 TASK-P3-01 回放模式半程登记 E040/E041（断言迁移：原断言「E04x 不得登记」翻转；
+    // 回归锁仍有效——其余 E04x 码在触达前不得登记）；SW-E012 已由 GAP-04 文件锁落地登记（W4-LOCK-T01）
+    expect(ERROR_CODES.filter((code) => code.startsWith('SW-E04')).sort()).toEqual([
+      'SW-E040',
+      'SW-E041',
+    ]);
     expect(ERROR_CODES.includes('SW-E012' as (typeof ERROR_CODES)[number])).toBe(true);
   });
 

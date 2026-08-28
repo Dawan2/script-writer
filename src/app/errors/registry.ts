@@ -6,7 +6,8 @@
  * 从本表生成（保证消息与文档永不漂移）；注册表 lint（`npm run lint:errors`）进 CI。
  *
  * 纪律（SPEC-03 + W1-P1-T06 风险条款）：
- * - v1 只收 SPEC-01/02 实际触达的错误码，禁止预填未用码（AI 段 SW-E04x 待 AI 适配器落地再登记）。
+ * - v1 只收 SPEC-01/02 实际触达的错误码，禁止预填未用码（AI 段 SW-E04x 已随 TASK-P3-01
+ *   网关回放模式半程登记 E040/E041——与首个触达用例同提交）。
  * - `fail(code, ctx)` 是业务代码抛用户可见错误的唯一入口；禁止散落 console.error / 裸异常（ESLint 拦截）。
  * - 空态文案与错误文案同库管理、同 lint 覆盖（空态三要素：这里是什么 / 示例长什么样 / 下一步敲什么命令）。
  */
@@ -52,6 +53,10 @@ export interface ErrorContexts {
   'SW-E033': { format: string };
   /** SPEC-06 §5.2-2：export 无可导出内容（大纲缺失/全空白且无任何场文件），零产物落盘。 */
   'SW-E034': Record<string, never>;
+  /** TASK-P3-01（回放模式半程）：模型网关调用失败——重试与备用模型切换均用尽（或遇不可重试错误）。 */
+  'SW-E040': { model: string; attempts: number; lastError: string };
+  /** TASK-P3-01（回放模式半程）：调用模型但未配置凭据（AI 为可选适配器，P1 §5.1；缺 SW_LLM_API_KEY）。 */
+  'SW-E041': Record<string, never>;
 }
 
 export type ErrorCode = keyof ErrorContexts;
@@ -74,7 +79,7 @@ export interface ErrorSpec<C extends ErrorCode = ErrorCode> {
 /**
  * 错误码注册表（全部来自 SPEC-01/02 的实际触达路径）。
  * 段位含义（SPEC-03 注册表）：E01x 项目/文件系统；E02x 状态/版本；E03x 输入校验；
- * E04x AI 供应商（未登记：AI 默认关闭、无触达路径，登记即违反「禁止预填未用码」）。
+ * E04x AI 供应商（TASK-P3-01 回放模式半程登记 E040/E041，均与首个触达用例同提交）。
  * W3 集成追加：E021/E022（工作流引擎 loadProject 实际触达，语义冲突 ② 核销）；
  * E013/E031（init 向导实际触达，语义冲突 ③④ 核销；E012 留给 GAP-04 文件锁）。
  */
@@ -155,6 +160,18 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     what: '没有可导出的内容',
     why: 'outline.md 缺失或全空白，且 scenes/ 下没有任何场文件——导出已中止，未产生任何文件。',
     fix: '先运行 `sw outline` 补大纲，或运行 `sw draft 010 --title "开场"` 创建第一场，然后再导出。',
+    example: {},
+  },
+  'SW-E040': {
+    what: '模型调用失败（{model}，已尝试 {attempts} 次）',
+    why: '模型供应商持续不可用或返回了不可重试的错误：{lastError}。已按 F3 策略完成退避重试与备用模型切换（若已配置）。',
+    fix: '稍后重试；若持续失败，检查 SW_LLM_BASE_URL / SW_LLM_MODEL 配置与供应商服务状态。凭据相关问题运行 `sw doctor` 核对。',
+    example: { model: 'gpt-4o-mini', attempts: 4, lastError: 'HTTP 500：Internal Server Error' },
+  },
+  'SW-E041': {
+    what: '未配置模型凭据，AI 功能未启用',
+    why: 'script-writer 的核心工作流（大纲 → 场景 → 导出）不依赖 AI；只有显式调用模型能力时才需要凭据，当前环境变量 SW_LLM_API_KEY 为空。',
+    fix: '设置环境变量 SW_LLM_API_KEY（另可配 SW_LLM_BASE_URL / SW_LLM_MODEL）后重试；不需要 AI 时可直接使用 `sw draft` 等核心命令。',
     example: {},
   },
 };

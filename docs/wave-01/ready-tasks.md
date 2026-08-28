@@ -168,6 +168,8 @@ flowchart LR
 - **验收（二值）**：E1 模块入主分支；E4 一次真实调用的请求/响应脱敏记录存档且内容与剧本创作相关；仓库全文检索不到任何凭据明文。
 - **依赖**：BLK-W1-01、BLK-W1-02 解除。凭据未到位期间可先以录制/回放模式开发（方案 R-2），但验收必须有真实调用。
 
+> 状态：半程 —— P3 实现槽（模型网关·回放模式，方案 R-2） / 2026-08-28 / `cursor/w4-help-registry-impl`（E1 达成：`src/agent/gateway/` + 31 测试 + SW-E040/E041 同提交登记，落地说明 `docs/wave-05/work-model-gateway.md`；E4 真实调用脱敏记录仍阻塞于 BLK-W1-02，凭据到位后补证据方可翻「完成」）
+
 #### TASK-P3-02 提示词库与技能注册
 
 - **目标**：建立 `prompts/rules|skills|schemas` 三层结构与加载器；最小版交付 1 条规则 + 1 个技能（建议 `generate_outline` 或 `rewrite_scene`）；完整版交付版本化（`id@version`）与注册时校验。

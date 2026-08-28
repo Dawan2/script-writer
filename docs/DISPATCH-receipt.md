@@ -528,3 +528,22 @@
 - **复用声明**：只引用不重做——各单命令验收引用前四波落地说明；distEntry 定义上移为单一点。
 - **阻塞**：BLK-W1-02（模型凭据）仍开放；P3 模型网关链受其阻塞。
 - **合规声明**：未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。
+---
+
+## 回执：P3 / 模型网关最小实现·回放模式半程（TASK-P3-01，方案 R-2）
+
+- **日期**：2026-08-28（UTC）
+- **分支**：`cursor/w4-help-registry-impl`（已 push，未开 PR）
+- **产出**：
+  - `src/agent/gateway/`（types / redact / providers.openaiCompat / providers.replay / gateway）— 唯一调用出口、单次超时（AbortSignal）、F3 指数退避（500×2^n、3 次）+ 备用模型切换一次、凭据环境注入永不落盘、错误文本脱敏
+  - `gatewayConfigFromEnv`（SW_LLM_API_KEY/BASE_URL/MODEL/FALLBACK_MODEL/REPLAY_DIR）；回放夹具指纹 sha1(model+messages)[:16]，成功/失败均可录放
+  - 错误注册表 E04x 段首批 SW-E040/E041（与首个触达用例同提交，gen:errors 零漂移，16 文档）
+  - `tests/agent/gateway.spec.ts` 31 例；`tests/app/errors-registry.spec.ts` E04x 断言迁移（内联注释）
+  - `docs/wave-05/work-model-gateway.md`（落地说明：验收对照 E1 ✅ / E4 ⏸）、本回执
+- **关键结论**：
+  1. 测试 426 → 457（456 过 + 1 todo），只增不减；CI 八门全绿。
+  2. E1（模块入库）达成；E4（真实调用脱敏记录）按方案 R-2 回放模式先行，BLK-W1-02 凭据到位后同网关切 openai-compatible 补归档。
+  3. 重试策略单点在网关层；适配器只发单次请求——方案 §2.4「策略表是配置」的落点。
+- **复用声明**：fail()/SwError/render 原样消费；E040 ctx.lastError 预格式化沿用 E012 holder 先例。
+- **阻塞**：BLK-W1-02 仍开放（E4 与 TASK-P3-02/03/04 端到端验收同受此阻）。
+- **合规声明**：未创建子代理；未创建 PR；未删测试（一处断言迁移有内联注释）；未跳过失败；未合并任何内容进 `main`。
