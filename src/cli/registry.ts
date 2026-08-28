@@ -17,6 +17,7 @@ import type { Command } from 'commander';
 import type { CliIo } from './io.js';
 import { registerInitCommand } from './commands/init.js';
 import { registerStatusCommand } from './commands/status.js';
+import { registerOutlineCommand } from './commands/outline.js';
 import { registerHelpCommand } from './commands/help.js';
 
 export interface CommandSpec {
@@ -53,10 +54,11 @@ export const COMMAND_REGISTRY: readonly CommandSpec[] = [
   {
     name: 'outline',
     alias: 'o',
-    summary: '编辑大纲',
+    summary: '创建/补齐大纲 outline.md（缺失或为空时写入模板骨架）',
     group: 'main',
-    status: 'planned',
-    taskId: 'W1-P1-T07',
+    status: 'available',
+    taskId: 'W1-P1-T07 最小版',
+    register: registerOutlineCommand,
   },
   {
     name: 'draft',

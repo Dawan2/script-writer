@@ -101,9 +101,9 @@ describe('app/workflow/init · runInitWorkflow', () => {
     expect(result.meta.format).toBe('screenplay');
     expect(result.meta.expectedSceneCount).toBe(8);
     expect(result.meta.settings.ai.enabled).toBe(true);
-    // screenplay 专属模板随 W1-P1-T07 交付，当前回退通用骨架
-    expect(result.templateId).toBe('short-video');
-    expect(result.templateFallback).toBe(true);
+    // W1-P1-T07 已交付：screenplay 专属模板就位，不再回退通用骨架（断言随 T07 迁移期望，未删除）
+    expect(result.templateId).toBe('screenplay');
+    expect(result.templateFallback).toBe(false);
 
     const outline = await readFile(path.join(target, 'outline.md'), 'utf8');
     expect(outline).toContain('# 我的短片 · 大纲');
