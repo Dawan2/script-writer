@@ -90,7 +90,33 @@ describe('core/model/parseProject', () => {
     const parsed = parseProjectMeta(shape);
     expect(parsed.ok).toBe(true);
     if (parsed.ok) {
-      expect(parsed.meta.progress).toEqual({ step: 'draft', scenesDone: ['010', '020'] });
+      expect(parsed.meta.progress).toEqual({ step: 'draft', scenesDone: ['010', '020'], scenesRevised: [] });
+    }
+  });
+
+  it('scenes_revised 贯通（SPEC-04/W2-GAP-T01，§6.2 三处同提交）：缺失读作空、空数组不落键、有值往返、类型错误入 issues', () => {
+    const shape = validShape();
+    // 缺失读作空数组
+    const missing = parseProjectMeta(shape);
+    expect(missing.ok && missing.meta.progress.scenesRevised).toEqual([]);
+    // 空数组不落键（未用过 revise 的旧文件重写后字节稳定）
+    if (missing.ok) {
+      const reshaped = toProjectFileShape(missing.meta);
+      expect('scenes_revised' in reshaped.progress).toBe(false);
+    }
+    // 有值往返不丢
+    (shape['progress'] as Record<string, unknown>)['scenes_revised'] = ['010'];
+    const withRevised = parseProjectMeta(shape);
+    expect(withRevised.ok && withRevised.meta.progress.scenesRevised).toEqual(['010']);
+    if (withRevised.ok) {
+      expect(toProjectFileShape(withRevised.meta).progress.scenes_revised).toEqual(['010']);
+    }
+    // 类型错误入 issues
+    (shape['progress'] as Record<string, unknown>)['scenes_revised'] = [10];
+    const bad = parseProjectMeta(shape);
+    expect(bad.ok).toBe(false);
+    if (!bad.ok && bad.reason === 'malformed') {
+      expect(bad.issues.join('\n')).toContain('scenes_revised');
     }
   });
 });

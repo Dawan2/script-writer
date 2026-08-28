@@ -38,7 +38,7 @@ describe('app/workflow/engine：init 挂钩', () => {
     expect(loaded.ok).toBe(true);
     if (loaded.ok) {
       expect(loaded.meta.title).toBe('我的短片');
-      expect(loaded.meta.progress).toEqual({ step: 'outline', scenesDone: [] });
+      expect(loaded.meta.progress).toEqual({ step: 'outline', scenesDone: [], scenesRevised: [] });
     }
   });
 
@@ -121,7 +121,7 @@ describe('app/workflow/engine：状态回写与恢复（SPEC-02 数据流 ③④
     if (!init.ok) return;
     await saveProject(dir, {
       ...init.meta,
-      progress: { step: 'export', scenesDone: ['010'] },
+      progress: { step: 'export', scenesDone: ['010'], scenesRevised: [] },
     });
     const reloaded = await loadProject(dir);
     expect(reloaded.ok).toBe(true);

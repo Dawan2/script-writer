@@ -19,6 +19,7 @@ import { registerInitCommand } from './commands/init.js';
 import { registerStatusCommand } from './commands/status.js';
 import { registerOutlineCommand } from './commands/outline.js';
 import { registerDraftCommand } from './commands/draft.js';
+import { registerReviseCommand } from './commands/revise.js';
 import { registerExportCommand } from './commands/export.js';
 import { registerHelpCommand } from './commands/help.js';
 
@@ -74,10 +75,11 @@ export const COMMAND_REGISTRY: readonly CommandSpec[] = [
   {
     name: 'revise',
     alias: 'r',
-    summary: '改写场景',
+    summary: '修订场景：清单/打开/--done 标记已修订（不创建场）',
     group: 'main',
-    status: 'planned',
+    status: 'available',
     taskId: 'W2-GAP-T01',
+    register: registerReviseCommand,
   },
   {
     name: 'export',

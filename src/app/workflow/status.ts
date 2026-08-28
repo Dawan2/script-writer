@@ -9,7 +9,8 @@ const STEP_COMMANDS: Record<WorkflowStep, string> = {
   init: 'sw init',
   outline: 'sw outline',
   draft: 'sw draft <scene-id>',
-  revise: 'sw draft <scene-id> --force',
+  // W2-GAP-T01：revise 命令注册同提交切换（原 sw draft <scene-id> --force 占位退役，§6.3）
+  revise: 'sw revise',
   export: 'sw export',
 };
 

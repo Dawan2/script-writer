@@ -253,10 +253,10 @@ describe('cli · 帮助与版本的退出码（GAP-06：正常终止为 0）', (
     expect(t.stdout()).toContain('sw init my-story --yes');
   });
 
-  it('根 --help 的路线图标注 init 已可用、其余仍规划中（诚实进度）', async () => {
+  it('根 --help 的路线图逐条标注可用与责任任务号（诚实进度；五步主命令随 W2-GAP-T01/W3-DRAFT-T02 落地全部可用，断言迁移）', async () => {
     const t = makeIo();
     await runCli(argv('--help'), t.io);
     expect(t.stdout()).toContain('[可用 · W1-P1-T04]');
-    expect(t.stdout()).toContain('规划中');
+    expect(t.stdout()).toContain('[可用 · W2-GAP-T01]');
   });
 });

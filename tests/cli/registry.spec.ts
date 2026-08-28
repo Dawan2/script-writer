@@ -54,10 +54,11 @@ describe('cli/registry：注册表结构约束（SPEC-07 §4.1/§4.2）', () => 
     expect(aliasOf('status')).toBe('s');
   });
 
-  it('revise 为 planned 条目且在表中（ROADMAP_HELP 漏行缺陷的注册表化修正，§7-7）', () => {
+  it('revise 已在表中且随 W2-GAP-T01 落地转 available（ROADMAP_HELP 漏行缺陷的注册表化修正，§7-7）', () => {
     const revise = COMMAND_REGISTRY.find((s) => s.name === 'revise');
     expect(revise).toBeDefined();
-    expect(revise?.status).toBe('planned');
+    expect(revise?.status).toBe('available');
     expect(revise?.taskId).toBe('W2-GAP-T01');
+    expect(revise?.register).toBeDefined();
   });
 });

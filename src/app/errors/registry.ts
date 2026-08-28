@@ -207,6 +207,8 @@ export interface HintContexts {
   'scenes-empty': Record<string, never>;
   /** P1 §6.3 / SPEC-02：outline.md 为空（由 sw status 提示、sw outline 写骨架时内嵌）。 */
   'outline-empty': Record<string, never>;
+  /** ES-07（SPEC-04/W2-GAP-T01）：scenes/ 为空时运行 sw revise（无可修订的场）。 */
+  'revise-empty': Record<string, never>;
 }
 
 export type HintSlot = keyof HintContexts;
@@ -224,7 +226,7 @@ export interface HintSpec<S extends HintSlot = HintSlot> {
 }
 
 /**
- * 空态注册表 v1：只收 P1 §6.3 点名的两个位点。
+ * 空态注册表 v1：P1 §6.3 点名的两个位点 + SPEC-04 ES-07（revise 空态，W2-GAP-T01 随命令同提交登记）。
  * 注意（虚假可用性纪律，W1-P1-T01 验收 ③）：位点接线属 W1-P1-T05/T07——
  * 在 `sw draft` / `sw outline` 真实落地前，任何用户可见输出不得渲染这两条 hint。
  */
@@ -239,6 +241,12 @@ export const HINT_REGISTRY: { readonly [S in HintSlot]: HintSpec<S> } = {
     what: 'outline.md 还没有内容——这里是全片大纲，逐场列出场编号与一句话梗概。',
     example: '- 010 开场：主角在雨夜接到一通陌生电话',
     next: 'sw outline',
+    exampleCtx: {},
+  },
+  'revise-empty': {
+    what: 'scenes/ 还没有任何场——修订步针对既有场文件，无可修订对象。',
+    example: 'scenes/010-opening.md（先用 sw draft 创建场骨架）',
+    next: 'sw draft 010 --title "开场"',
     exampleCtx: {},
   },
 };

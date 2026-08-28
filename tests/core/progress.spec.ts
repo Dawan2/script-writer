@@ -4,10 +4,21 @@ import {
   ensureStepAtLeast,
   isStepBefore,
   recordSceneDone,
+  recordSceneRevised,
   sceneCompletion,
 } from '../../src/core/model/progress.js';
 
-const base: ProjectProgress = { step: 'outline', scenesDone: [] };
+const base: ProjectProgress = { step: 'outline', scenesDone: [], scenesRevised: [] };
+
+describe('core/model/progress：recordSceneRevised（SPEC-04/W2-GAP-T01，与 recordSceneDone 同构）', () => {
+  it('记录场编号且不改入参；幂等；保持升序', () => {
+    const once = recordSceneRevised(base, '020');
+    expect(once.scenesRevised).toEqual(['020']);
+    expect(base.scenesRevised).toEqual([]);
+    expect(recordSceneRevised(once, '020')).toBe(once);
+    expect(recordSceneRevised(once, '010').scenesRevised).toEqual(['010', '020']);
+  });
+});
 
 describe('core/model/progress', () => {
   it('recordSceneDone 记录场编号且不改入参（纯函数）', () => {
@@ -34,7 +45,7 @@ describe('core/model/progress', () => {
 
   it('ensureStepAtLeast 向前补齐步骤（可跳过语义）、不回退（幂等）', () => {
     expect(ensureStepAtLeast(base, 'draft').step).toBe('draft');
-    const atExport: ProjectProgress = { step: 'export', scenesDone: [] };
+    const atExport: ProjectProgress = { step: 'export', scenesDone: [], scenesRevised: [] };
     expect(ensureStepAtLeast(atExport, 'draft')).toBe(atExport);
   });
 
@@ -45,7 +56,7 @@ describe('core/model/progress', () => {
   });
 
   it('sceneCompletion = 已记录完成数 / 磁盘实际场文件数（sw status 的 3/5 语义）', () => {
-    const progress: ProjectProgress = { step: 'draft', scenesDone: ['010', '020', '030'] };
+    const progress: ProjectProgress = { step: 'draft', scenesDone: ['010', '020', '030'], scenesRevised: [] };
     const disk = { outlineExists: true, sceneIds: ['010', '020', '030', '040', '050'] };
     expect(sceneCompletion(progress, disk)).toEqual({ done: 3, total: 5 });
   });

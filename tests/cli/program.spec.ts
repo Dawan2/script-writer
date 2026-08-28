@@ -27,7 +27,9 @@ describe('cli/program', () => {
     });
     expect(() => program.parse(['node', 'sw', '--help'])).toThrow();
     expect(printed).toContain('init → outline → draft → revise → export');
-    expect(printed).toContain('规划中');
+    // W2-GAP-T01/W3-DRAFT-T02 落地后五步主命令全部可用（断言迁移：原「其余规划中」
+    // 的诚实进度意图由逐条 [可用 · 任务号] 标注承接；doctor 仍为 aux 规划中，见 --all 视图）。
+    expect(printed).toContain('[可用 · W3-DRAFT-T02]');
     expect(printed).toContain('docs/quickstart.md');
   });
 

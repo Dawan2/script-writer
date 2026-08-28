@@ -20,7 +20,7 @@ describe('core/model/project', () => {
         // ADR-0001 §3.6：v1 默认导出格式为 markdown（勘误自 SPEC-01 示例的 fountain）
         export: { default: 'markdown' },
       },
-      progress: { step: 'outline', scenesDone: [] },
+      progress: { step: 'outline', scenesDone: [], scenesRevised: [] },
     });
   });
 

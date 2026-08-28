@@ -40,6 +40,7 @@
 | --- | --- | --- |
 | `scenes-empty` | scenes/ 目前是空的——这里按「一场一文件」存放每一场的正文（Markdown）。 | `sw draft 010 --title "开场"` |
 | `outline-empty` | outline.md 还没有内容——这里是全片大纲，逐场列出场编号与一句话梗概。 | `sw outline` |
+| `revise-empty` | scenes/ 还没有任何场——修订步针对既有场文件，无可修订对象。 | `sw draft 010 --title "开场"` |
 
 空态由 `hint(slot, ctx)` 渲染（三要素：这里是什么 / 示例 / 下一步命令）；
 位点接线属 W1-P1-T05/T07，接线前不得在用户可见输出中渲染。

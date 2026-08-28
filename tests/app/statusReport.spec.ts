@@ -28,9 +28,10 @@ function statusOf(
   scenesDone: string[],
   sceneIds: string[],
   outlineExists = true,
+  scenesRevised: string[] = [],
 ): ProjectStatus {
   const base = createProjectMeta({ title: '我的短片', created: '2026-08-27' });
-  const meta: ProjectMeta = { ...base, progress: { step, scenesDone } };
+  const meta: ProjectMeta = { ...base, progress: { step, scenesDone, scenesRevised } };
   return {
     meta,
     disk: { outlineExists, sceneIds },
@@ -82,20 +83,22 @@ describe('app/workflow/statusReport：下一步命令（SPEC-02 可复制约束�
     expect(nextActionCommand(status)).toBe('sw draft 020');
   });
 
-  it('draft 期：全部完成且已达/缺省预计场数 → 建议 sw export（revise 未注册前不落 sw revise，SPEC-05 §4.4-4）', () => {
-    expect(nextActionCommand(statusOf('draft', ['010'], ['010']))).toBe('sw export');
+  it('draft 期：全部完成且已达/缺省预计场数 → 建议 sw revise（W2-GAP-T01 注册同提交切换，SPEC §11 顺序耦合核销）', () => {
+    expect(nextActionCommand(statusOf('draft', ['010'], ['010']))).toBe('sw revise');
     const base = statusOf('draft', ['010', '020'], ['010', '020']);
     const reached: ProjectStatus = {
       ...base,
       meta: { ...base.meta, expectedSceneCount: 2 },
     };
-    expect(nextActionCommand(reached)).toBe('sw export');
+    expect(nextActionCommand(reached)).toBe('sw revise');
   });
 
-  it('revise 阶段给出可执行的 --force 命令（具体场编号，非占位符）', () => {
-    expect(nextActionCommand(statusOf('revise', ['010'], ['010', '020']))).toBe(
-      'sw draft 010 --force',
+  it('revise 期：有未修订场 → sw revise <首个未修订 id>；scenes_revised ⊇ scenes_done → sw export（SPEC-04 §6.3）', () => {
+    expect(nextActionCommand(statusOf('revise', ['010'], ['010', '020']))).toBe('sw revise 010');
+    expect(nextActionCommand(statusOf('revise', ['010'], ['010'], true, ['010']))).toBe(
+      'sw export',
     );
+    expect(nextActionCommand(statusOf('revise', [], []))).toBe(FIRST_SCENE_COMMAND);
   });
 });
 

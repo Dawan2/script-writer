@@ -29,6 +29,8 @@ export interface ProjectFileShape {
   progress: {
     step: string;
     scenes_done: string[];
+    /** 已修订场编号（SPEC-04/W2-GAP-T01 可选字段；空数组不落键 ≡ 键缺失）。 */
+    scenes_revised?: string[];
   };
 }
 
@@ -122,6 +124,7 @@ export function parseProjectMeta(data: unknown): ParseProjectResult {
   const progress = data['progress'];
   let step: ProjectMeta['progress']['step'] | null = null;
   let scenesDone: string[] | null = null;
+  let scenesRevised: string[] = [];
   if (!isRecord(progress)) {
     issues.push('progress 必须是映射（含 step 与 scenes_done）');
   } else {
@@ -136,6 +139,15 @@ export function parseProjectMeta(data: unknown): ParseProjectResult {
       issues.push('progress.scenes_done 必须是字符串数组');
     } else {
       scenesDone = scenesRaw as string[];
+    }
+    // SPEC-04 可选字段：缺失读作空数组；出现则必须是字符串数组。
+    const revisedRaw = progress['scenes_revised'];
+    if (revisedRaw !== undefined && revisedRaw !== null) {
+      if (!Array.isArray(revisedRaw) || revisedRaw.some((item) => typeof item !== 'string')) {
+        issues.push('progress.scenes_revised 必须是字符串数组（或省略该字段）');
+      } else {
+        scenesRevised = revisedRaw as string[];
+      }
     }
   }
 
@@ -152,7 +164,7 @@ export function parseProjectMeta(data: unknown): ParseProjectResult {
       created: createdText as string,
       ...(expectedSceneCount !== undefined ? { expectedSceneCount } : {}),
       settings: { ai, export: { default: exportDefault } },
-      progress: { step, scenesDone },
+      progress: { step, scenesDone, scenesRevised },
     },
   };
 }
@@ -175,6 +187,10 @@ export function toProjectFileShape(meta: ProjectMeta): ProjectFileShape {
     progress: {
       step: meta.progress.step,
       scenes_done: [...meta.progress.scenesDone],
+      // SPEC-04：空数组 ≡ 键缺失（未用过 revise 的旧文件被任何命令重写后字节稳定）
+      ...(meta.progress.scenesRevised.length > 0
+        ? { scenes_revised: [...meta.progress.scenesRevised] }
+        : {}),
     },
   };
 }

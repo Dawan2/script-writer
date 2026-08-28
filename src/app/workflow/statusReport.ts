@@ -31,8 +31,9 @@ export function suggestNextSceneId(sceneIds: readonly string[]): string {
  * 步骤未到 draft 时先补大纲；draft 期细化（SPEC-05 §4.4-4）：
  * ① 磁盘无场 → 第一场完整示例；② 有场未标完成 → 首个未完成场的 --done 命令；
  * ③ 全部已完成且未达预计场数（expectedSceneCount，GAP-03 消费侧；字段缺省视为已达）→ 下一场；
- * ④ 全部已完成且已达预计场数 → sw export（revise 未注册前不落 sw revise——虚假可用性禁令 §3-6，
- * 切换到 sw revise 与 W2-GAP-T01 命令注册同提交，SPEC-04 §6.3）。
+ * ④ 全部已完成且已达预计场数 → sw revise（W2-GAP-T01 注册同提交切换，SPEC §11 顺序耦合核销）。
+ * revise 期（SPEC-04 §6.3）：有未修订场 → `sw revise <首个未修订 id>`；
+ * scenes_revised ⊇ scenes_done → sw export（完成判定按 id 集合比较）。
  */
 export function nextActionCommand(status: ProjectStatus): string {
   const { meta, disk } = status;
@@ -56,11 +57,15 @@ export function nextActionCommand(status: ProjectStatus): string {
     ) {
       return `sw draft ${suggestNextSceneId(disk.sceneIds)}`;
     }
-    return 'sw export';
+    return 'sw revise';
   }
   if (step === 'revise') {
-    const first = disk.sceneIds[0];
-    return first === undefined ? FIRST_SCENE_COMMAND : `sw draft ${first} --force`;
+    if (disk.sceneIds.length === 0) {
+      return FIRST_SCENE_COMMAND;
+    }
+    const revised = new Set(meta.progress.scenesRevised);
+    const firstUnrevised = disk.sceneIds.find((id) => !revised.has(id));
+    return firstUnrevised === undefined ? 'sw export' : `sw revise ${firstUnrevised}`;
   }
   return 'sw export';
 }
@@ -69,13 +74,18 @@ export function nextActionCommand(status: ProjectStatus): string {
 export function renderStatusReport(status: ProjectStatus): string[] {
   const { meta, scenes } = status;
   const stepNumber = WORKFLOW_STEPS.indexOf(meta.progress.step) + 1;
-  return [
+  const lines = [
     `项目：${meta.title}（${meta.format}）`,
     `当前步骤：${meta.progress.step}（第 ${stepNumber}/${WORKFLOW_STEPS.length} 步：${STEP_PATH}）`,
     `场景完成度：${scenes.done}/${scenes.total} 场已完成`,
-    '下一步（可直接复制执行）：',
-    nextActionCommand(status),
   ];
+  // SPEC-04：revise 期追加修订进度（分母 = scenes_done，完成判定按 id 集合比较）
+  if (meta.progress.step === 'revise') {
+    lines.push(
+      `修订进度：已修订 ${meta.progress.scenesRevised.length}/${meta.progress.scenesDone.length} 场`,
+    );
+  }
+  return [...lines, '下一步（可直接复制执行）：', nextActionCommand(status)];
 }
 
 /**

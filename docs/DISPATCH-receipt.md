@@ -447,3 +447,25 @@
 - **复用声明**：只引用不重做——sceneSlug（draft 槽）、writeFileAtomic、ensureStepAtLeast、failProject 映射原样消费；格式面按 ADR-0001 §3.6 不重裁不预实现。
 - **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
 - **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。
+
+---
+
+## 回执：W2 / 实现槽「revise 修订步命令」（W2-GAP-T01 / SPEC-04 + W3 规格 §6 增补）
+
+- **日期**：2026-08-28（UTC）
+- **槽位**：第 2 波 / 实现槽「revise 修订步命令」（SPEC-04 原文 + W3 计划槽 §6 对齐增补）
+- **分支**：`cursor/w4-help-registry-impl`（含 help 注册表、outline、draft、export 落地；已 push，未开 PR）
+- **产出**：
+  - `src/app/workflow/revise.ts` + `reviseReport.ts`（新）— 清单/打开/--done/空态四路径；不创建场；E030/E032 复用既有码零新增；--list 纯只读零写盘
+  - `src/cli/commands/revise.ts`（新）— --done 缺 id 与 --done×--list 互斥均走退出码 2
+  - `scenes_revised` 三处贯通（ProjectProgress / ProjectFileShape / parse 互转）：空数组不落键、缺失读作空，schema 仍为 1
+  - status.ts 与 statusReport.ts 两处 `sw draft --force` 占位与命令注册**同提交**切换为 sw revise 系命令（§6.3 纪律）；revise 期 status 追加修订进度行
+  - 空态位点 ES-07（revise-empty）同提交登记；注册表 revise planned→available（别名 r 生效）
+  - `docs/wave-02/work-revise.md`（落地说明：验收 ①–⑤ + §6 增补逐项核销）、本回执
+- **关键结论**：
+  1. SPEC-04 验收 ①–⑤ 与 §6 增补全项核销；CI 七门全绿；测试 350 → 374（373 过 + 1 todo），只增不减。
+  2. 五步主链全部可用，MP-01 闭环；真实 CLI 走查中发现并修复 --done 建议命令按更新前修订集计算的缺陷（已补回归锁）。
+  3. 断言迁移四处（statusReport/registry/program/init 的「规划中」与占位命令期望），均内联迁移说明，零删除。
+- **复用声明**：只引用不重做——normalizeSceneId/findSceneFileById/readSceneFiles（draft 槽）、recordSceneDone 同构先例、hint 注册表、failProject 映射原样消费。
+- **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
+- **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。

@@ -33,6 +33,8 @@ export interface ProjectSettings {
 export interface ProjectProgress {
   step: WorkflowStep;
   scenesDone: string[];
+  /** 已修订场编号（SPEC-04/W2-GAP-T01；序列化时空数组不落 scenes_revised 键）。 */
+  scenesRevised: string[];
 }
 
 export interface ProjectMeta {
@@ -78,7 +80,7 @@ export function createProjectMeta(input: CreateProjectMetaInput): ProjectMeta {
       ai: { enabled: input.aiEnabled ?? false, provider: null },
       export: { default: 'markdown' },
     },
-    progress: { step: 'outline', scenesDone: [] },
+    progress: { step: 'outline', scenesDone: [], scenesRevised: [] },
   };
   if (input.expectedSceneCount !== undefined) {
     if (!Number.isInteger(input.expectedSceneCount) || input.expectedSceneCount < 1) {

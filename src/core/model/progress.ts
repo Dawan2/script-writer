@@ -44,6 +44,21 @@ export function ensureStepAtLeast(progress: ProjectProgress, floor: WorkflowStep
   return { ...progress, step: floor };
 }
 
+/**
+ * 幂等记录场景修订（SPEC-04：`sw revise <id> --done` 把 id 记入 progress.scenes_revised）。
+ * 与 recordSceneDone 同构：trim、幂等、排序、返回新对象。
+ */
+export function recordSceneRevised(progress: ProjectProgress, sceneId: string): ProjectProgress {
+  const id = sceneId.trim();
+  if (id.length === 0) {
+    throw new RangeError('场编号不能为空');
+  }
+  if (progress.scenesRevised.includes(id)) {
+    return progress;
+  }
+  return { ...progress, scenesRevised: [...progress.scenesRevised, id].sort() };
+}
+
 /** a 是否严格早于 b（五步顺序）。 */
 export function isStepBefore(a: WorkflowStep, b: WorkflowStep): boolean {
   return stepIndex(a) < stepIndex(b);

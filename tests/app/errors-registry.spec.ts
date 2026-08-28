@@ -93,8 +93,8 @@ describe('app/errors/registry：fail() 唯一抛错入口与 SwError', () => {
 });
 
 describe('app/errors/registry：空态注册表（与错误文案同库、同 lint）', () => {
-  it('v1 恰好收录 P1 §6.3 点名的两个位点（scenes-empty / outline-empty）', () => {
-    expect([...HINT_SLOTS].sort()).toEqual(['outline-empty', 'scenes-empty']);
+  it('恰好收录 P1 §6.3 两个位点 + SPEC-04 ES-07（revise 空态，W2-GAP-T01 同提交登记）', () => {
+    expect([...HINT_SLOTS].sort()).toEqual(['outline-empty', 'revise-empty', 'scenes-empty']);
   });
 
   it.each(HINT_SLOTS)('%s：空态三要素（这里是什么 / 示例 / 下一步）全部非空', (slot) => {

@@ -101,7 +101,7 @@ describe('app/workflow/outline：幂等与状态回写（引擎数据流 ④）'
     if (!init.ok) return;
     await saveProject(dir, {
       ...init.meta,
-      progress: { step: 'export', scenesDone: ['010'] },
+      progress: { step: 'export', scenesDone: ['010'], scenesRevised: [] },
     });
     const before = await readFile(join(dir, PROJECT_FILE), 'utf8');
     const result = await ensureOutline(dir);
@@ -170,7 +170,7 @@ describe('app/workflow/outline：骨架渲染纯出口', () => {
         format,
         created: '2026-08-27',
         settings: { ai: { enabled: false, provider: null }, export: { default: 'markdown' } },
-        progress: { step: 'outline', scenesDone: [] },
+        progress: { step: 'outline', scenesDone: [], scenesRevised: [] },
       });
       expect(text).toContain('标题X');
       expect(text).not.toContain('{{');
