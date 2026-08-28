@@ -193,6 +193,8 @@ flowchart LR
 - **验收（二值）**：E4 一次运行产出的 JSONL 文件包含全部最小事件且字段齐全；E3 脱敏导出测试：导出物中无凭据、无剧本正文全文（仅引用）。
 - **依赖**：TASK-P3-01。
 
+> 状态：完成（最小版） —— P3 实现槽（trace） / 2026-08-28 / `cursor/w4-help-registry-impl`（E4 最小事件集回放 run 达成 + E3 脱敏导出断言常驻；真实模型 run 待 BLK-W1-02；落地说明 `docs/wave-05/work-trace.md`）
+
 #### TASK-P3-05 工具注册表 + 首批只读工具
 
 - **目标**：工具描述 schema（含 `side_effect/preconditions/failure_modes`）与注册表校验；实现首批只读工具 `read_scene / list_scenes / get_bible_entry`；F2 前置参数校验生效。

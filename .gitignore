@@ -7,5 +7,8 @@ coverage/
 # 用户项目导出产物（P1 方案 §6.1：exports/ 为 git-ignored）
 exports/
 
+# Agent 运行轨迹（P3 方案 §2.7：runs/*.jsonl 为运行期瞬态件；核验证据以脱敏摘要归档 docs/evidence/）
+runs/
+
 # 编辑器与系统杂项
 .DS_Store

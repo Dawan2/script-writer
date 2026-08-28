@@ -564,3 +564,19 @@
   3. 最小版即含版本化与注册校验（非完整版独占）；完整版余项 = 多技能扩充。
 - **阻塞**：BLK-W1-02 仍开放（与本槽无关）。
 - **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。
+---
+
+## 回执：P3 / 运行轨迹 trace 最小实现（TASK-P3-04）
+
+- **日期**：2026-08-28（UTC）
+- **分支**：`cursor/w4-help-registry-impl`（已 push，未开 PR）
+- **产出**：
+  - `src/agent/trace/`（types / tracer / summary）— JSONL 四件最小事件（run_start/run_end/llm_call/repair_event）；emit 前 redactSecrets 强制脱敏；tracedLlmCall 网关观测粘接点（SW-E040 → repair_event F3/failed）；summarizeRun 脱敏 Markdown 摘要（docs/evidence/ 归档产出器）
+  - `.gitignore` +`runs/`；`tests/agent/trace.spec.ts` 6 例
+  - `docs/wave-05/work-trace.md`（落地说明）、本回执
+- **关键结论**：
+  1. 测试 474 → 479（478 过 + 1 todo）；CI 八门全绿。
+  2. E4（最小事件集字段齐全）以回放模式 run 达成；真实模型 run 待 BLK-W1-02。
+  3. 顺带核销 TASK-P3-02 尾项：回放 run 的 llm_call 事件含 `skill: generate_outline@1`（版本化引用运行佐证）。
+- **阻塞**：BLK-W1-02 仍开放（真实 run 证据与 P3-03 真实 F1 重试 trace 同受此阻）。
+- **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。
