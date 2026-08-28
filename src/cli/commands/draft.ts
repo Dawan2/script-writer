@@ -7,6 +7,7 @@
 import { Command, Option } from 'commander';
 import { runDraftScene, type DraftOptions } from '../../app/workflow/draft.js';
 import { renderDraftReport } from '../../app/workflow/draftReport.js';
+import { runWithProjectLock } from '../lockGuard.js';
 import type { CliIo } from '../io.js';
 
 const DRAFT_EXAMPLES = `
@@ -26,7 +27,9 @@ export function registerDraftCommand(program: Command, io: CliIo): void {
     .addOption(new Option('--done', '把该场标记为已完成（幂等）').conflicts(['title']))
     .addHelpText('after', DRAFT_EXAMPLES)
     .action(async (sceneId: string, options: DraftOptions) => {
-      const outcome = await runDraftScene(process.cwd(), sceneId, options);
+      const outcome = await runWithProjectLock(io, process.cwd(), () =>
+        runDraftScene(process.cwd(), sceneId, options),
+      );
       io.out(`${renderDraftReport(outcome).join('\n')}\n`);
     });
 }

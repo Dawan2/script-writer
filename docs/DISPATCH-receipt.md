@@ -489,3 +489,24 @@
 - **复用声明**：只引用不重做——DOCTOR_CHECKS 七项检查与报告渲染自源分支原样移植；引擎 readProjectFileRaw/parseProjectMeta/inspectDir、CliIo、fail() 框架原样消费。
 - **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放；ai-key 检查按调度指令报「未实现」跳过。
 - **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。
+
+---
+
+## 回执：W4 / 实现槽「项目级文件锁」（W4-LOCK-T01/T02 核销 W2-GAP-T04 / SPEC-07）
+
+- **日期**：2026-08-28（UTC）
+- **槽位**：第 4 波 / 实现槽「文件锁」（承接 W4 计划槽 SPEC-07，`cursor/w4-spec-file-lock-a3e6`）
+- **分支**：`cursor/w4-help-registry-impl`（含 help 注册表、五步主链、doctor 落地；已 push，未开 PR）
+- **产出**：
+  - `src/infra/store/lock.ts`（新）— O_EXCL 独占创建锁原语（获取/stale 判定/自动接管/尽力释放/withProjectLock + LockDeps 全注入测试缝）
+  - `src/cli/lockGuard.ts`（新）— 全库唯一取装点 + LOCKED_WRITE_COMMANDS 清单（AT-L15 数据源）
+  - 五命令接线（init 按 §6.2 特殊次序 + prelocked 旗标；revise --list 只读不加锁）；doctor lockCheck 四态落地（W4-LOCK-T02，SPEC-07 §7）
+  - SW-E012 与首个触达用例同提交登记（gen:errors 零漂移）；smoke:exit-codes +1（13/13）
+  - `docs/wave-04/work-file-lock.md`（落地说明：AT-L01…L15 逐项核销表）、本回执
+- **关键结论**：
+  1. AT-L01…L15 全项核销；CI 七门全绿；测试 402 → 426（425 过 + 1 todo），只增不减。
+  2. SPEC-07 §11-1 对齐点完成（LOCK_FILE 正典迁 layout.ts，checks.ts 接口零变化）；§11-2 撞号已在 doctor 槽以 E014 先行处置，E015 建议不再适用（登记备查）。
+  3. E012 ctx 取 {dir, holder} 预格式化形态（§5「渲染细节实现槽定」授权），消息语义与规格成文一致。
+- **复用声明**：只引用不重做——SPEC-07 全文即开工依据；writeFileAtomic/inspectDir/fail()/CliIo 原样消费；锁文件不走 writeFileAtomic（§3.3 裁定）单独说明。
+- **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
+- **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。

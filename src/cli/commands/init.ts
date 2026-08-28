@@ -7,9 +7,12 @@
  */
 
 import readline from 'node:readline/promises';
+import { resolve } from 'node:path';
 import { Command, InvalidArgumentError, Option } from 'commander';
 import { SCRIPT_FORMATS, type ScriptFormat } from '../../core/model/project.js';
 import { runInitWorkflow, type InitFlags, type InitResult } from '../../app/workflow/init.js';
+import { inspectDir } from '../../infra/store/projectFile.js';
+import { withProjectLock } from '../../infra/store/lock.js';
 import type { CliIo } from '../io.js';
 
 const INIT_EXAMPLES = `
@@ -124,14 +127,28 @@ export function registerInitCommand(program: Command, io: CliIo): void {
       };
       const { ask, dispose } = createAsk(io);
       try {
-        const result = await runInitWorkflow(dir, flags, {
-          ask,
-          info: (line) => {
-            io.out(`${line}\n`);
-          },
-          today: () => new Date().toISOString().slice(0, 10),
-        });
-        io.out(`${renderSummary(result, dir)}\n`);
+        const runBody = async (extra?: Pick<InitFlags, 'prelocked'>) => {
+          const result = await runInitWorkflow(dir, { ...flags, ...extra }, {
+            ask,
+            info: (line) => {
+              io.out(`${line}\n`);
+            },
+            today: () => new Date().toISOString().slice(0, 10),
+          });
+          io.out(`${renderSummary(result, dir)}\n`);
+        };
+        // SPEC-07 §6.2 init 特殊次序：E013（目标是文件）/E010（非空且无 --force）判定
+        // 先于取锁——先建 .sw/lock 会把空目录变非空、自我否决；失败形态零 .sw/ 副作用。
+        const dirState = await inspectDir(resolve(dir ?? '.'));
+        if (dirState === 'file' || (dirState === 'non-empty' && options.force !== true)) {
+          await runBody();
+        } else {
+          await withProjectLock(
+            resolve(dir ?? '.'),
+            () => runBody({ prelocked: true }),
+            (line) => io.err(line),
+          );
+        }
       } finally {
         dispose();
       }

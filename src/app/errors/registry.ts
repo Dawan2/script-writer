@@ -27,6 +27,8 @@ export interface ErrorContexts {
   'SW-E010': { dir: string };
   /** SPEC-02：项目命令在非项目目录运行（缺 project.yaml）。 */
   'SW-E011': { cwd: string };
+  /** SPEC-07 §5：写命令遇项目锁占用（GAP-04 预留号，随 AT-L01 首个触达用例登记；holder 预格式化，不可解析时为「未知…」）。 */
+  'SW-E012': { dir: string; holder: string };
   /**
    * SPEC-01：init 目标路径已存在且是文件（W3 集成登记，E010 双现场拆分裁定——
    * 与「目录非空」文案语义不同，拆码而非同码双文案；SW-E012 留给 GAP-04 文件锁既定规划）。
@@ -88,6 +90,12 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     why: '未找到 project.yaml（查找位置：{cwd}）。',
     fix: '运行 `sw init` 新建项目，或 cd 到既有项目目录。',
     example: { cwd: '/home/writer/somewhere' },
+  },
+  'SW-E012': {
+    what: '项目正被另一个进程写入（项目锁被占用）',
+    why: '{dir}/.sw/lock 当前由 {holder} 持有；同一项目同一时刻只允许一个写命令，以防两个进程互相覆盖（丢失更新，GAP-04 裁决）。',
+    fix: '若确有另一条 sw 命令正在运行，等它完成后重试。若确认没有 sw 进程在运行（进程残留、pid 被复用、他机残留或锁文件损坏），运行 `sw doctor` 核对锁健康，并按其红项给出的命令删除 .sw/lock——确认无持有进程后删除是安全的，下次写命令会自动重建。',
+    example: { dir: '/home/writer/my-script', holder: 'pid 12345（主机 writers-laptop，获取于 2026-08-28T02:31:07Z）' },
   },
   'SW-E013': {
     what: '目标路径已存在且不是目录',

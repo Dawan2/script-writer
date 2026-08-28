@@ -8,6 +8,8 @@ export const OUTLINE_FILE = 'outline.md';
 export const CHARACTERS_DIR = 'characters';
 export const SCENES_DIR = 'scenes';
 export const EXPORTS_DIR = 'exports';
+/** 项目级建议性文件锁路径（SPEC-07 §3.1：常量正典在本模块，doctor 检查项从此导入）。 */
+export const LOCK_FILE = '.sw/lock';
 
 /** 场编号 → 三位零填充字符串（10 → "010"）。 */
 export function padSceneId(id: number): string {

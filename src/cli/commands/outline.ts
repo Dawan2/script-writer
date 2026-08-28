@@ -10,6 +10,7 @@ import type { Command } from 'commander';
 import { ensureOutline } from '../../app/workflow/outline.js';
 import { renderOutlineReport } from '../../app/workflow/outlineReport.js';
 import { failProject } from '../../app/workflow/statusReport.js';
+import { runWithProjectLock } from '../lockGuard.js';
 import type { CliIo } from '../io.js';
 
 /** 纯执行体：CLI action 与测试共用。成功返回渲染行；失败抛 SwError（SW-E011/E020/E021/E022）。 */
@@ -31,7 +32,7 @@ export function registerOutlineCommand(program: Command, io: CliIo): void {
       '\n示例：\n  cd my-story && sw outline   # outline.md 缺失/为空时写入模板骨架；已有内容则不覆盖\n',
     )
     .action(async () => {
-      const lines = await runOutline(process.cwd());
+      const lines = await runWithProjectLock(io, process.cwd(), () => runOutline(process.cwd()));
       io.out(`${lines.join('\n')}\n`);
     });
 }

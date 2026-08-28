@@ -67,6 +67,8 @@ describe('cli · sw init --yes（非交互路径，SPEC-01 验收"零交互跑�
     expect(t.stdout()).not.toContain('? ①'); // 零交互：无任何提问
     expect((await readdir(target)).sort()).toEqual([
       '.gitignore',
+      // SPEC-07 §6.2：init 持锁后 .sw/ 空目录留存属合法（锁已释放；快照/后续锁共居），断言迁移
+      '.sw',
       'characters',
       'exports',
       'outline.md',

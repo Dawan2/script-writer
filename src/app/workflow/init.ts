@@ -10,6 +10,7 @@
  */
 
 import path from 'node:path';
+import { readdir } from 'node:fs/promises';
 import {
   DEFAULT_EXPECTED_SCENE_COUNT,
   SCRIPT_FORMATS,
@@ -41,6 +42,8 @@ export interface InitFlags {
   scenes?: number;
   ai?: boolean;
   force?: boolean;
+  /** CLI 已持有项目锁（SPEC-07 §6.2）：目录仅含 `.sw/`（锁文件）视同空目录，不误判 E010。 */
+  prelocked?: boolean;
 }
 
 export interface InitDeps {
@@ -228,9 +231,16 @@ export async function runInitWorkflow(
 ): Promise<InitResult> {
   const target = path.resolve(dirArg ?? '.');
 
-  const dirState = await inspectDir(target);
+  let dirState = await inspectDir(target);
   if (dirState === 'file') {
     fail('SW-E013', { target });
+  }
+  // SPEC-07 §6.2：CLI 持锁路径下目标目录仅含 .sw/（锁文件）视同空目录
+  if (dirState === 'non-empty' && flags.prelocked === true) {
+    const entries = await readdir(target);
+    if (entries.every((entry) => entry === '.sw')) {
+      dirState = 'empty';
+    }
   }
   if (dirState === 'non-empty' && !flags.force) {
     fail('SW-E010', { dir: target });

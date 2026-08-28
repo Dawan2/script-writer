@@ -4,11 +4,24 @@
  * 退出码 1 档随首个真实业务命令落地（W3 集成：`sw status` 于非项目目录 → SW-E011 → 1）。
  */
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { hostname } from 'node:os';
 import { join } from 'node:path';
 
 const emptyDir = mkdtempSync(join(tmpdir(), 'sw-smoke-'));
+
+// W4-LOCK-T01（AT-L13）：预置活锁的项目目录——holder pid = 本进程（断言期间存活）
+const lockedDir = mkdtempSync(join(tmpdir(), 'sw-smoke-lock-'));
+spawnSync(process.execPath, [join(process.cwd(), 'dist/cli/main.js'), 'init', '--yes'], {
+  cwd: lockedDir,
+});
+mkdirSync(join(lockedDir, '.sw'), { recursive: true });
+writeFileSync(
+  join(lockedDir, '.sw', 'lock'),
+  `pid: ${process.pid}\nhostname: ${hostname()}\nacquired_at: 2026-08-28T02:31:07Z\n`,
+  'utf8',
+);
 
 const CASES = [
   { args: ['--version'], expected: 0, note: '正常终止（版本）' },
@@ -23,6 +36,7 @@ const CASES = [
   { args: ['help', 'no-such-command'], expected: 2, note: 'help 未知词条 = 用法错误（SPEC-07 §4.4）' },
   { args: ['--no-such-flag'], expected: 2, note: '未知旗标 = 用法错误' },
   { args: ['no-such-command'], expected: 2, note: '未知命令（多余参数）= 用法错误' },
+  { args: ['outline'], cwd: lockedDir, expected: 1, note: '活锁下写命令 = 运行期错误（SW-E012，SPEC-07/AT-L13）' },
 ];
 
 const distEntry = join(process.cwd(), 'dist/cli/main.js');
@@ -45,6 +59,7 @@ for (const { args, expected, note, cwd } of CASES) {
 }
 
 rmSync(emptyDir, { recursive: true, force: true });
+rmSync(lockedDir, { recursive: true, force: true });
 
 if (failed > 0) {
   console.error(`✖ 退出码冒烟未通过：${failed}/${CASES.length} 用例失败`);

@@ -139,20 +139,53 @@ describe('app/diagnostics/checks · 单项检查', () => {
     expect(garbled.fix).toContain('nodejs.org');
   });
 
-  it('项目锁：未实现——报「未实现」跳过且不崩溃（GAP-04 承接位）', async () => {
+  it('项目锁四态（SPEC-07 §7，W4-LOCK-T02 替换「未实现」）：无锁绿 / 活锁绿 / stale 红 / 不可解析红 / 他机 skip', async () => {
     const root = await makeTempRoot();
     const check = findCheck('project-lock');
 
+    // 1：无锁 → pass
     const absent = await check.run(makeCtx({ dir: root }));
-    expect(absent.status).toBe('skip');
-    expect(absent.detail).toContain('未实现');
-    expect(absent.detail).toContain('W2-GAP-T04');
+    expect(absent.status).toBe('pass');
+    expect(absent.detail).toContain('无项目锁文件');
 
+    // 2：活锁（本进程 pid）→ pass 注明正常并发
     await mkdir(path.join(root, '.sw'), { recursive: true });
-    await writeFile(path.join(root, LOCK_FILE), 'pid: 1', 'utf8');
-    const present = await check.run(makeCtx({ dir: root }));
-    expect(present.status).toBe('skip');
-    expect(present.detail).toContain('已发现 .sw/lock');
+    await writeFile(
+      path.join(root, LOCK_FILE),
+      `pid: ${process.pid}\nhostname: ${os.hostname()}\nacquired_at: 2026-08-28T02:31:07Z\n`,
+      'utf8',
+    );
+    const live = await check.run(makeCtx({ dir: root }));
+    expect(live.status).toBe('pass');
+    expect(live.detail).toContain(`pid ${process.pid}`);
+
+    // 3：stale（不存活 pid）→ 红项 + 可复制修复命令（GAP-04 验收 ④）
+    const deadPid = 2 ** 22 + 12345; // 远离活跃 pid 空间
+    await writeFile(
+      path.join(root, LOCK_FILE),
+      `pid: ${deadPid}\nhostname: ${os.hostname()}\nacquired_at: 2026-08-28T02:31:07Z\n`,
+      'utf8',
+    );
+    const stale = await check.run(makeCtx({ dir: root }));
+    expect(stale.status).toBe('fail');
+    expect(stale.detail).toContain('陈旧项目锁');
+    expect(stale.fix).toContain('rm');
+
+    // 4a：不可解析 → 红项（不自愈，§4.4 自愈出口）
+    await writeFile(path.join(root, LOCK_FILE), '', 'utf8');
+    const broken = await check.run(makeCtx({ dir: root }));
+    expect(broken.status).toBe('fail');
+    expect(broken.detail).toContain('不完整或损坏');
+
+    // 4b：他机锁 → skip 如实登记（不出假红）
+    await writeFile(
+      path.join(root, LOCK_FILE),
+      `pid: 12345\nhostname: other-machine\nacquired_at: 2026-08-28T02:31:07Z\n`,
+      'utf8',
+    );
+    const foreign = await check.run(makeCtx({ dir: root }));
+    expect(foreign.status).toBe('skip');
+    expect(foreign.detail).toContain('other-machine');
   });
 
   it('AI key：未启用绿；已启用报「未实现」跳过（网关属 TASK-P3-01）', async () => {
@@ -172,7 +205,7 @@ describe('app/diagnostics/checks · 单项检查', () => {
 });
 
 describe('app/diagnostics/doctor · runDoctorWorkflow（验收①②③的工作流层）', () => {
-  it('健康项目：零红项 ok=true，检查项顺序固定，锁为「未实现」跳过', async () => {
+  it('健康项目：零红项 ok=true，检查项顺序固定，锁为「无锁文件」绿（W4-LOCK-T02 后四态落地，断言迁移）', async () => {
     const target = await makeHealthyProject();
 
     const report = await runDoctorWorkflow(target, doctorDeps);
@@ -192,8 +225,8 @@ describe('app/diagnostics/doctor · runDoctorWorkflow（验收①②③的工作
       expect(['pass', 'skip']).toContain(result.status);
     }
     const lock = report.results.find((result) => result.id === 'project-lock');
-    expect(lock?.status).toBe('skip');
-    expect(lock?.detail).toContain('未实现');
+    expect(lock?.status).toBe('pass');
+    expect(lock?.detail).toContain('无项目锁文件');
     expect(report.passCount + report.skipCount).toBe(report.results.length);
   });
 

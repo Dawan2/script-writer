@@ -7,6 +7,7 @@
 import { Command, CommanderError, Option } from 'commander';
 import { runRevise, type ReviseOptions } from '../../app/workflow/revise.js';
 import { renderReviseReport } from '../../app/workflow/reviseReport.js';
+import { runWithProjectLock } from '../lockGuard.js';
 import type { CliIo } from '../io.js';
 
 const REVISE_EXAMPLES = `
@@ -31,7 +32,10 @@ export function registerReviseCommand(program: Command, io: CliIo): void {
         io.err('错误：--done 需要指定场编号，如 `sw revise 010 --done`。\n');
         throw new CommanderError(2, 'commander.reviseUsageError', '--done 缺 <scene-id>');
       }
-      const outcome = await runRevise(process.cwd(), sceneId, options);
+      // SPEC-07 §6.1：--list 纯只读不加锁；其余路径（清单推进/打开/--done）加锁
+      const body = () => runRevise(process.cwd(), sceneId, options);
+      const outcome =
+        options.list === true ? await body() : await runWithProjectLock(io, process.cwd(), body);
       io.out(`${renderReviseReport(outcome).join('\n')}\n`);
     });
 }

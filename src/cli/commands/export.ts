@@ -7,6 +7,7 @@
 import { Command } from 'commander';
 import { runExport, type ExportOptions } from '../../app/workflow/export.js';
 import { renderExportReport } from '../../app/workflow/exportReport.js';
+import { runWithProjectLock } from '../lockGuard.js';
 import type { CliIo } from '../io.js';
 
 const EXPORT_EXAMPLES = `
@@ -25,7 +26,9 @@ export function registerExportCommand(program: Command, io: CliIo): void {
     .option('--out <path>', '产物文件路径（缺省 exports/<标题>.md；父目录自动创建）')
     .addHelpText('after', EXPORT_EXAMPLES)
     .action(async (options: ExportOptions) => {
-      const outcome = await runExport(process.cwd(), options);
+      const outcome = await runWithProjectLock(io, process.cwd(), () =>
+        runExport(process.cwd(), options),
+      );
       io.out(`${renderExportReport(outcome).join('\n')}\n`);
     });
 }

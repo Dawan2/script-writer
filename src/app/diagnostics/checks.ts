@@ -15,17 +15,20 @@
  * - scenes-done 修复文案更新：sw draft 已交付（SPEC-05 §8.2 交接核销），移除「随 T05 交付」标注。
  */
 
-import { readdir } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { SCHEMA_VERSION } from '../../core/model/project.js';
 import {
   CHARACTERS_DIR,
   EXPORTS_DIR,
+  LOCK_FILE,
   OUTLINE_FILE,
   PROJECT_FILE,
   SCENES_DIR,
 } from '../../infra/store/layout.js';
 import { inspectDir } from '../../infra/store/projectFile.js';
+import { isPidAlive, parseLockContent } from '../../infra/store/lock.js';
 import type { ProjectMetaFindings } from './validate.js';
 
 export type CheckStatus = 'pass' | 'fail' | 'skip';
@@ -243,19 +246,50 @@ const scenesDoneCheck: DoctorCheck = {
   },
 };
 
-/** GAP-04 裁决的项目级建议性文件锁路径（实现属 W2-GAP-T04）。 */
-export const LOCK_FILE = '.sw/lock';
+/** 项目级建议性文件锁路径（SPEC-07 §11-1：常量正典迁至 layout.ts，此处再导出保持接口不变）。 */
+export { LOCK_FILE };
 
 const lockCheck: DoctorCheck = {
   id: 'project-lock',
   title: '项目锁',
   async run(ctx) {
-    // 锁机制（GAP-04：`.sw/lock`，pid/hostname/acquired_at）属 W2-GAP-T04，尚未交付。
-    // 按调度指令报「未实现」且不崩溃；T04 落地后本检查项接入 stale 判定（红项 + 修复命令）。
-    const state = await inspectDir(path.join(ctx.dir, LOCK_FILE));
-    const foundNote = state === 'file' ? `（已发现 ${LOCK_FILE} 文件，暂不判定其健康度）` : '';
-    return skip(
-      `未实现——锁机制（GAP-04 裁决的 ${LOCK_FILE}）属 W2-GAP-T04，尚未交付；落地后本检查项接入 stale 锁判定与修复命令${foundNote}`,
+    // SPEC-07 §7 四态契约（W4-LOCK-T02 替换「未实现」skip）：
+    // doctor 全程只读——永不删锁、永不接管（接管只属写命令取锁路径）。
+    const lockPath = path.join(ctx.dir, LOCK_FILE);
+    const state = await inspectDir(lockPath);
+    if (state === 'missing') {
+      return pass('无项目锁文件，无持有者');
+    }
+    if (state !== 'file') {
+      return fail(
+        `${LOCK_FILE} 被同名目录占用，无法作为锁文件读取`,
+        `移走该同名目录后重跑 \`sw doctor\``,
+      );
+    }
+    const text = await readFile(lockPath, 'utf8');
+    const content = parseLockContent(text);
+    if (content === null) {
+      // 4a：不可解析锁——写命令侧不自愈（§4.4），doctor 红项给出自愈出口
+      return fail(
+        '项目锁文件内容不完整或损坏，无法判定持有者',
+        `确认无 sw 进程在运行后执行 \`rm ${LOCK_FILE}\`（项目根内；下次写命令会自动重建）`,
+      );
+    }
+    if (content.hostname !== os.hostname()) {
+      // 4b：他机锁——不出假红（doctor 红项必须本机可行动），如实登记
+      return skip(
+        `锁由他机 ${content.hostname} 持有（pid ${content.pid}），无法在本机判定存活；确认该机无 sw 进程后可手工删除 ${LOCK_FILE}`,
+      );
+    }
+    if (isPidAlive(content.pid)) {
+      return pass(
+        `项目锁由 pid ${content.pid} 持有（存活，获取于 ${content.acquiredAt}）——另一条写命令正在运行，属正常并发`,
+      );
+    }
+    // 3：stale 锁（GAP-04 验收 ④）
+    return fail(
+      `发现陈旧项目锁：pid ${content.pid} 已不存活（获取于 ${content.acquiredAt}）`,
+      `在项目根执行 \`rm ${LOCK_FILE}\`（或运行任意写命令——会自动接管并告警）`,
     );
   },
 };
