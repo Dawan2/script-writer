@@ -510,3 +510,21 @@
 - **复用声明**：只引用不重做——SPEC-07 全文即开工依据；writeFileAtomic/inspectDir/fail()/CliIo 原样消费；锁文件不走 writeFileAtomic（§3.3 裁定）单独说明。
 - **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
 - **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。
+---
+
+## 回执：W3 / 主链进程级 e2e + TTFS 基准（W3-DRAFT-T03，规格 §10 收口）
+
+- **日期**：2026-08-28（UTC）
+- **分支**：`cursor/w4-help-registry-impl`（已 push，未开 PR）
+- **产出**：
+  - `scripts/e2e-mainchain.mjs`（新）— 进程级 e2e：init → draft → draft --done → export，逐步断言退出码 0 + 末行逐字匹配；终态 exports/ 恰好 1 个 .md
+  - `scripts/smoke-exit-codes.mjs`（只加不改）— CASES +9（draft/revise/export 各覆盖 0/1/2），13 → 22 用例；新增 chainDir/emptyProjDir 载体目录
+  - `package.json` +`smoke:e2e`；`.github/workflows/ci.yml` 第八门（主链 e2e）
+  - `docs/wave-03/work-mainchain-e2e.md`（落地说明：§10 总验收 1–6 收口对照）、本回执
+- **关键结论**：
+  1. TTFS 4 条命令 ≤ 5 达标；八门全绿；测试 426（425 过 + 1 todo）只增不减。
+  2. 实测偏差修正：init --yes 的 outline.md 模板骨架非空，SW-E034 双空用例需在冒烟脚本中删 outline.md 构造（脚本层修正，app 逻辑不动）。
+  3. 规格 §10 总验收表 1–6 项全部核销；CLI 主链（init/outline/draft/revise/export/status/doctor/help + 文件锁）全部可用。
+- **复用声明**：只引用不重做——各单命令验收引用前四波落地说明；distEntry 定义上移为单一点。
+- **阻塞**：BLK-W1-02（模型凭据）仍开放；P3 模型网关链受其阻塞。
+- **合规声明**：未创建子代理；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。

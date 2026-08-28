@@ -47,3 +47,6 @@ jobs:
 
       - name: 退出码约定冒烟（SPEC-03-EXT：0 成功 / 2 用法错误，真实进程断言）
         run: npm run smoke:exit-codes
+
+      - name: 主链进程级 e2e + TTFS 基准（W3-DRAFT-T03，规格 §10-2/3）
+        run: npm run smoke:e2e
