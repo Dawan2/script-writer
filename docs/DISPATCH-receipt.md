@@ -596,3 +596,19 @@
   3. 依赖面零新增（校验器自写最小子集，ADR-0001 轻依赖取向）。
 - **阻塞**：BLK-W1-02 仍开放。
 - **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。
+---
+
+## 回执：P3 / 工具注册表 + 首批只读工具（TASK-P3-05）
+
+- **日期**：2026-08-28（UTC）
+- **分支**：`cursor/w4-help-registry-impl`（已 push，未开 PR）
+- **产出**：
+  - `src/agent/tools/`（types / registry / builtin）— 工具描述 schema 强制字段校验（fail fast 六类拒载）；F2 前置参数校验三码（TOOL_ARG_UNKNOWN/MISSING/TYPE）；首批只读工具 read_scene / list_scenes / get_bible_entry（side_effect 全 none，P-3）
+  - `tests/agent/tools.spec.ts` 14 例
+  - `docs/wave-05/work-tool-registry.md`（落地说明）、本回执
+- **关键结论**：
+  1. 测试 487 → 501（500 过 + 1 todo）；CI 八门全绿。
+  2. E3（拒载矩阵 + 夹具断言 + F2）全达成；E4（模型发起工具调用 trace）待编排层 + BLK-W1-02。
+  3. 取数面纪律：正文走 P1 store 层；bible v1 目录优先级 story-bible/ > characters/（P3-06 落地后切换，描述不变）。
+- **阻塞**：BLK-W1-02 仍开放。
+- **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。
