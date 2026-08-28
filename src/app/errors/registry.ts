@@ -42,6 +42,8 @@ export interface ErrorContexts {
   'SW-E030': { sceneId: string; existingIds: readonly string[] };
   /** SPEC-01：--template 指定的模板不存在（init 向导实际触达，W3 集成随 init 并入同提交登记）。 */
   'SW-E031': { templateId: string; available: readonly string[] };
+  /** SPEC-05 §4.2-D6：draft 场编号形态非法（编号预留见 §7.1，随首个触达用例登记）。 */
+  'SW-E032': { sceneId: string; existingIds: readonly string[] };
 }
 
 export type ErrorCode = keyof ErrorContexts;
@@ -116,6 +118,12 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     why: 'templates/ 下没有名为 {templateId} 的模板目录。',
     fix: '可用模板：{available}。换用 `--template <id>`，或省略该旗标（默认跟随脚本类型）。',
     example: { templateId: 'nope', available: ['short-video'] },
+  },
+  'SW-E032': {
+    what: '场编号不合法：{sceneId}',
+    why: '场编号须是数字（1–3 位会自动补零，如 10 ≡ 010；也接受 4 位及以上），收到的是「{sceneId}」。',
+    fix: '改用数字编号，如 `sw draft 010`；现有场编号：{existingIds}。',
+    example: { sceneId: 'abc', existingIds: ['010', '020'] },
   },
 };
 

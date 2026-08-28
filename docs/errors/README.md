@@ -27,6 +27,7 @@
 | [`SW-E022`](./SW-E022.md) | project.yaml 字段不完整或类型错误 | SW-E02x 状态 / 版本 |
 | [`SW-E030`](./SW-E030.md) | 场景 {sceneId} 不存在 | SW-E03x 输入校验 |
 | [`SW-E031`](./SW-E031.md) | 模板不存在：{templateId} | SW-E03x 输入校验 |
+| [`SW-E032`](./SW-E032.md) | 场编号不合法：{sceneId} | SW-E03x 输入校验 |
 
 注：SW-E04x（AI 供应商）段暂无登记——AI 默认关闭、无触达路径，
 按 W1-P1-T06「禁止预填未用码」纪律待 AI 适配器落地时再登记。

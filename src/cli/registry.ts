@@ -18,6 +18,7 @@ import type { CliIo } from './io.js';
 import { registerInitCommand } from './commands/init.js';
 import { registerStatusCommand } from './commands/status.js';
 import { registerOutlineCommand } from './commands/outline.js';
+import { registerDraftCommand } from './commands/draft.js';
 import { registerHelpCommand } from './commands/help.js';
 
 export interface CommandSpec {
@@ -63,10 +64,11 @@ export const COMMAND_REGISTRY: readonly CommandSpec[] = [
   {
     name: 'draft',
     alias: 'd',
-    summary: '起草/续写场景',
+    summary: '创建/续写场景文件；--done 标记完成',
     group: 'main',
-    status: 'planned',
+    status: 'available',
     taskId: 'W3-DRAFT-T01',
+    register: registerDraftCommand,
   },
   {
     name: 'revise',

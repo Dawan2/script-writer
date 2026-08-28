@@ -156,7 +156,8 @@ describe('app/workflow/outline：渲染层（末行可复制命令，SPEC-02 验
     const last = lines[lines.length - 1];
     expect(last?.startsWith('sw ')).toBe(true);
     expect(last).not.toContain('<');
-    expect(last).toBe('sw draft 020');
+    // draft 落地后下一场推算细化：场 010 已存在但未完成，优先提示回写完成态
+    expect(last).toBe('sw draft 010 --done');
   });
 });
 

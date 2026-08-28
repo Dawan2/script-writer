@@ -65,10 +65,31 @@ describe('app/workflow/statusReport：下一步命令（SPEC-02 可复制约束�
     expect(FIRST_SCENE_COMMAND).toBe('sw draft 010 --title "开场"');
   });
 
-  it('draft 已有场景时按步长 10 推算下一场编号', () => {
-    expect(nextActionCommand(statusOf('draft', ['010'], ['010', '020']))).toBe('sw draft 030');
+  it('draft 期建议细化（SPEC-05 §4.4-4）：有场未标完成 → 首个未完成场的 --done 命令', () => {
+    // 断言随 SPEC-05 迁移期望文案（集成图纪律：迁移不删除）；
+    // 原断言的 suggestNextSceneId 步长 10 推算保留在下方独立锁。
+    expect(nextActionCommand(statusOf('draft', ['010'], ['010', '020']))).toBe('sw draft 020 --done');
     expect(suggestNextSceneId([])).toBe('010');
     expect(suggestNextSceneId(['010', '020'])).toBe('030');
+  });
+
+  it('draft 期：全部完成且未达 expectedSceneCount → 建议下一场（GAP-03 分母消费）', () => {
+    const base = statusOf('draft', ['010'], ['010']);
+    const status: ProjectStatus = {
+      ...base,
+      meta: { ...base.meta, expectedSceneCount: 3 },
+    };
+    expect(nextActionCommand(status)).toBe('sw draft 020');
+  });
+
+  it('draft 期：全部完成且已达/缺省预计场数 → 建议 sw export（revise 未注册前不落 sw revise，SPEC-05 §4.4-4）', () => {
+    expect(nextActionCommand(statusOf('draft', ['010'], ['010']))).toBe('sw export');
+    const base = statusOf('draft', ['010', '020'], ['010', '020']);
+    const reached: ProjectStatus = {
+      ...base,
+      meta: { ...base.meta, expectedSceneCount: 2 },
+    };
+    expect(nextActionCommand(reached)).toBe('sw export');
   });
 
   it('revise 阶段给出可执行的 --force 命令（具体场编号，非占位符）', () => {

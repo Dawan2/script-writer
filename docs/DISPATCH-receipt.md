@@ -404,3 +404,25 @@
 - **余项**：`docs/user/commands.md` 别名标注 / 豁免清单勘误与 §6.2 同提交核查留作 W4-HELP-T02 互链余项（该文件未并入实现基分支，避免与 `cursor/w3-user-docs-ia-f6ca` 双写冲突；并入后 URL 自动点亮并翻转对应断言，交接见落地说明 §5）。
 - **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
 - **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（`it.todo` 为规格 §5-③ 明文授权的渐进增强断言位，非跳过失败）；未合并任何内容进 `main`。
+
+---
+
+## 回执：W3 / 实现槽「draft 场景写作命令」（W3-DRAFT-T01 / SPEC-05）
+
+- **日期**：2026-08-28（UTC）
+- **槽位**：第 3 波 / 实现槽「draft 场景写作命令」（承接 W3 计划槽 SPEC-05）
+- **分支**：`cursor/w4-help-registry-impl`（基于 W3 集成分支头 `b99cb92`，已含 W4 help 注册表与 outline 落地；已 push，未开 PR）
+- **产出**：
+  - `src/infra/store/sceneFile.ts`（新）— 场文件存取与 id 归一（`10` ≡ `010`）
+  - `src/app/workflow/draft.ts` + `draftReport.ts`（新）— 行为矩阵 D1–D7 全实现；D3 复用 ensureOutline；D5 防线 SW-E032
+  - `src/cli/commands/draft.ts`（新）— `--done` 与 `--title` 经 Option.conflicts 互斥 → 退出码 2
+  - 注册表：draft planned→available（别名 d 生效）；错误注册表 +SW-E032（同提交登记，`docs/errors/SW-E032.md` 生成零漂移）
+  - `statusReport.nextActionCommand` draft 期细化（无场→首场 / 有未完成→`--done` / 全完成未满→下一场 / 否则→`sw export`；revise 未注册不落 `sw revise`，规格 §11 渐进增强口径）
+  - `docs/wave-03/work-draft.md`（落地说明：§4.5 验收 ①–⑨ 逐项核销表 + 真实 CLI 走查证据）、本回执
+- **关键结论**：
+  1. SPEC-05 §4.5 验收 ①–⑨ 全项核销；CI 七门全绿；测试 289 → 321（320 过 + 1 todo），只增不减。
+  2. 「完成 = 用户显式 `--done`」裁定落地：创建即完成的语义陷阱关闭，MP-02 `x/y 场已完成` 语义保住。
+  3. 命令槽冲突面兑现 SPEC-07 §9 预期：draft 落地在 `program.ts` 的触碰面 = 注册表条目一行。
+- **复用声明**：只引用不重做——ensureOutline（outline 槽交付）、engine 原子写与 ensureStepAtLeast、fail()/hint() 错误框架、CliIo 抽象原样消费。
+- **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
+- **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。

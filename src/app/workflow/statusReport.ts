@@ -28,7 +28,11 @@ export function suggestNextSceneId(sceneIds: readonly string[]): string {
 
 /**
  * 计算下一步建议命令：整条命令可直接粘贴执行。
- * 步骤未到 draft 时先补大纲；draft/revise 阶段依磁盘现状给出具体场编号。
+ * 步骤未到 draft 时先补大纲；draft 期细化（SPEC-05 §4.4-4）：
+ * ① 磁盘无场 → 第一场完整示例；② 有场未标完成 → 首个未完成场的 --done 命令；
+ * ③ 全部已完成且未达预计场数（expectedSceneCount，GAP-03 消费侧；字段缺省视为已达）→ 下一场；
+ * ④ 全部已完成且已达预计场数 → sw export（revise 未注册前不落 sw revise——虚假可用性禁令 §3-6，
+ * 切换到 sw revise 与 W2-GAP-T01 命令注册同提交，SPEC-04 §6.3）。
  */
 export function nextActionCommand(status: ProjectStatus): string {
   const { meta, disk } = status;
@@ -41,7 +45,18 @@ export function nextActionCommand(status: ProjectStatus): string {
     if (disk.sceneIds.length === 0) {
       return FIRST_SCENE_COMMAND; // 空态：给出第一场的完整示例命令
     }
-    return `sw draft ${suggestNextSceneId(disk.sceneIds)}`;
+    const done = new Set(meta.progress.scenesDone);
+    const firstUndone = disk.sceneIds.find((id) => !done.has(id));
+    if (firstUndone !== undefined) {
+      return `sw draft ${firstUndone} --done`;
+    }
+    if (
+      meta.expectedSceneCount !== undefined &&
+      disk.sceneIds.length < meta.expectedSceneCount
+    ) {
+      return `sw draft ${suggestNextSceneId(disk.sceneIds)}`;
+    }
+    return 'sw export';
   }
   if (step === 'revise') {
     const first = disk.sceneIds[0];
