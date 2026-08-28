@@ -40,6 +40,8 @@
 - **风险**：与 W1-P1-T05 的 e2e/TTFS 基准耦合——revise 为可跳过步，TTFS 主路径（MP-01）不因本任务加长，须有「跳过 revise 直接 export 合法」的回归断言。
 - **依赖**：W1-P1-T05、W1-P1-T06。
 
+> 状态：完成 —— W3 实现槽（revise 修订步） / 2026-08-28 / `cursor/w4-help-registry-impl` @ `c20a1df`（落地说明 `docs/wave-03/work-revise.md`；SPEC-04 验收①–⑤ 核销；「跳过 revise 直接 export 合法」回归断言常驻 `scripts/e2e-mainchain.mjs`）
+
 #### W2-GAP-T02 · P1 · 短别名表与 `sw help --all` 命令全集（GAP-02）
 
 - **目标**：按裁决文档 §3.2 落地集中别名表（`sw d`/`sw x`/`sw r`）与 `sw help --all`（全集从命令注册表生成，禁止手工清单）；默认 help 保持只展示五步主命令 + status（渐进披露不回退）。
@@ -64,6 +66,8 @@
 - **验收标准**：裁决文档 §3.4「验收要点」①–④（并发互斥、stale 接管、只读不受阻、doctor 红项）。
 - **风险**：跨平台锁语义差异（Windows 文件占用）——采用「独占创建锁文件」而非 flock 系统调用，以可移植性优先；ADR-0002 兼容说明由 W1-P4-T03 承接（勘误表 #7）。
 - **依赖**：W1-P1-T05、W1-P1-T06；联动 W1-P1-T08。
+
+> 状态：完成 —— W4 实现槽（项目级文件锁 + doctor 锁检查项） / 2026-08-28 / `cursor/w4-help-registry-impl` @ `2250a51`（SPEC-07 AT-L01…L15 全项核销，落地说明 `docs/wave-04/work-file-lock.md`）
 
 #### W2-GAP-T05 · P2 · `characters/` 空态覆盖与基准清单回写（GAP-05）
 

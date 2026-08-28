@@ -99,6 +99,8 @@
 - **风险**：低。检查项清单会随功能增长——在代码中以可注册检查项数组组织，避免巨型函数。
 - **依赖**：T05、T06。
 
+> 状态：完成 —— W3 实现槽（doctor 诊断，含 W4-LOCK-T02 锁检查项四态） / 2026-08-28 / `cursor/w4-help-registry-impl` @ `ca9d514`+`2250a51`（落地说明 `docs/wave-03/work-doctor.md`；锁检查项见 `docs/wave-04/work-file-lock.md`）
+
 ### W1-P1-T09 · P2 · 用户文档 IA 落地
 
 - **目标**：按方案 §6.6 建立 `docs/quickstart.md`（补全 T01 占位）、`docs/concepts/`（领域词汇表）、`docs/reference/`（命令逐条，含 ≥1 可复制示例）并接通互链闭环（help ↔ docs ↔ 错误锚点）。

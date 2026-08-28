@@ -113,3 +113,11 @@
 - W3-PLAN-T04：**完成** @ `874c783`…`a0236e5` 六提交（六分支正文逐一在位、三份 ready-tasks 分区完整、回执并集无丢失）
 - W3-PLAN-T05：**完成**（终验锚定 `02f0a6a`：验收门全绿、207 测试 0 跳过、退出码 0/1/2 三档冒烟各≥1 例；证据 `docs/evidence/wave-03/W3-PLAN-T05/`；①–⑦ 核销表见 [`work-integration.md`](./work-integration.md) §3）
 <!-- END:WAVE03-PLAN -->
+
+<!-- BEGIN:WAVE03-DRAFT-STATUS -->
+### 执行状态（W3-DRAFT 实现槽 2026-08-28 追加，分支 `cursor/w4-help-registry-impl`）
+
+- W3-DRAFT-T01（`sw draft` / SPEC-05）：**完成** @ `5e797ef`（落地说明 [`work-draft.md`](./work-draft.md)；SW-E032 同提交登记）
+- W3-DRAFT-T02（`sw export` / SPEC-06）：**完成** @ `b7c2ec8`（落地说明 [`work-export.md`](./work-export.md)；SW-E033/E034 同提交登记）
+- W3-DRAFT-T03（主链进程级 e2e + TTFS ≤ 5 / 规格 §10 收口）：**完成** @ `d4da0fe`（落地说明 [`work-mainchain-e2e.md`](./work-mainchain-e2e.md)；TTFS 4 ≤ 5；退出码冒烟 22/22；CI 八门全绿）
+<!-- END:WAVE03-DRAFT-STATUS -->
