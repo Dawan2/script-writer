@@ -28,6 +28,8 @@ export default tseslint.config(
         },
       ],
       // 退出码只允许在进程入口 main.ts 写入（见下方豁免），其余位置一律经 runCli 返回值传递。
+      // GAP-02 / SPEC-07 §4.2-4：.alias() 只允许在 src/cli/registry.ts 调用（唯一别名注入点，
+      // 散落注册在 CI lint 中失败；豁免见下方 registry.ts 覆写块）。
       'no-restricted-syntax': [
         'error',
         {
@@ -35,6 +37,11 @@ export default tseslint.config(
             "AssignmentExpression[left.object.name='process'][left.property.name='exitCode']",
           message:
             'SPEC-03-EXT：process.exitCode 只能在 src/cli/main.ts 设定（唯一出口）；业务代码经 runCli 返回退出码。',
+        },
+        {
+          selector: "CallExpression[callee.property.name='alias'][arguments.length>0]",
+          message:
+            'GAP-02/SPEC-07：.alias() 注册只允许出现在 src/cli/registry.ts（挂载循环统一注入）；新命令别名请登记命令注册表。',
         },
       ],
     },
@@ -50,6 +57,13 @@ export default tseslint.config(
   {
     // 唯一豁免点：进程入口设定 process.exitCode（SPEC-03-EXT 落地位置）。
     files: ['src/cli/main.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // SPEC-07 豁免点：命令注册表是全库唯一 .alias() 注入点（挂载循环内统一注入）。
+    files: ['src/cli/registry.ts'],
     rules: {
       'no-restricted-syntax': 'off',
     },

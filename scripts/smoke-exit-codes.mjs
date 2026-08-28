@@ -15,6 +15,12 @@ const CASES = [
   { args: ['--help'], expected: 0, note: '正常终止（帮助）' },
   { args: [], expected: 0, note: '无参数 = 输出帮助，成功' },
   { args: ['status'], cwd: emptyDir, expected: 1, note: '非项目目录 status = 运行期错误（SW-E011）' },
+  { args: ['s'], cwd: emptyDir, expected: 1, note: '别名 s ≡ status（SPEC-07 §4.2）' },
+  { args: ['help'], expected: 0, note: 'help 子命令（≡ --help）' },
+  { args: ['help', '--all'], cwd: emptyDir, expected: 0, note: 'help --all 非项目目录可用（SPEC-07 §4.6）' },
+  { args: ['help', 'status'], expected: 0, note: 'help <command>（≡ <command> --help）' },
+  { args: ['help', 'draft', '--all'], expected: 2, note: '--all 与 <command> 互斥 = 用法错误（SPEC-07 §4.4）' },
+  { args: ['help', 'no-such-command'], expected: 2, note: 'help 未知词条 = 用法错误（SPEC-07 §4.4）' },
   { args: ['--no-such-flag'], expected: 2, note: '未知旗标 = 用法错误' },
   { args: ['no-such-command'], expected: 2, note: '未知命令（多余参数）= 用法错误' },
 ];

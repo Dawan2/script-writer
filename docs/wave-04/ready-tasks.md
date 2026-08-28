@@ -38,6 +38,7 @@
 - **验收标准（二值）**：① 规格文档 §5-⑦（无 ROADMAP_HELP 字面量、路线图含 revise planned 行且自注册表生成）；② §5-①（渐进披露四入口断言，此时 aux/planned 均不见于默认 help）；③ §5-②的「注册表 ↔ commander 注册」双向一致断言（`--all` 侧断言归 T02）；④ 全套 CI 门通过、测试只增不减。
 - **风险**：低。改造面收敛在 `src/cli/`，不触引擎/存储；与并行命令槽的冲突面反而因注册表化收窄（规格文档 §9）。
 - **依赖**：W3-PLAN-T02（集成分支 error+engine+init 归一，已交付 @ `e2721d4`）；开工前确认集成分支头未变基。
+- **状态（2026-08-28，W4 实现槽 `cursor/w4-help-registry-impl`）**：**已完成**。`src/cli/registry.ts`（单一数据源 + 挂载循环 + 唯一别名注入点）、`src/cli/helpText.ts`（三视图同源渲染）、`program.ts` 挂载循环化且 ROADMAP_HELP 退役（grep 零命中）；init/status 命令模块内部零改动；aux 组隐藏经 `configureHelp.visibleCommands` 实现（commander v15 无 `hideHelp()`，偏差登记见 `docs/wave-04/work-help-registry.md` §4-1）。验收 ①–④ 核销见该说明 §2。
 
 #### W4-HELP-T02 · P1 · help 快照测试与用户文档互链收口（W1-P1-T10 快照半面）
 
@@ -46,6 +47,7 @@
 - **验收标准（二值）**：规格文档 §5 ①–⑨ 全项（其中 ③ 的写命令别名断言按渐进增强口径：断言框架 + 已注册命令覆盖即达标，未注册者留 todo 断言位并在对应命令槽补齐）+ §6.2 同提交责任的历史核查（W2-GAP-T02 使能提交含 commands.md 更新）。
 - **风险**：快照易碎——沿用 W1-P1-T10 既有缓解（只锁结构断言不锁全文，规格文档 §5 开头）；`--all` 尾部 URL 的点亮时机依赖 user-docs 文档并入基分支，未并入时该断言按「行不出现」验收（虚假 URL 禁令），无阻塞。
 - **依赖**：W4-HELP-T01、W2-GAP-T02。
+- **状态（2026-08-28，W4 实现槽 `cursor/w4-help-registry-impl`）**：**已完成（互链半面留余项）**。`tests/cli/help.spec.ts` 20 例（§5 ①–⑥ + §6.3 渐进增强断言，含写命令别名 `it.todo` 断言位）、`scripts/smoke-exit-codes.mjs` 只加不改扩 6 行（12/12）；`docs/user/commands.md` 别名标注与豁免清单勘误、§6.2 同提交核查**留作余项**——该文件未并入实现基分支（权威版本在 `cursor/w3-user-docs-ia-f6ca`），避免双写冲突；其并入后 `--all` 尾部 URL 自动点亮并翻转 `help.spec.ts` 的「不印 URL」断言（交接见 `docs/wave-04/work-help-registry.md` §5）。
 
 ### 修订记录
 

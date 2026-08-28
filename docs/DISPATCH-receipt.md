@@ -379,3 +379,28 @@
 - **阻塞**：无新增。W4-HELP-T01 前置（W3-PLAN-T02）已交付；W3-PLAN-T04/T05 未完成不阻塞规格消费，实现槽开工前确认集成分支头稳定即可；`--all` 尾部 commands.md URL 的点亮依赖 user-docs 文档并入实现基分支，未并入前按「行不出现」验收（渐进增强，非阻塞）。
 - **合规声明**：未创建子代理；未使用 Task；未创建 PR；本槽 docs-only，零 `src/` 改动、零测试与 CI 配置改动（未删测试、未跳过失败、未降低 CI 标准——规格与任务明确「CI 门不可降标、测试只增不减、断言只迁移不删除」）；未合并任何内容进 `main`。
 >>>>>>> origin/cursor/w4-spec-help-aliases-0f4e
+
+---
+
+## 回执：W4 / 实现槽「help 注册表与别名」（W4-HELP-T01 + W2-GAP-T02 + W4-HELP-T02）
+
+- **日期**：2026-08-28（UTC）
+- **槽位**：第 4 波 / 周期 W4 落地 / 实现槽「help 注册表与别名」
+- **分支**：`cursor/w4-help-registry-impl`（基于 W3 集成分支头 `b99cb92`；并集合入 docs 槽 `cursor/w4-spec-help-aliases-0f4e`，DISPATCH add/add 冲突按并集解、零回执丢失；已 push，未开 PR）
+- **产出**：
+  - `src/cli/registry.ts`（新）— 命令注册表单一数据源（name/alias/summary/group/status/taskId/register）+ 唯一挂载循环 `mountCommands`；全库唯一 `.alias()` setter 调用点
+  - `src/cli/helpText.ts`（新）— 默认 help / 路线图 / `--all` 三视图同源渲染；`--all` 尾部 commands.md URL 渐进增强（文件并入才点亮）
+  - `src/cli/commands/help.ts`（新）— `sw help [command] [--all]`；隐式 help 命令经 `addHelpCommand(false)` 停用；互斥与未知词条走 CommanderError → 退出码 2
+  - `src/cli/program.ts`（改）— 挂载循环化；ROADMAP_HELP 手工字面量退役（grep 零命中）；aux 组经 `configureHelp.visibleCommands` 隐出默认 help
+  - `eslint.config.js`（改）— 带参 `.alias(...)` 调用在注册表外即 lint 失败（反例验证通过，见落地说明 §2-⑧）
+  - `tests/cli/registry.spec.ts`（新，7 例）、`tests/cli/help.spec.ts`（新，20 例含 1 条 §5-③ 授权的 `it.todo` 断言位）、`scripts/smoke-exit-codes.mjs`（只加不改 +6 行，12/12）
+  - `docs/wave-04/work-help-registry.md`（落地说明：验收 ①–⑨ 核销表 / 偏差登记 / 交接清单）、ready-tasks 状态行（wave-02 W2-GAP-T02 + wave-04 T01/T02）、docs/README.md wave-04 分区索引、本回执
+- **关键结论**：
+  1. SPEC-07 §5 验收 ①–⑨ 全项核销；CI 七门全绿 0 跳过；测试 207 → 234（233 过 + 1 todo 占位），只增不减，既有 `program.spec.ts` 断言原文保留全部通过。
+  2. 别名全集 v1 六只（i/o/d/r/x/s）一次交付：i/s 随 init/status 即时生效并逐字节等价断言；o/d/r/x 声明入表、随命令落地生效（别名先行禁令满足——planned 条目零注册）。
+  3. ROADMAP_HELP 漏 revise 行的缺陷类别由注册表化彻底关闭（路线图首行与逐行清单同一数据生成）。
+  4. 后续命令槽（W3-DRAFT-T01/T02、W2-GAP-T01、doctor）在 `program.ts` 的冲突面缩为注册表条目一行（SPEC-07 §9 预期兑现）。
+- **复用声明**：只引用不重做——SPEC-07 全文即开工依据；init/status 命令模块内部零改动；runCli 退出码通道、CliIo 抽象、SPEC-03-EXT 三档表原样消费。
+- **余项**：`docs/user/commands.md` 别名标注 / 豁免清单勘误与 §6.2 同提交核查留作 W4-HELP-T02 互链余项（该文件未并入实现基分支，避免与 `cursor/w3-user-docs-ia-f6ca` 双写冲突；并入后 URL 自动点亮并翻转对应断言，交接见落地说明 §5）。
+- **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
+- **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准（`it.todo` 为规格 §5-③ 明文授权的渐进增强断言位，非跳过失败）；未合并任何内容进 `main`。

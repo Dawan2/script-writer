@@ -1,14 +1,18 @@
 /**
  * 接口层·CLI 程序构建。
- * W1-P1-T04 起 `sw init` 可用、W1-P1-T05 起 `sw status`（最小版）可用；
- * 其余子命令仍标注"规划中"（禁止虚假可用性承诺，见 W1-P1-T01 验收 ③）。
+ * W1-P1-T04 起 `sw init` 可用、W1-P1-T05 起 `sw status`（最小版）可用、
+ * W2-GAP-T02 起 `sw help` 可用；其余子命令仍标注"规划中"（注册表 planned 条目零注册，
+ * 禁止虚假可用性承诺，见 W1-P1-T01 验收 ③）。
+ *
+ * SPEC-07（W4-HELP-T01）：子命令挂载、别名注入与 help 路线图全部自命令注册表
+ * （src/cli/registry.ts）生成；手工 ROADMAP_HELP 字面量已退役（GAP-02「禁止手工清单」）。
  */
 
 import { readFileSync } from 'node:fs';
 import { Command } from 'commander';
 import { processIo, type CliIo } from './io.js';
-import { registerInitCommand } from './commands/init.js';
-import { registerStatusCommand } from './commands/status.js';
+import { COMMAND_REGISTRY, mountCommands } from './registry.js';
+import { renderDefaultHelpTail } from './helpText.js';
 
 interface PackageManifest {
   version: string;
@@ -21,19 +25,6 @@ function readManifest(): PackageManifest {
   return JSON.parse(readFileSync(url, 'utf8')) as PackageManifest;
 }
 
-const ROADMAP_HELP = `
-主工作流（五步，P1 方案 §6.2）：init → outline → draft → revise → export
-
-子命令实现进度：
-  sw init      初始化项目向导          [可用 · W1-P1-T04]
-  sw status    显示进度与下一步命令    [可用 · W1-P1-T05 最小版]
-  sw outline   编辑大纲                [规划中 · W1-P1-T05]
-  sw draft     起草/续写场景           [规划中 · W1-P1-T05]
-  sw export    导出脚本                [规划中 · W1-P1-T05]
-
-文档：https://github.com/Dawan2/script-writer/blob/main/docs/quickstart.md
-`;
-
 export function buildProgram(io: CliIo = processIo): Command {
   const manifest = readManifest();
   const program = new Command();
@@ -42,7 +33,9 @@ export function buildProgram(io: CliIo = processIo): Command {
     .description(manifest.description)
     .version(manifest.version, '-V, --version', '输出版本号')
     .helpOption('-h, --help', '显示帮助')
-    .addHelpText('after', ROADMAP_HELP)
+    // 隐式 help 命令停用：显式注册表 aux 条目承载 help（否则 --all 无处挂载，SPEC-07 §4.4）
+    .addHelpCommand(false)
+    .addHelpText('after', renderDefaultHelpTail(COMMAND_REGISTRY))
     // 退出码由 run.ts 顶层统一裁定（SPEC-03-EXT）；输出走注入的 CliIo。
     // 两者须在注册子命令前设置，子命令创建时继承（commander copyInheritedSettings）。
     .exitOverride()
@@ -54,12 +47,22 @@ export function buildProgram(io: CliIo = processIo): Command {
         io.err(str);
       },
     })
+    // 渐进披露（SPEC-07 §4.3-2）：默认 help 清单只展示 main 组命令，
+    // aux 组命令经 sw help --all 全集视图展示（数据同源自注册表）。
+    .configureHelp({
+      visibleCommands: (cmd) => {
+        const auxNames = new Set(
+          COMMAND_REGISTRY.filter((s) => s.group === 'aux').map((s) => s.name),
+        );
+        return cmd.commands.filter((c) => !auxNames.has(c.name()));
+      },
+    })
     .action(() => {
       // 无参数运行 = 输出帮助；待非项目目录也有引导后，
       // 按 P1 §6.4 切换为等价 sw status（切换点：本 action 改调 runStatus）
       program.outputHelp();
     });
-  registerInitCommand(program, io);
-  registerStatusCommand(program, io);
+  // 唯一挂载循环：注册 available 条目并统一注入别名与可见性尾注（SPEC-07 §4.1-1）
+  mountCommands(program, io);
   return program;
 }

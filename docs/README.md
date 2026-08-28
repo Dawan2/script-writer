@@ -44,6 +44,14 @@
 | [`wave-03/ready-tasks.md`](./wave-03/ready-tasks.md) | Wave-03 就绪任务队列（WAVE03-PLAN 分区：W3-PLAN-T01…T05 集成任务，已全部完成并附状态行） | `cursor/w3-integration-map-bf24 @ 43a6ecf`（W3 集成并入） |
 | [`wave-03/work-integration.md`](./wave-03/work-integration.md) | W3 集成槽落地说明：合并梯队记录、文本/语义冲突①–⑦核销、测试对账（77→207 零删测）、doctor/outline rebase 交接清单 | `cursor/w3-integrate-w2-f334`（本分支） |
 
+## 波次工作文档（wave-04）
+
+| 文档 | 内容 | 来源分支 |
+| --- | --- | --- |
+| [`wave-04/spec-help-aliases.md`](./wave-04/spec-help-aliases.md) | W4 计划槽：SPEC-07 命令注册表驱动 help（默认渐进披露 / help --all 全集）与短别名全集 v1（i/o/d/r/x/s）、help 快照测试面、T09 用户文档互链 | `cursor/w4-spec-help-aliases-0f4e` |
+| [`wave-04/ready-tasks.md`](./wave-04/ready-tasks.md) | Wave-04 就绪任务队列（WAVE04-HELP 分区：W4-HELP-T01/T02；实现主体仍为 W2-GAP-T02，不重复立项） | `cursor/w4-spec-help-aliases-0f4e` |
+| [`wave-04/work-help-registry.md`](./wave-04/work-help-registry.md) | W4 实现槽落地说明：注册表基建 + help --all + 六别名交付、SPEC-07 §5 验收①–⑨核销、测试对账（207→234 零删测）、互链余项与并行槽交接清单 | `cursor/w4-help-registry-impl`（本分支） |
+
 ## 决策与用户文档（W2 起建立）
 
 | 文档 | 内容一句话 | 说明 |

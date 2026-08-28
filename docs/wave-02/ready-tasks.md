@@ -47,6 +47,7 @@
 - **验收标准**：裁决文档 §3.2「验收要点」①–③（快照断言、默认 help 不含非主命令、别名与主命令逐字节等价）。
 - **风险**：低。快照易碎问题沿用 W1-P1-T10 的既有缓解（只锁结构断言不锁全文）。
 - **依赖**：W1-P1-T05；验收并入 W1-P1-T10。
+- **状态（2026-08-28，W4 实现槽 `cursor/w4-help-registry-impl`）**：**已完成**。开工依据按勘误改指 SPEC-07 全文（别名全集扩为六只 i/o/d/r/x/s，GAP-02 扩展路径 + 勘误 §7-1/2）；依赖经勘误追加 W4-HELP-T01（已先行交付）。集中别名表落点为 `src/cli/registry.ts`（alias 字段 + 挂载循环唯一注入点，文件范围 `src/cli/aliases.ts` 按 SPEC-07 §4.1 归并入注册表）。SPEC-07 §5 验收 ①–⑨ 核销表见 `docs/wave-04/work-help-registry.md` §2；使能提交含本状态行。`docs/user/commands.md` 同步更新责任（SPEC-07 §6.2）因该文件未并入实现基分支而转 W4-HELP-T02 收口余项（work-help-registry.md §5）。
 
 #### W2-GAP-T03 · P1 · `project.yaml` 可选字段 `expectedSceneCount`（GAP-03）
 
