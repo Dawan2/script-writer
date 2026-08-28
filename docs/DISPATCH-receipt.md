@@ -547,3 +547,20 @@
 - **复用声明**：fail()/SwError/render 原样消费；E040 ctx.lastError 预格式化沿用 E012 holder 先例。
 - **阻塞**：BLK-W1-02 仍开放（E4 与 TASK-P3-02/03/04 端到端验收同受此阻）。
 - **合规声明**：未创建子代理；未创建 PR；未删测试（一处断言迁移有内联注释）；未跳过失败；未合并任何内容进 `main`。
+---
+
+## 回执：P3 / 提示词库与技能注册·最小版（TASK-P3-02）
+
+- **日期**：2026-08-28（UTC）
+- **分支**：`cursor/w4-help-registry-impl`（已 push，未开 PR）
+- **产出**：
+  - `prompts/rules/base.md`、`prompts/skills/generate_outline.md`（@1）、`prompts/schemas/outline-draft.json` — 三层结构入库（E1）
+  - `src/agent/prompts/`（types + loader）— 注册即校验六类拒载 + 保留槽 {{rules}} + skillRef 恒为 id@version；PromptStoreError 开发期错误不走 fail()（裁定见落地说明）
+  - `tests/agent/prompts.spec.ts` 17 例；eslint no-console 通道扩至 src/agent/**
+  - `docs/wave-05/work-prompt-store.md`（落地说明）、本回执
+- **关键结论**：
+  1. 测试 457 → 474（473 过 + 1 todo）；CI 八门全绿。
+  2. E1/E3 达成；「trace 技能引用含版本号」数据源（skillRef）就绪，运行佐证随 TASK-P3-04。
+  3. 最小版即含版本化与注册校验（非完整版独占）；完整版余项 = 多技能扩充。
+- **阻塞**：BLK-W1-02 仍开放（与本槽无关）。
+- **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "prompts/schemas/outline-draft.json",
+  "title": "generate_outline 技能输出（大纲草稿）",
+  "type": "object",
+  "required": ["scenes"],
+  "additionalProperties": false,
+  "properties": {
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["scene_id", "summary"],
+        "additionalProperties": false,
+        "properties": {
+          "scene_id": {
+            "type": "string",
+            "pattern": "^[0-9]{3,}$",
+            "description": "三位及以上场编号（010、020…留间隔便于插场）"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "description": "一句话梗概：本场要发生什么"
+          }
+        }
+      }
+    }
+  }
+}

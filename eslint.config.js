@@ -47,9 +47,9 @@ export default tseslint.config(
     },
   },
   {
-    // P1 §5.2 UX 强制通道：core/app/infra 禁止散落 console 输出，
+    // P1 §5.2 UX 强制通道：core/app/infra/agent 禁止散落 console 输出，
     // 用户可见错误/空态一律经 SPEC-03 渲染层（fail/renderError/renderHint）。
-    files: ['src/core/**/*.ts', 'src/app/**/*.ts', 'src/infra/**/*.ts'],
+    files: ['src/core/**/*.ts', 'src/app/**/*.ts', 'src/infra/**/*.ts', 'src/agent/**/*.ts'],
     rules: {
       'no-console': 'error',
     },
