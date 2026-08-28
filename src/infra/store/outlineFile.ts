@@ -36,3 +36,18 @@ export async function inspectOutlineFile(projectDir: string): Promise<OutlineFil
 export async function writeOutlineFile(projectDir: string, content: string): Promise<void> {
   await writeFileAtomic(join(projectDir, OUTLINE_FILE), content);
 }
+
+/**
+ * 读取 outline.md 原文（SPEC-06 §5.2 聚合数据源）；文件缺失返回 null。
+ * 空白判定与修剪由调用方负责（export 的全空白省略带 §5.2-2）。
+ */
+export async function readOutlineText(projectDir: string): Promise<string | null> {
+  try {
+    return await readFile(join(projectDir, OUTLINE_FILE), 'utf8');
+  } catch (error) {
+    if (isFsError(error) && (error.code === 'ENOENT' || error.code === 'ENOTDIR')) {
+      return null;
+    }
+    throw error;
+  }
+}

@@ -19,6 +19,7 @@ import { registerInitCommand } from './commands/init.js';
 import { registerStatusCommand } from './commands/status.js';
 import { registerOutlineCommand } from './commands/outline.js';
 import { registerDraftCommand } from './commands/draft.js';
+import { registerExportCommand } from './commands/export.js';
 import { registerHelpCommand } from './commands/help.js';
 
 export interface CommandSpec {
@@ -81,10 +82,11 @@ export const COMMAND_REGISTRY: readonly CommandSpec[] = [
   {
     name: 'export',
     alias: 'x',
-    summary: '导出脚本',
+    summary: '导出脚本为 markdown（聚合 outline.md 与 scenes/*.md）',
     group: 'main',
-    status: 'planned',
+    status: 'available',
     taskId: 'W3-DRAFT-T02',
+    register: registerExportCommand,
   },
   {
     name: 'status',

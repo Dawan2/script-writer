@@ -426,3 +426,24 @@
 - **复用声明**：只引用不重做——ensureOutline（outline 槽交付）、engine 原子写与 ensureStepAtLeast、fail()/hint() 错误框架、CliIo 抽象原样消费。
 - **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
 - **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。
+
+---
+
+## 回执：W3 / 实现槽「export 导出命令」（W3-DRAFT-T02 / SPEC-06，markdown v1）
+
+- **日期**：2026-08-28（UTC）
+- **槽位**：第 3 波 / 实现槽「export 导出命令」（承接 W3 计划槽 SPEC-06）
+- **分支**：`cursor/w4-help-registry-impl`（含 W4 help 注册表、outline、draft 落地；已 push，未开 PR）
+- **产出**：
+  - `src/app/workflow/exportRender.ts`（新）— 聚合纯函数零 IO，确定性输出无时间戳（同输入字节级相同）
+  - `src/app/workflow/export.ts` + `exportReport.ts`（新）— md ≡ markdown 归一；settings.export.default 缺省路径同走 E033；双空 E034 零产物；--out 父目录自动创建；成功 ensureStepAtLeast('export')
+  - `src/infra/store/exportFile.ts`（新）+ outlineFile/sceneFile 读侧扩展
+  - 注册表：export planned→available（别名 x 生效）；错误注册表 +SW-E033/E034（同提交登记，docs/errors 两码生成零漂移）
+  - `docs/wave-03/work-export.md`（落地说明：§5.4 验收 ①–⑩ 逐项核销 + 真实 CLI 走查证据）、本回执
+- **关键结论**：
+  1. SPEC-06 §5.4 验收 ①–⑩ 全项核销；CI 七门全绿；测试 321 → 350（349 过 + 1 todo），只增不减。
+  2. MP-01 五步主链四步可用（init → outline → draft → export），TTFS 主链首次端到端可测（W3-DRAFT-T03 进程级 e2e 待补）。
+  3. 派生产物覆盖语义落地：确定性重导出 = 刷新，无需 --force（§5.2-5 勘误 §9-3 边界）。
+- **复用声明**：只引用不重做——sceneSlug（draft 槽）、writeFileAtomic、ensureStepAtLeast、failProject 映射原样消费；格式面按 ADR-0001 §3.6 不重裁不预实现。
+- **阻塞**：无新增。BLK-W1-02（模型凭据）仍开放，与本槽无关。
+- **合规声明**：未创建子代理；未使用 Task；未创建 PR；未删测试、未跳过失败、未降低 CI 标准；未合并任何内容进 `main`。

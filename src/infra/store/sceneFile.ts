@@ -4,7 +4,7 @@
  * 写侧：writeFileAtomic 原子落盘（与 project.yaml / outline.md 同一中断安全语义）。
  */
 
-import { mkdir, readdir } from 'node:fs/promises';
+import { mkdir, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { writeFileAtomic } from './atomicFile.js';
 import { padSceneId, SCENES_DIR } from './layout.js';
@@ -53,4 +53,17 @@ export async function writeSceneFile(
   const dir = join(projectDir, SCENES_DIR);
   await mkdir(dir, { recursive: true });
   await writeFileAtomic(join(dir, fileName), content);
+}
+
+/** 读取全部场文件原文（文件名升序，SPEC-06 §5.2 聚合数据源；scenes/ 缺失视为空）。 */
+export async function readSceneFiles(
+  projectDir: string,
+): Promise<{ fileName: string; content: string }[]> {
+  const names = await listSceneFiles(projectDir);
+  return Promise.all(
+    names.map(async (fileName) => ({
+      fileName,
+      content: await readFile(join(projectDir, SCENES_DIR, fileName), 'utf8'),
+    })),
+  );
 }

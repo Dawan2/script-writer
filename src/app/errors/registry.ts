@@ -44,6 +44,10 @@ export interface ErrorContexts {
   'SW-E031': { templateId: string; available: readonly string[] };
   /** SPEC-05 §4.2-D6：draft 场编号形态非法（编号预留见 §7.1，随首个触达用例登记）。 */
   'SW-E032': { sceneId: string; existingIds: readonly string[] };
+  /** SPEC-06 §5.1：export 格式不支持（v1 仅 markdown，md 为归一别名；含 settings.export.default 被改坏的缺省路径）。 */
+  'SW-E033': { format: string };
+  /** SPEC-06 §5.2-2：export 无可导出内容（大纲缺失/全空白且无任何场文件），零产物落盘。 */
+  'SW-E034': Record<string, never>;
 }
 
 export type ErrorCode = keyof ErrorContexts;
@@ -124,6 +128,18 @@ export const ERROR_REGISTRY: { readonly [C in ErrorCode]: ErrorSpec<C> } = {
     why: '场编号须是数字（1–3 位会自动补零，如 10 ≡ 010；也接受 4 位及以上），收到的是「{sceneId}」。',
     fix: '改用数字编号，如 `sw draft 010`；现有场编号：{existingIds}。',
     example: { sceneId: 'abc', existingIds: ['010', '020'] },
+  },
+  'SW-E033': {
+    what: '不支持的导出格式：{format}',
+    why: 'v1 只实现了 markdown 导出（fountain / pdf 属后续波次），收到的是「{format}」。',
+    fix: '显式运行 `sw export --format markdown`；若是 project.yaml 的 settings.export.default 被改成了不支持的值，请改回 markdown。',
+    example: { format: 'fountain' },
+  },
+  'SW-E034': {
+    what: '没有可导出的内容',
+    why: 'outline.md 缺失或全空白，且 scenes/ 下没有任何场文件——导出已中止，未产生任何文件。',
+    fix: '先运行 `sw outline` 补大纲，或运行 `sw draft 010 --title "开场"` 创建第一场，然后再导出。',
+    example: {},
   },
 };
 
