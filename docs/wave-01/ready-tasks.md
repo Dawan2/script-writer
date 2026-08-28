@@ -186,6 +186,8 @@ flowchart LR
 - **验收（二值）**：E3 测试覆盖三种路径：一次通过 / 重试后通过 / 降级；E4 一次真实 F1 重试的 trace 记录（`repair_event` 含失败码与结果）。
 - **依赖**：TASK-P3-01/02。
 
+> 状态：完成 —— P3 实现槽（受控输出层） / 2026-08-28 / `cursor/w4-help-registry-impl`（E3 三路径全绿；E4 真实 F1 trace 待 BLK-W1-02，回放已验证 repair_event 形态；落地说明 `docs/wave-05/work-output-guard.md`）
+
 #### TASK-P3-04 运行轨迹 trace 最小实现
 
 - **目标**：JSONL 事件流落盘（最小事件集：`run_start/run_end/llm_call/repair_event`），含 token、延迟、技能版本、上下文槽位引用；`runs/` 进 gitignore，脱敏摘要可导出到 `docs/evidence/`。

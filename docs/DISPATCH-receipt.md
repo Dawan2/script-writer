@@ -580,3 +580,19 @@
   3. 顺带核销 TASK-P3-02 尾项：回放 run 的 llm_call 事件含 `skill: generate_outline@1`（版本化引用运行佐证）。
 - **阻塞**：BLK-W1-02 仍开放（真实 run 证据与 P3-03 真实 F1 重试 trace 同受此阻）。
 - **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。
+---
+
+## 回执：P3 / 受控输出层（TASK-P3-03：schema 校验 + F1 重试降级）
+
+- **日期**：2026-08-28（UTC）
+- **分支**：`cursor/w4-help-registry-impl`（已 push，未开 PR）
+- **产出**：
+  - `src/agent/orchestrator/output-guard/` — 最小 JSON Schema 校验器（白名单关键字，超子集加载即抛）+ renderSkillPrompt（槽位/保留槽 {{rules}}）+ guardedSkillCall（F1：带错误反馈重试 ≤2 → degraded 纯文本草稿+人工确认；repair_event F1 recovered/degraded）
+  - `tests/agent/output-guard.spec.ts` 14 例（三路径 trace 事件序列逐条断言；F3/F1 正交边界）
+  - `docs/wave-05/work-output-guard.md`（落地说明）、本回执
+- **关键结论**：
+  1. 测试 479 → 487（486 过 + 1 todo）；CI 八门全绿。
+  2. E3 三路径达成；E4 真实 F1 trace 待 BLK-W1-02（回放已验证事件形态）。
+  3. 依赖面零新增（校验器自写最小子集，ADR-0001 轻依赖取向）。
+- **阻塞**：BLK-W1-02 仍开放。
+- **合规声明**：未创建子代理；未创建 PR；测试只增不减；未合并任何内容进 `main`。
